@@ -434,14 +434,50 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <div class="grid grid-cols-2 gap-2">
                             ${meals.map(meal => `
                                 <div>
-                                    <label class="text-[8px] uppercase text-gray-400">${meal}</label>
-                                    <input type="text" id="${day}-${meal}" value="${dayData[meal]?.item || ''}" class="w-full bg-transparent border-b border-gray-200 dark:border-white/10 text-xs py-1">
+                                    <div class="flex justify-between items-center">
+                                        <label class="text-[8px] uppercase text-gray-400">${meal}</label>
+                                        <div id="${day}-${meal}-stats" class="text-[8px] font-bold flex gap-2"></div>
+                                    </div>
+                                    <input type="text" id="${day}-${meal}" value="${dayData[meal]?.item || ''}" class="w-full bg-transparent border-b border-gray-200 dark:border-white/10 text-xs py-1 transition-colors focus:border-indigo-500">
                                 </div>
                             `).join('')}
                         </div>
                     </div>
                 `;
             }).join('');
+        });
+
+        // --- RATINGS AGGREGATION ---
+        onSnapshot(collection(db, CONSTANTS.COLLECTIONS.MEAL_RATINGS), snap => {
+            const ratings = {};
+            snap.forEach(doc => {
+                const d = doc.data();
+                if (!d.day || !d.meal) return;
+                const key = `${d.day}-${d.meal}`;
+                if (!ratings[key]) ratings[key] = { like: 0, dislike: 0 };
+                if (d.rating === 'like' || d.rating === 'dislike') {
+                    ratings[key][d.rating]++;
+                }
+            });
+
+            // Update UI
+            days.forEach(day => {
+                meals.forEach(meal => {
+                    const key = `${day}-${meal}`;
+                    const el = document.getElementById(`${key}-stats`);
+                    if (el) {
+                        const r = ratings[key] || { like: 0, dislike: 0 };
+                        if (r.like > 0 || r.dislike > 0) {
+                            el.innerHTML = `
+                                <span class="text-green-500 flex items-center gap-0.5"><i class="fas fa-heart text-[8px]"></i>${r.like}</span>
+                                <span class="text-red-400 flex items-center gap-0.5"><i class="fas fa-thumbs-down text-[8px]"></i> ${r.dislike}</span>
+                            `;
+                        } else {
+                            el.innerHTML = `<span class="text-gray-300 dark:text-gray-600">-</span>`;
+                        }
+                    }
+                });
+            });
         });
     }
 
