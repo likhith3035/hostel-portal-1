@@ -92,16 +92,28 @@
 
     <div id="loading-screen"
         class="fixed inset-0 z-[100] flex items-center justify-center bg-white/95 dark:bg-black/95 backdrop-blur-md transition-opacity duration-500">
-        <div class="text-center">
-            <div
-                class="w-12 h-12 border-[5px] border-iosBlue border-t-transparent rounded-full animate-spin mx-auto mb-6">
+        <div class="text-center relative">
+            <div class="relative w-16 h-16 mx-auto mb-6 flex items-center justify-center">
+                <!-- Glowing Pulsing Background -->
+                <div class="absolute inset-0 bg-indigo-500/20 dark:bg-indigo-400/20 rounded-full blur-xl animate-pulse">
+                </div>
+
+                <!-- Breathing Shield Icon -->
+                <div class="relative z-10 animate-float">
+                    <div
+                        class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                        <i class="fas fa-shield-halved text-white text-xl"></i>
+                    </div>
+                </div>
             </div>
-            <h2 class="text-sm font-black tracking-widest text-gray-900 dark:text-white uppercase opacity-80">
-                Authenticating Access...</h2>
+            <h2
+                class="text-[10px] font-black tracking-[0.3em] text-gray-900 dark:text-white uppercase opacity-80 animate-pulse">
+                Authenticating...</h2>
         </div>
     </div>
 
-    <div id="admin-interface" class="flex flex-col md:flex-row h-screen opacity-0 transition-opacity duration-500">
+    <div id="admin-interface"
+        class="flex flex-col md:flex-row h-screen opacity-0 scale-95 transition-all duration-700 ease-out origin-center">
 
         <div x-show="sidebarOpen" @click="sidebarOpen = false" x-transition.opacity
             class="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden"></div>

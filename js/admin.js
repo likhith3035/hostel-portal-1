@@ -62,8 +62,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         loadingScreen.classList.add('opacity-0');
         setTimeout(() => {
             loadingScreen.classList.add('hidden');
-            adminInterface.classList.remove('opacity-0');
-        }, 500);
+            // Trigger entry animation
+            adminInterface.classList.remove('opacity-0', 'scale-95');
+        }, 600);
     }
 
     // Initial skeletons
