@@ -91,22 +91,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (idName) idName.textContent = name;
                 if (idRole && userData?.firestoreData?.role) idRole.textContent = userData.firestoreData.role;
 
-                if (qrContainer && typeof QRCode !== 'undefined' && userData?.uid) {
-                    qrContainer.innerHTML = '';
-                    try {
-                        // Generate URL for verificaiton
-                        const verificationUrl = `https://nbkristhostelportal.netlify.app/id-card.html?uid=${userData.uid}`;
-                        new QRCode(qrContainer, {
-                            text: verificationUrl,
-                            width: 160,
-                            height: 160,
-                            colorDark: "#000000",
-                            colorLight: "#ffffff",
-                            correctLevel: QRCode.CorrectLevel.H
-                        });
-                    } catch (e) {
-                        console.error("QR Gen Error:", e);
-                    }
+                if (qrContainer && userData?.uid) {
+                    const verificationUrl = `https://nbkristhostelportal.netlify.app/id-card.html?uid=${userData.uid}`;
+                    // Use Image API for reliability (works even if tab is hidden)
+                    qrContainer.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(verificationUrl)}&color=007AFF&bgcolor=ffffff" class="w-full h-full object-contain" alt="ID QR">`;
                 }
             } else {
                 idUniqueState(idIncomplete, idComplete);
