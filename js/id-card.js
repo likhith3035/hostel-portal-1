@@ -1,4 +1,4 @@
-import { db } from '../main.js';
+import { db } from '../firebase-config.js';
 import { doc, getDoc } from './firebase/firebase-firestore.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
