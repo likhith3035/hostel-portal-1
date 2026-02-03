@@ -14,6 +14,40 @@ import {
 window.toggleTheme = toggleTheme;
 window.toggleSidebar = toggleSidebar;
 
+// --- NOTICE BOARD (Public) ---
+const initNoticeBoard = () => {
+    const noticeList = document.getElementById('notice-board-list');
+    if (!noticeList) return;
+
+    const noticesQuery = query(
+        collection(db, CONSTANTS.COLLECTIONS.NOTICES),
+        orderBy('timestamp', 'desc'),
+        limit(3)
+    );
+
+    onSnapshot(noticesQuery, (snap) => {
+        if (snap.empty) {
+            noticeList.innerHTML = '<div class="p-8 text-center text-gray-400 text-sm">No notices.</div>';
+            return;
+        }
+
+        let html = '';
+        snap.forEach(doc => {
+            const d = doc.data();
+            const date = d.timestamp ? new Date(d.timestamp.seconds * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
+            html += `
+            <div class="p-4 rounded-2xl bg-white/50 dark:bg-white/5 border border-transparent hover:border-iosBlue/20 dark:hover:border-iosBlue/40 transition-all group spring-click cursor-default mb-3 last:mb-0">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-[9px] font-bold text-iosBlue bg-blue-50 dark:bg-blue-500/10 px-2 py-0.5 rounded-md uppercase tracking-wider">${escapeHTML(date)}</span>
+                    <div class="w-1.5 h-1.5 rounded-full bg-iosBlue opacity-40 group-hover:opacity-100 transition-opacity"></div>
+                </div>
+                <p class="text-sm font-semibold text-gray-800 dark:text-gray-200 leading-relaxed">${escapeHTML(d.message || d.text || 'No content')}</p>
+            </div>`;
+        });
+        noticeList.innerHTML = html;
+    });
+};
+
 document.addEventListener('DOMContentLoaded', async () => {
 
     await checkUserSession(false);
@@ -32,6 +66,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     };
     initSkeletons();
+    initNoticeBoard();
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
@@ -191,30 +226,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
 
-        const noticeList = document.getElementById('notice-board-list');
-        if (noticeList) {
-            const noticesQuery = query(
-                collection(db, CONSTANTS.COLLECTIONS.NOTICES),
-                orderBy('timestamp', 'desc'),
-                limit(3)
-            );
-            onSnapshot(noticesQuery, (snap) => {
-                if (snap.empty) { noticeList.innerHTML = '<div class="p-8 text-center text-gray-400 text-sm">No notices.</div>'; return; }
-                let html = '';
-                snap.forEach(doc => {
-                    const d = doc.data();
-                    const date = d.timestamp ? new Date(d.timestamp.seconds * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
-                    html += `
-                    <div class="p-4 rounded-2xl bg-white/50 dark:bg-white/5 border border-transparent hover:border-iosBlue/20 dark:hover:border-iosBlue/40 transition-all group spring-click cursor-default mb-3 last:mb-0">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-[9px] font-bold text-iosBlue bg-blue-50 dark:bg-blue-500/10 px-2 py-0.5 rounded-md uppercase tracking-wider">${escapeHTML(date)}</span>
-                            <div class="w-1.5 h-1.5 rounded-full bg-iosBlue opacity-40 group-hover:opacity-100 transition-opacity"></div>
-                        </div>
-                        <p class="text-sm font-semibold text-gray-800 dark:text-gray-200 leading-relaxed">${escapeHTML(d.message || d.text || 'No content')}</p>
-                    </div>`;
-                });
-                noticeList.innerHTML = html;
-            });
-        }
+
     });
 });

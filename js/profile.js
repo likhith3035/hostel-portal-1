@@ -68,6 +68,31 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (emailPreview) emailPreview.textContent = userData?.email || 'Not logged in';
         if (rolePreview) rolePreview.textContent = 'Guest';
 
+        // --- Digital ID Update ---
+        const idName = document.getElementById('id-card-name');
+        const idRole = document.getElementById('id-card-role');
+        const qrContainer = document.getElementById('qrcode-container');
+
+        if (idName) idName.textContent = name;
+        if (idRole && userData?.firestoreData?.role) idRole.textContent = userData.firestoreData.role;
+
+        if (qrContainer && typeof QRCode !== 'undefined' && userData?.email) {
+            qrContainer.innerHTML = '';
+            try {
+                new QRCode(qrContainer, {
+                    text: `ID:${userData.uid}|${userData.email}`,
+                    width: 160,
+                    height: 160,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            } catch (e) {
+                console.error("QR Gen Error:", e);
+                qrContainer.innerHTML = '<p class="text-[10px] text-red-500">QR Error</p>';
+            }
+        }
+
         if (userData?.firestoreData) {
             localFirestoreData = userData.firestoreData;
             if (phoneInput) phoneInput.value = userData.firestoreData.phone || '';
