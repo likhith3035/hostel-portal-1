@@ -17,14 +17,19 @@ window.toggleSidebar = toggleSidebar;
 
 // Global function for redirect to personal tab
 window.editProfile = () => {
-    const alpineRoot = document.querySelector('[x-data]');
-    if (alpineRoot && alpineRoot.__x) {
-        alpineRoot.__x.$data.tab = 'personal';
+    // Find and click the "Personal" tab button
+    const buttons = document.querySelectorAll('button');
+    const personalTab = Array.from(buttons).find(btn =>
+        btn.textContent.includes('Personal') && btn.hasAttribute('@click')
+    );
+
+    if (personalTab) {
+        personalTab.click();
         window.scrollTo({ top: 0, behavior: 'smooth' });
         setTimeout(() => {
             const nameInput = document.getElementById('displayName');
             if (nameInput) nameInput.focus();
-        }, 500);
+        }, 300);
     }
 };
 
