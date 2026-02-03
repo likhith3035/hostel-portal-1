@@ -1,274 +1,409 @@
 <!DOCTYPE html>
-<html lang="en" class="antialiased">
+<html lang="en" class="scroll-smooth antialiased">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Login - NBKRIST</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <!-- Tailwind CSS (Loaded first to avoid blocking) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 fontFamily: {
-                    sans: ['Outfit', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                    sans: ['Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
                 },
                 extend: {
                     colors: {
                         iosBlue: '#007AFF',
                         iosDark: '#000000',
+                        iosCardDark: '#1C1C1E',
                     },
                     boxShadow: {
                         'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.07)',
                         'glow': '0 0 40px -10px rgba(0, 122, 255, 0.3)',
                     },
                     animation: {
-                        'fade-in': 'fadeIn 0.8s ease-out forwards',
+                        'fade-in': 'fadeIn 0.6s ease-out forwards',
                         'float': 'float 10s infinite ease-in-out',
                     },
                     keyframes: {
-                        fadeIn: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
-                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-15px)' } }
+                        fadeIn: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } }
                     }
                 }
             }
         }
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
     </script>
+
+
+    <meta name="google-site-verification" content="apNcQpoLSzkdrCeYkcXIAF3ok9viphvV-bfdnfP3q-0" />
+    <title>NBKR Hostel Portal | Rooms, Mess Menu, Rules & Student Services</title>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <meta name="description"
+        content="Official NBKR Institute Hostel Portal. View mess menu, hostel rules, room booking, complaints, and student services online. Managed by NBKRIST.">
+    <meta name="keywords"
+        content="nbkrist hostel, nbkrist hostels, nbkrist girls hostel, nbkr all hostels, nbkr hostels, nbkrist student portal, nellore, vidyanagar">
+    <link rel="canonical" href="https://nbkristhostelportal.netlify.app/">
+
+    <!-- Favicon -->
+    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/en/3/3d/NBKRIST_logo.png">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://nbkristhostelportal.netlify.app/">
+    <meta property="og:title" content="NBKR Hostel Portal | Rooms, Mess Menu, Rules & Student Services">
+    <meta property="og:site_name" content="NBKRIST Hostel Portal">
+    <meta name="application-name" content="NBKRIST Hostel Portal">
+    <meta property="og:description"
+        content="View your personalized student dashboard at NBKRIST. Track your activities and stay updated.">
+    <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/en/3/3d/NBKRIST_logo.png">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "NBKRIST Hostel Portal",
+      "alternateName": ["NBKR Hostel", "NBKRIST Student Portal"],
+      "url": "https://nbkristhostelportal.netlify.app/"
+    }
+    </script>
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://nbkristhostelportal.netlify.app/">
+    <meta property="twitter:title"
+        content="NBKR Hostel Dashboard | NBKR Institute of Science and Technology, Vidyanagar">
+    <meta property="twitter:description" content="Your central hub for all hostel-related tasks and information.">
+    <meta property="twitter:image" content="https://upload.wikimedia.org/wikipedia/en/3/3d/NBKRIST_logo.png">
+
+    <!-- PWA Meta Tags -->
+    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/en/3/3d/NBKRIST_logo.png">
+    <link rel="manifest" href="manifest.json?v=17">
+    <meta name="theme-color" content="#007AFF">
+    <meta name="apple-mobile-web-app-title" content="Hostel Portal">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="js/vendor/alpine.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Custom Style System -->
+    <link rel="stylesheet" href="css/style.css">
 
     <style>
-        /* Hide Scrollbar */
-        ::-webkit-scrollbar { width: 0px; background: transparent; }
-
-        /* Premium Glass Effect */
+        /* Modern iOS Overrides */
         .glass-panel {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(24px) saturate(180%);
-            -webkit-backdrop-filter: blur(24px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1);
+            backdrop-filter: blur(25px) saturate(180%) !important;
         }
-
-        /* Input Fields */
-        .form-input {
-            width: 100%; padding: 1rem 1rem 1rem 3rem; border-radius: 1rem;
-            border: 1px solid rgba(0,0,0,0.1); background: rgba(255,255,255,0.6);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-size: 0.95rem; font-weight: 500; color: #1f2937;
-        }
-        .form-input:focus {
-            outline: none; border-color: #007AFF; background: white;
-            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15); transform: translateY(-1px);
-        }
-
-        /* Button Animation */
-        .btn-primary {
-            background: #007AFF; color: white; font-weight: 700;
-            border-radius: 1rem; padding: 1rem; width: 100%;
-            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
-            box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
-        }
-        .btn-primary:active { transform: scale(0.96); }
-        .btn-primary:hover { box-shadow: 0 10px 25px -5px rgba(0, 122, 255, 0.5); background: #0062cc; }
-
-        /* Dynamic Background */
-        .mesh-bg { position: fixed; inset: 0; z-index: -1; background: #F2F2F7; }
-        .orb { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.6; }
-        .orb-1 { top: -10%; left: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, rgba(0,122,255,0.2) 0%, transparent 70%); animation: float 12s infinite ease-in-out; }
-        .orb-2 { bottom: -10%; right: -10%; width: 70vw; height: 70vw; background: radial-gradient(circle, rgba(94,92,230,0.15) 0%, transparent 70%); animation: float 16s infinite ease-in-out reverse; }
     </style>
 </head>
-<body class="text-gray-900 min-h-screen flex items-center justify-center p-4" x-data="{ mode: 'login' }">
 
-    <div class="mesh-bg"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+<body class="text-gray-900 dark:text-white transition-colors duration-500">
 
-    <div class="w-full max-w-[1100px] h-[700px] bg-white/60 backdrop-blur-3xl rounded-[2.5rem] shadow-2xl border border-white/60 overflow-hidden flex relative animate-fade-in">
-        
-        <div class="hidden lg:flex w-5/12 relative overflow-hidden flex-col justify-between p-10 text-white bg-black">
-            <img src="https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=1000&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay hover:scale-105 transition-transform duration-[20s]">
-            <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/80"></div>
-
-            <div class="relative z-10">
-                <div class="w-14 h-14 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20 shadow-lg mb-6">
-                    <img src="https://upload.wikimedia.org/wikipedia/en/3/3d/NBKRIST_logo.png" class="w-10 h-10 object-contain brightness-0 invert">
-                </div>
-                <h1 class="text-4xl font-bold tracking-tight leading-tight">Student hostel <br>Portal</h1>
-                <p class="text-white/80 mt-2 font-medium text-sm">Manage your hostel life seamlessly.</p>
-            </div>
-            
-            
-        </div>
-
-        <div class="w-full lg:w-7/12 relative p-8 sm:p-12 lg:p-16 flex flex-col justify-center">
-            
-            <div class="lg:hidden absolute top-8 left-8 flex items-center gap-3">
-                <img src="https://upload.wikimedia.org/wikipedia/en/3/3d/NBKRIST_logo.png" class="w-10 h-10">
-                <span class="font-bold text-xl tracking-tight">NBKRIST</span>
-            </div>
-
-            <div x-show="mode === 'login'" 
-                 x-transition:enter="transition ease-out duration-500"
-                 x-transition:enter-start="opacity-0 translate-x-8"
-                 x-transition:enter-end="opacity-100 translate-x-0"
-                 class="w-full max-w-md mx-auto">
-                
-                <h2 class="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
-                <p class="text-gray-500 mb-10">Please sign in to continue.</p>
-
-                <form id="login-form" class="space-y-5">
-                    <div class="relative group">
-                        <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-iosBlue transition-colors"></i>
-                        <input type="email" id="login-email" class="form-input" placeholder="Email Address" required>
-                    </div>
-                    
-                    <div class="relative group" x-data="{ show: false }">
-                        <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-iosBlue transition-colors"></i>
-                        <input :type="show ? 'text' : 'password'" id="login-password" class="form-input" placeholder="Password" required>
-                        <button type="button" @click="show = !show" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                            <i class="fas" :class="show ? 'fa-eye-slash' : 'fa-eye'"></i>
-                        </button>
-                    </div>
-
-                    <div class="flex justify-end">
-                        <a href="#" @click.prevent="mode = 'forgot'" class="text-sm font-bold text-iosBlue hover:text-blue-700 transition-colors">Forgot Password?</a>
-                    </div>
-
-                    <button type="submit" class="btn-primary">Sign In</button>
-                </form>
-
-                <div class="relative my-8">
-                    <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-200"></div></div>
-                    <div class="relative flex justify-center text-xs uppercase tracking-widest"><span class="px-4 bg-transparent text-gray-400 font-bold">Or</span></div>
-                </div>
-
-                <button id="google-signin-btn" class="w-full flex items-center justify-center gap-3 p-3.5 border border-gray-200 bg-white rounded-2xl hover:bg-gray-50 transition-all group shadow-sm">
-                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5 group-hover:scale-110 transition-transform">
-                    <span class="font-bold text-gray-600 group-hover:text-gray-800">Continue with Google</span>
-                </button>
-
-                <p class="text-center mt-8 text-sm text-gray-500">
-                    New student? <a href="#" @click.prevent="mode = 'register'" class="font-bold text-iosBlue hover:underline">Create Account</a>
-                </p>
-            </div>
-
-            <div x-show="mode === 'register'" 
-                 style="display: none;"
-                 x-transition:enter="transition ease-out duration-500"
-                 x-transition:enter-start="opacity-0 translate-x-8"
-                 x-transition:enter-end="opacity-100 translate-x-0"
-                 class="w-full max-w-md mx-auto">
-                
-                <button @click="mode = 'login'" class="mb-6 text-gray-400 hover:text-gray-800 flex items-center gap-2 text-sm font-bold transition-colors"><i class="fas fa-arrow-left"></i> Back to Login</button>
-
-                <h2 class="text-3xl font-bold text-gray-900 mb-2">Create Account</h2>
-                <p class="text-gray-500 mb-8">Join the hostel community.</p>
-
-                <form id="register-form" class="space-y-4">
-                    <div class="relative group">
-                        <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-iosBlue transition-colors"></i>
-                        <input type="email" id="register-email" class="form-input" placeholder="Student Email" required>
-                    </div>
-                    <div class="relative group">
-                        <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-iosBlue transition-colors"></i>
-                        <input type="password" id="register-password" class="form-input" placeholder="Password (Min 6 chars)" required>
-                    </div>
-                    <div class="relative group">
-                        <i class="fas fa-check-circle absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-iosBlue transition-colors"></i>
-                        <input type="password" id="confirm-password" class="form-input" placeholder="Confirm Password" required>
-                    </div>
-
-                    <button type="submit" class="btn-primary mt-4">Create Account</button>
-                </form>
-            </div>
-
-            <div x-show="mode === 'forgot'" 
-                 style="display: none;"
-                 x-transition:enter="transition ease-out duration-500"
-                 x-transition:enter-start="opacity-0 scale-95"
-                 x-transition:enter-end="opacity-100 scale-100"
-                 class="w-full max-w-md mx-auto text-center">
-                
-                <div class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl text-iosBlue shadow-inner">
-                    <i class="fas fa-key"></i>
-                </div>
-
-                <h2 class="text-3xl font-bold text-gray-900 mb-2">Reset Password</h2>
-                <p class="text-gray-500 mb-8">Enter your registered email to receive reset instructions.</p>
-
-                <form id="forgot-password-form" class="space-y-5 text-left">
-                    <div class="relative group">
-                        <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-iosBlue transition-colors"></i>
-                        <input type="email" id="forgot-email" class="form-input" placeholder="Email Address" required>
-                    </div>
-                    <button type="submit" class="btn-primary">Send Reset Link</button>
-                </form>
-
-                <button @click="mode = 'login'" class="mt-8 text-gray-400 hover:text-gray-800 text-sm font-bold">Cancel</button>
-            </div>
-
-        </div>
+    <div class="mesh-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    
-    <script type="module">
-        import { firebaseConfig } from './firebase-config.js';
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+    <div class="layout-wrapper flex flex-col md:flex-row h-screen overflow-hidden">
 
-        const showToast = (message, isError = false) => {
-            Swal.fire({
-                toast: true, position: 'top', showConfirmButton: false, timer: 3000, timerProgressBar: true,
-                icon: isError ? 'error' : 'success', title: message,
-                customClass: { popup: 'rounded-2xl shadow-xl' }
-            });
-        };
+        <div id="sidebar-overlay" onclick="toggleSidebar()"
+            class="fixed inset-0 bg-black/40 z-40 hidden backdrop-blur-sm transition-opacity"></div>
 
-        const handleSuccess = async (user) => {
-            const userRef = db.collection('users').doc(user.uid);
-            const doc = await userRef.get();
-            if (!doc.exists) {
-                await userRef.set({ email: user.email, displayName: user.displayName, photoURL: user.photoURL, role: 'student', createdAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
-            }
-            window.location.href = 'dashboard.html';
-        };
+        <aside id="sidebar"
+            class="fixed md:static top-0 left-0 h-full w-72 flex flex-col glass-panel z-50 md:m-5 md:rounded-[2.5rem] md:h-[calc(100vh-2.5rem)] transition-transform duration-300 transform -translate-x-full md:translate-x-0 border-r md:border-none border-white/20">
+            <div class="p-8 flex items-center gap-4">
+                <img src="https://upload.wikimedia.org/wikipedia/en/3/3d/NBKRIST_logo.png"
+                    class="w-12 h-12 object-contain filter drop-shadow-md" alt="Logo">
+                <div>
+                    <h1 class="font-bold text-2xl tracking-tight">NBKRIST</h1>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Student Portal</p>
+                </div>
+            </div>
 
-        // Event Listeners
-        document.getElementById('google-signin-btn').addEventListener('click', () => {
-            auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).then(r => handleSuccess(r.user)).catch(e => showToast(e.message, true));
-        });
+            <nav class="flex-1 px-5 space-y-3 overflow-y-auto" id="sidebar-nav">
+                <a href="index.html"
+                    class="nav-item active flex items-center px-5 py-4 rounded-[1.2rem] font-semibold transition-all spring-click"><i
+                        class="fas fa-grid-2 w-6"></i> <span>Overview</span></a>
+                <a href="mess-menu.html"
+                    class="nav-item flex items-center px-5 py-4 rounded-[1.2rem] text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all spring-click"><i
+                        class="fas fa-utensils w-6"></i> <span>Mess Menu</span></a>
+                <a href="booking.html"
+                    class="nav-item flex items-center px-5 py-4 rounded-[1.2rem] text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all spring-click"><i
+                        class="fas fa-bed w-6"></i> <span>Room Booking</span></a>
+                <a href="outpass.html"
+                    class="nav-item flex items-center px-5 py-4 rounded-[1.2rem] text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all spring-click"><i
+                        class="fas fa-ticket-alt w-6"></i> <span>Outpass</span></a>
+                <a href="complaints.html"
+                    class="nav-item flex items-center px-5 py-4 rounded-[1.2rem] text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all spring-click"><i
+                        class="fas fa-comment-alt w-6"></i> <span>Complaints</span></a>
+                <a href="rules.html"
+                    class="nav-item flex items-center px-5 py-4 rounded-[1.2rem] text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all spring-click"><i
+                        class="fas fa-book w-6"></i> <span>Rules</span></a>
+                <a href="about.html"
+                    class="nav-item flex items-center px-5 py-4 rounded-[1.2rem] text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all spring-click"><i
+                        class="fas fa-info-circle w-6"></i> <span>About</span></a>
+                <a href="developer.html"
+                    class="nav-item flex items-center px-5 py-4 rounded-[1.2rem] text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all spring-click"><i
+                        class="fas fa-code w-6"></i> <span>Developer</span></a>
+            </nav>
 
-        document.getElementById('login-form').addEventListener('submit', e => {
-            e.preventDefault();
-            auth.signInWithEmailAndPassword(document.getElementById('login-email').value, document.getElementById('login-password').value)
-            .then(r => handleSuccess(r.user)).catch(() => showToast('Invalid credentials', true));
-        });
+            <div class="p-5 mt-auto">
+                <div class="flex justify-center space-x-6 mb-6 opacity-70">
+                    <a href="https://github.com/likhith3035" target="_blank"
+                        class="hover:text-iosBlue transition-transform hover:scale-110"><i
+                            class="fab fa-github text-xl"></i></a>
+                    <a href="https://www.instagram.com/lucky__likhith?igsh=bTgxYjZtZ2wwYmR4" target="_blank"
+                        class="hover:text-iosBlue transition-transform hover:scale-110"><i
+                            class="fab fa-instagram text-xl"></i></a>
+                    <a href="https://www.linkedin.com/in/likhith-kami/" target="_blank"
+                        class="hover:text-iosBlue transition-transform hover:scale-110"><i
+                            class="fab fa-linkedin text-xl"></i></a>
+                </div>
+                <button id="logout-sidebar"
+                    class="w-full flex items-center px-6 py-4 rounded-[1.2rem] bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all text-sm font-bold spring-click">
+                    <i class="fas fa-sign-out-alt w-6"></i> Sign Out
+                </button>
+            </div>
+        </aside>
 
-        document.getElementById('register-form').addEventListener('submit', e => {
-            e.preventDefault();
-            const p1 = document.getElementById('register-password').value;
-            const p2 = document.getElementById('confirm-password').value;
-            if(p1 !== p2) return showToast('Passwords match error', true);
-            if(p1.length < 6) return showToast('Password too short', true);
-            auth.createUserWithEmailAndPassword(document.getElementById('register-email').value, p1)
-            .then(r => { handleSuccess(r.user); showToast('Account Created!'); }).catch(e => showToast(e.message, true));
-        });
+        <main class="flex-1 overflow-y-auto overflow-x-hidden h-full scroll-smooth p-4 md:p-8">
 
-        document.getElementById('forgot-password-form').addEventListener('submit', e => {
-            e.preventDefault();
-            auth.sendPasswordResetEmail(document.getElementById('forgot-email').value)
-            .then(() => showToast('Reset link sent')).catch(e => showToast(e.message, true));
-        });
-    </script>
+            <header class="flex justify-between items-center mb-6 px-1 sticky top-0 z-30 py-3">
+                <div class="flex items-center gap-2">
+                    <button onclick="toggleSidebar()"
+                        class="lg:hidden w-10 h-10 rounded-full glass-panel flex items-center justify-center text-gray-500 hover:text-iosBlue transition-colors spring-click">
+                        <i class="fas fa-bars text-base"></i>
+                    </button>
+                    <div class="flex items-center gap-2">
+                        <div class="glass-panel px-3 py-1.5 rounded-full flex items-center gap-2 flex-shrink-0">
+                            <img src="https://upload.wikimedia.org/wikipedia/en/3/3d/NBKRIST_logo.png"
+                                class="w-6 h-6 md:w-7 md:h-7 object-contain">
+                            <span
+                                class="font-bold text-xs md:text-base tracking-tight text-gray-900 dark:text-white whitespace-nowrap">NBKRIST</span>
+                        </div>
+                        <div class="hidden lg:block ml-2">
+                            <h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Overview</h2>
+                            <div class="flex items-center gap-2">
+                                <p class="text-sm text-gray-500 dark:text-gray-400 font-medium" id="current-date">
+                                    Loading...</p>
+                                <span class="text-gray-300 dark:text-gray-700">|</span>
+                                <p class="text-sm font-bold text-iosBlue tabular-nums" id="clock-time">00:00</p>
+                                <p class="text-[10px] font-bold text-iosBlue uppercase" id="am-pm"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 lg:gap-4 relative">
+                    <button onclick="toggleTheme()"
+                        class="w-10 h-10 lg:w-12 lg:h-12 rounded-full glass-panel flex items-center justify-center text-gray-500 hover:text-iosBlue transition-colors spring-click">
+                        <i class="fas fa-sun dark:hidden text-base lg:text-lg"></i>
+                        <i class="fas fa-moon hidden dark:block text-base lg:text-lg"></i>
+                    </button>
+
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open; markNotificationsAsRead()"
+                            class="w-10 h-10 lg:w-12 lg:h-12 rounded-full glass-panel flex items-center justify-center text-gray-500 hover:text-iosBlue transition-colors relative spring-click">
+                            <i class="fas fa-bell text-base lg:text-lg"></i>
+                            <span id="unread-indicator"
+                                class="hidden absolute top-2.5 right-3 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white dark:ring-iosCardDark"></span>
+                        </button>
+
+                        <div x-show="open" @click.away="open = false"
+                            x-transition:enter="transition ease-out duration-200"
+                            x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-150"
+                            x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
+                            class="fixed left-4 right-4 top-24 sm:absolute sm:left-auto sm:right-0 sm:top-14 sm:w-96 glass-panel rounded-2xl shadow-2xl z-[100] border border-white/20 origin-top-right">
+                            <div
+                                class="p-5 border-b border-gray-100 dark:border-white/10 flex justify-between items-center">
+                                <span class="font-bold text-lg tracking-tight">Notifications</span><button
+                                    onclick="window.location.reload()"
+                                    class="bg-gray-100 dark:bg-white/10 p-2 rounded-full w-8 h-8 flex items-center justify-center text-gray-500 hover:text-iosBlue transition-colors"><i
+                                        class="fas fa-sync-alt text-xs"></i></button>
+                            </div>
+                            <ul id="notifications-list"
+                                class="max-h-[60vh] overflow-y-auto custom-scrollbar p-3 space-y-2">
+                                <li class="p-8 text-center text-gray-400 text-sm font-medium">Loading notifications...
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open"
+                            class="w-10 h-10 lg:w-12 lg:h-12 rounded-full glass-panel flex items-center justify-center relative spring-click p-0.5 hover:scale-105 transition-all active:scale-95">
+                            <img id="user-avatar" src="https://placehold.co/100"
+                                class="w-full h-full rounded-full object-cover shadow-sm">
+                        </button>
+                        <div x-show="open" @click.away="open = false" x-transition
+                            class="absolute right-0 top-12 w-64 liquid-glass-dropdown p-2 shadow-2xl z-[100] border border-white/20 origin-top-right rounded-3xl">
+                            <div class="p-3 border-b border-gray-100 dark:border-white/10 mb-1">
+                                <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Signed in
+                                    as
+                                </p>
+                                <p class="font-bold text-gray-900 dark:text-white truncate" id="user-name-dropdown">
+                                    Guest</p>
+                            </div>
+                            <div class="space-y-1" id="profile-dropdown-list"><a href="profile.html"
+                                    class="flex items-center px-3 py-2 text-xs font-semibold rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"><i
+                                        class="fas fa-user-circle w-4 mr-2 text-gray-400"></i> My Profile</a><a
+                                    href="developer.html"
+                                    class="flex items-center admin-link px-3 py-2 text-xs font-semibold rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors hidden"><i
+                                        class="fas fa-code w-4 mr-2 text-gray-400"></i> Developer</a></div>
+                            <div class="mt-1 pt-1 border-t border-gray-100 dark:border-white/10"><button
+                                    id="logout-header"
+                                    class="w-full flex items-center px-3 py-2 text-xs font-bold text-red-500 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors text-left"><i
+                                        class="fas fa-power-off w-4 mr-2"></i> Log Out</button></div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="max-w-7xl mx-auto space-y-6 pb-10 animate-fade-in">
+
+                <!-- Static SEO Content (Visible to Guests & Crawlers) -->
+                <section id="seo-content" class="mb-6">
+                    <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">NBKRIST
+                        Hostel Portal</h1>
+                    <p class="text-sm md:text-base text-gray-600 dark:text-gray-400 mt-2 max-w-3xl">
+                        Welcome to the official student accommodation portal for <strong>NBKR Institute of Science and
+                            Technology</strong>.
+                        Access the <a href="mess-menu.html" class="text-iosBlue hover:underline font-medium">weekly mess
+                            menu</a>,
+                        review <a href="rules.html" class="text-iosBlue hover:underline font-medium">hostel rules</a>,
+                        submit maintenance <a href="complaints.html"
+                            class="text-iosBlue hover:underline font-medium">complaints</a>,
+                        and manage <a href="booking.html" class="text-iosBlue hover:underline font-medium">room
+                            bookings</a> effortlessly.
+                    </p>
+                </section>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div
+                        class="md:col-span-2 relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 text-white p-8 md:p-10 shadow-glow min-h-[280px] flex flex-col justify-between animate-fade-in group cursor-default">
+                        <div
+                            class="absolute top-0 right-0 w-[500px] h-[500px] bg-white/10 rounded-full blur-[100px] -mr-32 -mt-32 group-hover:bg-white/20 transition-colors">
+                        </div>
+                        <div class="relative z-10 flex justify-between items-start">
+                            <div>
+                                <div
+                                    class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/20 backdrop-blur-md border border-white/10 text-[10px] font-bold uppercase tracking-widest mb-4 shadow-sm">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span> System
+                                    Live
+                                </div>
+                                <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Hi, <span id="welcome-name"
+                                        class="opacity-90">Student</span> 👋</h2>
+                                <p class="text-blue-100 font-medium mt-2 text-sm lg:text-base opacity-80">Everything
+                                    looks good today.</p>
+                            </div>
+
+                        </div>
+                        <div class="relative z-10 grid grid-cols-2 gap-4 mt-8">
+                            <a href="complaints.html"
+                                class="glass-panel bg-white/10 border-white/20 hover:bg-white/20 text-white p-4 lg:p-5 rounded-[1.5rem] flex items-center justify-between transition-all spring-click group/btn">
+                                <div>
+                                    <p class="text-[10px] text-blue-200 uppercase font-bold tracking-wider mb-1">Support
+                                    </p>
+                                    <p class="font-bold text-base md:text-lg">Report Issue</p>
+                                </div>
+                                <div
+                                    class="w-10 h-10 rounded-full bg-white text-blue-600 flex items-center justify-center text-lg shadow-lg group-hover/btn:scale-110 transition-transform">
+                                    <i class="fas fa-plus"></i>
+                                </div>
+                            </a>
+                            <a href="https://portal.nbkrsac.in/" target="_blank"
+                                class="glass-panel bg-white/10 border-white/20 hover:bg-white/20 text-white p-4 lg:p-5 rounded-[1.5rem] flex items-center justify-between transition-all spring-click group/btn">
+                                <div>
+                                    <p class="text-[10px] text-blue-200 uppercase font-bold tracking-wider mb-1">
+                                        Payments</p>
+                                    <p class="font-bold text-base md:text-lg">Pay Fee</p>
+                                </div>
+                                <div
+                                    class="w-10 h-10 rounded-full bg-white text-blue-600 flex items-center justify-center text-lg shadow-lg group-hover/btn:scale-110 transition-transform">
+                                    <i class="fas fa-arrow-right -rotate-45"></i>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="md:col-span-1 glass-panel p-8 rounded-[2.5rem] flex flex-col justify-center gap-4 relative overflow-hidden min-h-[280px] hover:border-gray-300 dark:hover:border-white/20 transition-all duration-500"
+                        id="room-status-widget">
+                        <div class="animate-pulse flex flex-col items-center justify-center h-full gap-4 opacity-50">
+                            <div class="w-20 h-20 bg-gray-200 dark:bg-white/10 rounded-full"></div>
+                            <div class="h-4 bg-gray-200 dark:bg-white/10 rounded w-2/3"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-4 px-2">
+                        <h3 class="font-bold text-xl flex items-center gap-2 text-gray-900 dark:text-white"><i
+                                class="fas fa-utensils text-iosBlue"></i> Today's Menu</h3>
+                        <a href="mess-menu.html"
+                            class="text-xs font-bold text-iosBlue bg-blue-50 dark:bg-blue-500/10 px-3 py-1.5 rounded-full transition-colors hover:bg-blue-100 dark:hover:bg-blue-500/20">Full
+                            Menu <i class="fas fa-chevron-right text-[10px] ml-1"></i></a>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4" id="daily-menu-grid">
+                        <div class="glass-panel p-6 rounded-[2rem] h-40 animate-pulse bg-white/40 dark:bg-white/5">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-10">
+                    <div class="glass-panel p-6 md:p-8 rounded-[2.5rem]">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-bold text-lg flex items-center gap-3"><span
+                                    class="bg-yellow-400 w-1.5 h-6 rounded-full"></span> Notice Board</h3>
+                        </div>
+                        <div id="notice-board-list" class="space-y-3 h-64 overflow-y-auto pr-2 custom-scrollbar">
+                            <div class="p-10 text-center text-gray-400 text-sm">No new notices.</div>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-6 lg:p-8 rounded-[2.5rem]">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-bold text-lg flex items-center gap-3"><span
+                                    class="bg-iosBlue w-1.5 h-6 rounded-full"></span> Recent Complaints</h3><a
+                                href="complaints.html"
+                                class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-white/10 hover:bg-iosBlue hover:text-white transition-all spring-click"><i
+                                    class="fas fa-plus"></i></a>
+                        </div>
+                        <div id="my-complaints-widget" class="space-y-3">
+                            <div class="p-10 text-center text-gray-400 text-sm">No recent complaints.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="mt-12 mb-6 flex flex-col items-center justify-center gap-2 opacity-70">
+                <p class="text-[10px] text-gray-500 dark:text-gray-400 font-medium text-center">
+                    <span class="font-bold text-red-500">Disclaimer:</span> Student academic project. Not an official
+                    portal.
+                </p>
+                <div class="flex items-center gap-3 text-[10px] font-bold tracking-wide">
+                    <a href="privacy.html" class="text-gray-400 hover:text-iosBlue transition-colors">Privacy</a>
+                    <span class="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700"></span>
+                    <a href="terms.html" class="text-gray-400 hover:text-iosBlue transition-colors">Terms</a>
+                </div>
+            </footer>
+
+        </main>
+
+
+
+    </div>
+
+    <script type="module" src="js/dashboard.js" data-cmp-ignore="1"></script>
 </body>
+
 </html>

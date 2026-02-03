@@ -1,18 +1,58 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth antialiased">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Rules - NBKRIST</title>
-    
+
+
+    <title>NBKR Hostel Rules & Regulations | Student Guidelines</title>
+    <meta name="description"
+        content="Official NBKR Institute Hostel rules and regulations. Read the code of conduct, anti-ragging policies, visiting hours, and safety guidelines.">
+    <meta name="keywords"
+        content="nbkr hostel rules, nbkrist rules, hostel code of conduct, nbkr anti ragging, nbkrist student discipline, vidyanagar">
+    <link rel="canonical" href="https://nbkristhostelportal.netlify.app/rules.html">
+
+    <!-- Open Graph / Brand Metadata -->
+    <meta property="og:site_name" content="NBKRIST Hostel Portal">
+    <meta property="og:title" content="NBKR Hostel Rules & Regulations">
+    <meta property="og:description" content="Official guidelines and code of conduct for NBKRIST hostel residents.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://nbkristhostelportal.netlify.app/rules.html">
+    <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/en/3/3d/NBKRIST_logo.png">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "NBKRIST Hostel Portal",
+      "url": "https://nbkristhostelportal.netlify.app/"
+    }
+    </script>
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://nbkristhostelportal.netlify.app/rules.html">
+    <meta property="twitter:title" content="NBKR Hostel Rules & Regulations">
+    <meta property="twitter:description" content="Official guidelines for residents of NBKRIST hostels.">
+    <meta property="twitter:image" content="https://upload.wikimedia.org/wikipedia/en/3/3d/NBKRIST_logo.png">
+
+    <!-- PWA Meta Tags -->
+    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/en/3/3d/NBKRIST_logo.png">
+    <link rel="manifest" href="manifest.json?v=17">
+    <meta name="theme-color" content="#007AFF">
+    <meta name="apple-mobile-web-app-title" content="Hostel Portal">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+    <script src="https://cdn.tailwindcss.com" data-cmp-ignore="1" class="cmp-ignore"></script>
+    <script src="js/vendor/alpine.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
@@ -20,7 +60,7 @@
             darkMode: 'class',
             theme: {
                 fontFamily: {
-                    sans: ['Outfit', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                    sans: ['Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
                 },
                 extend: {
                     colors: {
@@ -38,12 +78,12 @@
                     },
                     keyframes: {
                         fadeIn: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
-                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } }
+                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-15px)' } }
                     }
                 }
             }
         }
-        
+
         if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
         } else {
@@ -51,54 +91,34 @@
         }
     </script>
 
+    <!-- Custom Style System -->
+    <link rel="stylesheet" href="css/style.css">
+
     <style>
-        ::-webkit-scrollbar { width: 0px; background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.5); border-radius: 10px; }
-        
+        /* Modern iOS Overrides */
         .glass-panel {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(24px) saturate(180%);
-            -webkit-backdrop-filter: blur(24px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            backdrop-filter: blur(25px) saturate(180%) !important;
         }
-        .dark .glass-panel {
-            background: rgba(28, 28, 30, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-        }
-
-        .nav-item.active {
-            background: #007AFF; color: white;
-            box-shadow: 0 8px 25px -6px rgba(0, 122, 255, 0.5);
-        }
-        .nav-item.active i { color: white; }
-
-        .spring-click { transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .spring-click:active { transform: scale(0.95); }
-
-        .filter-btn { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .filter-btn.active { background: #007AFF; color: white; border-color: transparent; box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3); }
-
-        .mesh-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; background: #F2F2F7; transition: background 0.5s; }
-        .dark .mesh-bg { background: #000000; }
-        .orb { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.6; z-index: -1; }
-        .orb-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(0,122,255,0.2) 0%, transparent 70%); animation: float 12s infinite ease-in-out; }
-        .orb-2 { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, rgba(94,92,230,0.15) 0%, transparent 70%); animation: float 15s infinite ease-in-out reverse; }
     </style>
 </head>
+
 <body class="text-gray-900 dark:text-white transition-colors duration-500">
 
-    <div class="mesh-bg"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+    <div class="mesh-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
 
-    <div class="flex h-screen overflow-hidden">
-        
-        <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/40 z-40 hidden backdrop-blur-sm transition-opacity"></div>
+    <div class="flex flex-col md:flex-row h-screen overflow-hidden">
 
-        <aside id="sidebar" class="fixed lg:static top-0 left-0 h-full w-72 flex-col glass-panel z-50 lg:m-5 lg:rounded-[2.5rem] lg:h-[calc(100vh-2.5rem)] transition-transform duration-300 transform -translate-x-full lg:translate-x-0 border-r lg:border-none border-white/20">
+        <div id="sidebar-overlay" onclick="toggleSidebar()"
+            class="fixed inset-0 bg-black/40 z-40 hidden backdrop-blur-sm transition-opacity"></div>
+
+        <aside id="sidebar"
+            class="fixed md:static top-0 left-0 h-full w-72 flex flex-col glass-panel z-50 md:m-5 md:rounded-[2.5rem] md:h-[calc(100vh-2.5rem)] transition-transform duration-300 transform -translate-x-full md:translate-x-0 border-r md:border-none border-white/20">
             <div class="p-8 flex items-center gap-4">
-                <img src="https://upload.wikimedia.org/wikipedia/en/3/3d/NBKRIST_logo.png" class="w-12 h-12 object-contain filter drop-shadow-md" alt="Logo">
+                <img src="https://upload.wikimedia.org/wikipedia/en/3/3d/NBKRIST_logo.png"
+                    class="w-12 h-12 object-contain filter drop-shadow-md" alt="NBKRIST Logo">
                 <div>
                     <h1 class="font-bold text-2xl tracking-tight">NBKRIST</h1>
                     <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Student Portal</p>
@@ -106,281 +126,223 @@
             </div>
 
             <nav class="flex-1 px-5 space-y-3 overflow-y-auto" id="sidebar-nav">
-                <a href="dashboard.html" class="nav-item flex items-center px-5 py-4 rounded-[1.2rem] text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all spring-click"><i class="fas fa-grid-2 w-6"></i> <span>Overview</span></a>
-                <a href="mess-menu.html" class="nav-item flex items-center px-5 py-4 rounded-[1.2rem] text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all spring-click"><i class="fas fa-utensils w-6"></i> <span>Food Menu</span></a>
-                <a href="booking.html" class="nav-item flex items-center px-5 py-4 rounded-[1.2rem] text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all spring-click"><i class="fas fa-bed w-6"></i> <span>Room Booking</span></a>
-                <a href="complaints.html" class="nav-item flex items-center px-5 py-4 rounded-[1.2rem] text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all spring-click"><i class="fas fa-comment-alt w-6"></i> <span>Complaints</span></a>
-                <a href="rules.html" class="nav-item active flex items-center px-5 py-4 rounded-[1.2rem] font-semibold transition-all spring-click"><i class="fas fa-book w-6"></i> <span>Rules</span></a>
+                <a href="index.html"
+                    class="nav-item flex items-center px-5 py-4 rounded-[1.2rem] text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all spring-click"><i
+                        class="fas fa-grid-2 w-6"></i> <span>Dashboard</span></a>
+                <a href="mess-menu.html"
+                    class="nav-item flex items-center px-5 py-4 rounded-[1.2rem] text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all spring-click"><i
+                        class="fas fa-utensils w-6"></i> <span>Mess Menu</span></a>
+                <a href="booking.html"
+                    class="nav-item flex items-center px-5 py-4 rounded-[1.2rem] text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all spring-click"><i
+                        class="fas fa-bed w-6"></i> <span>Room Booking</span></a>
+                <a href="outpass.html"
+                    class="nav-item flex items-center px-5 py-4 rounded-[1.2rem] text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all spring-click"><i
+                        class="fas fa-ticket-alt w-6"></i> <span>Outpass</span></a>
+                <a href="complaints.html"
+                    class="nav-item flex items-center px-5 py-4 rounded-[1.2rem] text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all spring-click"><i
+                        class="fas fa-comment-alt w-6"></i> <span>Complaints</span></a>
+                <a href="rules.html"
+                    class="nav-item active flex items-center px-5 py-4 rounded-[1.2rem] font-semibold transition-all spring-click"><i
+                        class="fas fa-book w-6"></i> <span>Rules</span></a>
+                <a href="about.html"
+                    class="nav-item flex items-center px-5 py-4 rounded-[1.2rem] text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all spring-click"><i
+                        class="fas fa-info-circle w-6"></i> <span>About</span></a>
+                <a href="developer.html"
+                    class="nav-item flex items-center px-5 py-4 rounded-[1.2rem] text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all spring-click"><i
+                        class="fas fa-code w-6"></i> <span>Developer</span></a>
             </nav>
 
             <div class="p-5 mt-auto">
                 <div class="flex justify-center space-x-6 mb-6 opacity-70">
-                    <a href="https://github.com/likhith3035" target="_blank" class="hover:text-iosBlue transition-transform hover:scale-110"><i class="fab fa-github text-xl"></i></a>
-                    <a href="https://www.linkedin.com/in/likhith-kami/" target="_blank" class="hover:text-iosBlue transition-transform hover:scale-110"><i class="fab fa-linkedin text-xl"></i></a>
-                    <a href="https://www.instagram.com/lucky__likhith?igsh=bTgxYjZtZ2wwYmR4" target="_blank" class="hover:text-iosBlue transition-transform hover:scale-110"><i class="fab fa-instagram text-xl"></i></a>
+                    <a href="https://github.com/likhith3035" target="_blank"
+                        class="hover:text-iosBlue transition-transform hover:scale-110"><i
+                            class="fab fa-github text-xl"></i></a>
+                    <a href="https://www.instagram.com/lucky__likhith?igsh=bTgxYjZtZ2wwYmR4" target="_blank"
+                        class="hover:text-iosBlue transition-transform hover:scale-110"><i
+                            class="fab fa-instagram text-xl"></i></a>
+                    <a href="https://www.linkedin.com/in/likhith-kami/" target="_blank"
+                        class="hover:text-iosBlue transition-transform hover:scale-110"><i
+                            class="fab fa-linkedin text-xl"></i></a>
                 </div>
-                 <button id="logout-sidebar" class="w-full flex items-center px-6 py-4 rounded-[1.2rem] bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all text-sm font-bold spring-click">
+                <button id="logout-sidebar"
+                    class="w-full flex items-center px-6 py-4 rounded-[1.2rem] bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all text-sm font-bold spring-click">
                     <i class="fas fa-sign-out-alt w-6"></i> Sign Out
                 </button>
-            </div>
         </aside>
 
-        <main class="flex-1 overflow-y-auto h-full scroll-smooth p-4 lg:p-8">
-            
-            <header class="flex justify-between items-center mb-8 px-2 sticky top-0 z-30 py-3">
-                <div class="flex items-center gap-3">
-                    <button onclick="toggleSidebar()" class="lg:hidden w-11 h-11 rounded-full glass-panel flex items-center justify-center text-gray-500 hover:text-iosBlue transition-colors spring-click">
-                        <i class="fas fa-bars text-lg"></i>
+        <main class="flex-1 overflow-y-auto overflow-x-hidden h-full scroll-smooth p-4 md:p-8">
+
+            <header class="flex justify-between items-center mb-6 px-1 sticky top-0 z-30 py-3">
+                <div class="flex items-center gap-2">
+                    <button onclick="toggleSidebar()"
+                        class="lg:hidden w-10 h-10 rounded-full glass-panel flex items-center justify-center text-gray-500 hover:text-iosBlue transition-colors spring-click">
+                        <i class="fas fa-bars text-base"></i>
                     </button>
-                    <div class="glass-panel px-4 py-2 rounded-full lg:bg-transparent lg:backdrop-filter-none lg:border-none lg:shadow-none flex items-center gap-3 lg:block">
-                        <img src="https://upload.wikimedia.org/wikipedia/en/3/3d/NBKRIST_logo.png" class="w-8 h-8 object-contain lg:hidden">
-                        <div class="hidden lg:block">
-                            <h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Rules</h2>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 font-medium" id="current-date">Loading...</p>
+                    <div class="flex items-center gap-2">
+                        <div class="glass-panel px-3 py-1.5 rounded-full flex items-center gap-2 flex-shrink-0">
+                            <img src="https://upload.wikimedia.org/wikipedia/en/3/3d/NBKRIST_logo.png"
+                                class="w-6 h-6 md:w-7 md:h-7 object-contain">
+                            <span
+                                class="font-bold text-xs md:text-base tracking-tight text-gray-900 dark:text-white whitespace-nowrap">NBKRIST</span>
                         </div>
-                        <span class="font-bold text-lg lg:hidden">NBKRIST</span>
+                        <div class="hidden lg:block ml-2">
+                            <h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Rules</h2>
+                            <div class="flex items-center gap-2">
+                                <p class="text-sm text-gray-500 dark:text-gray-400 font-medium" id="current-date">
+                                    Loading...</p>
+                                <span class="text-gray-300 dark:text-gray-700">|</span>
+                                <p class="text-sm font-bold text-iosBlue tabular-nums" id="clock-time">00:00</p>
+                                <p class="text-[10px] font-bold text-iosBlue uppercase" id="am-pm"></p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-3 lg:gap-4 relative">
-                    <button onclick="toggleTheme()" class="w-11 h-11 lg:w-12 lg:h-12 rounded-full glass-panel flex items-center justify-center text-gray-500 hover:text-iosBlue transition-colors spring-click">
-                        <i class="fas fa-sun dark:hidden text-lg"></i>
-                        <i class="fas fa-moon hidden dark:block text-lg"></i>
+                <div class="flex items-center gap-2 lg:gap-4 relative">
+                    <button onclick="toggleTheme()"
+                        class="w-10 h-10 lg:w-12 lg:h-12 rounded-full glass-panel flex items-center justify-center text-gray-500 hover:text-iosBlue transition-colors spring-click">
+                        <i class="fas fa-sun dark:hidden text-base lg:text-lg"></i>
+                        <i class="fas fa-moon hidden dark:block text-base lg:text-lg"></i>
                     </button>
 
                     <div class="relative" x-data="{ open: false }">
-                        <button @click="open = !open; markNotificationsAsRead()" class="w-11 h-11 lg:w-12 lg:h-12 rounded-full glass-panel flex items-center justify-center text-gray-500 hover:text-iosBlue transition-colors relative spring-click">
-                            <i class="fas fa-bell text-lg"></i>
-                            <span id="unread-indicator" class="hidden absolute top-3 right-3.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white dark:ring-iosCardDark"></span>
+                        <button @click="open = !open; markNotificationsAsRead()"
+                            class="w-10 h-10 lg:w-12 lg:h-12 rounded-full glass-panel flex items-center justify-center text-gray-500 hover:text-iosBlue transition-colors relative spring-click">
+                            <i class="fas fa-bell text-base lg:text-lg"></i>
+                            <span id="unread-indicator"
+                                class="hidden absolute top-2.5 right-3 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white dark:ring-iosCardDark"></span>
                         </button>
-                        
-                        <div x-show="open" 
-                             @click.away="open = false" 
-                             x-transition:enter="transition ease-out duration-200"
-                             x-transition:enter-start="opacity-0 scale-95"
-                             x-transition:enter-end="opacity-100 scale-100"
-                             x-transition:leave="transition ease-in duration-150"
-                             x-transition:leave-start="opacity-100 scale-100"
-                             x-transition:leave-end="opacity-0 scale-95"
-                             class="absolute right-0 top-14 w-[90vw] sm:w-96 glass-panel rounded-2xl shadow-2xl z-50 border border-white/20 origin-top-right">
-                            
-                            <div class="p-5 border-b border-gray-100 dark:border-white/10 flex justify-between items-center">
+
+                        <div x-show="open" @click.away="open = false"
+                            x-transition:enter="transition ease-out duration-200"
+                            x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+                            class="fixed left-4 right-4 top-24 sm:absolute sm:left-auto sm:right-0 sm:top-14 sm:w-96 glass-panel rounded-2xl shadow-2xl z-[100] border border-white/20 origin-top-right">
+
+                            <div
+                                class="p-5 border-b border-gray-100 dark:border-white/10 flex justify-between items-center">
                                 <span class="font-bold text-lg tracking-tight">Notifications</span>
-                                <button onclick="window.location.reload()" class="bg-gray-100 dark:bg-white/10 p-2 rounded-full w-8 h-8 flex items-center justify-center text-gray-500 hover:text-iosBlue transition-colors"><i class="fas fa-sync-alt text-xs"></i></button>
+                                <button onclick="window.location.reload()"
+                                    class="bg-gray-100 dark:bg-white/10 p-2 rounded-full w-8 h-8 flex items-center justify-center text-gray-500 hover:text-iosBlue transition-colors"><i
+                                        class="fas fa-sync-alt text-xs"></i></button>
                             </div>
-                            
-                            <ul id="notifications-list" class="max-h-[60vh] overflow-y-auto custom-scrollbar p-3 space-y-2">
-                                <li class="p-8 text-center text-gray-400 text-sm font-medium">Loading notifications...</li>
+
+                            <ul id="notifications-list"
+                                class="max-h-[60vh] overflow-y-auto custom-scrollbar p-3 space-y-2">
+                                <li class="p-8 text-center text-gray-400 text-sm font-medium">Loading notifications...
+                                </li>
                             </ul>
                         </div>
                     </div>
 
                     <div class="relative" x-data="{ open: false }">
-                        <button @click="open = !open" class="flex items-center gap-3 glass-panel pl-1 pr-1 lg:pr-5 py-1 rounded-full hover:bg-white/80 dark:hover:bg-white/10 transition-all spring-click">
-                            <img id="user-avatar" src="https://placehold.co/100" class="w-9 h-9 lg:w-10 lg:h-10 rounded-full object-cover shadow-sm ring-2 ring-white dark:ring-transparent">
-                            <div class="text-left hidden lg:block">
-                                <p class="text-sm font-bold leading-none" id="user-name-display">Student</p>
-                                <p class="text-[10px] font-bold text-iosBlue uppercase tracking-wide">Profile</p>
-                            </div>
+                        <button @click="open = !open"
+                            class="w-10 h-10 lg:w-12 lg:h-12 rounded-full glass-panel flex items-center justify-center relative spring-click p-0.5 hover:scale-105 transition-all active:scale-95">
+                            <img id="user-avatar" src="https://placehold.co/100"
+                                class="w-full h-full rounded-full object-cover shadow-sm">
                         </button>
-                        
-                        <div x-show="open" 
-                             @click.away="open = false" 
-                             x-transition:enter="transition ease-out duration-200"
-                             x-transition:enter-start="opacity-0 scale-95"
-                             x-transition:enter-end="opacity-100 scale-100"
-                             class="absolute right-0 top-14 w-[85vw] sm:w-72 glass-panel rounded-2xl shadow-2xl z-50 border border-white/20 origin-top-right">
-                             
-                             <div class="p-5 border-b border-gray-100 dark:border-white/10 mb-2">
-                                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Signed in as</p>
-                                 <p class="text-base font-bold truncate mt-1" id="user-name-dropdown">Loading...</p>
-                             </div>
-                             
-                             <div class="px-2 space-y-1" id="profile-dropdown-list">
-                                 <a href="profile.html" class="flex items-center px-4 py-3 text-sm font-semibold rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"><i class="fas fa-user-circle w-5 mr-3 text-gray-400"></i> My Profile</a>
-                             </div>
-
-                             <div class="py-4 flex justify-center space-x-6 lg:hidden border-t border-gray-100 dark:border-white/10 mt-3 mx-4">
-                                <a href="https://github.com/likhith3035" target="_blank" class="text-gray-400 hover:text-iosBlue text-lg"><i class="fab fa-github"></i></a>
-                                <a href="https://www.linkedin.com/in/likhith-kami/" target="_blank" class="text-gray-400 hover:text-iosBlue text-lg"><i class="fab fa-linkedin"></i></a>
-                                <a href="https://www.instagram.com/lucky__likhith?igsh=bTgxYjZtZ2wwYmR4" target="_blank" class="text-gray-400 hover:text-iosBlue text-lg"><i class="fab fa-instagram"></i></a>
-                             </div>
-
-                             <div class="p-2 mt-1 border-t border-gray-100 dark:border-white/10">
-                                <button id="logout-header" class="w-full flex items-center px-4 py-3 text-sm font-bold text-red-500 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"><i class="fas fa-power-off w-5 mr-3"></i> Log Out</button>
-                             </div>
+                        <div x-show="open" @click.away="open = false" x-transition
+                            class="absolute right-0 top-12 w-64 liquid-glass-dropdown p-2 shadow-2xl z-[100] border border-white/20 origin-top-right rounded-3xl">
+                            <div class="p-3 border-b border-gray-100 dark:border-white/10 mb-1">
+                                <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Signed in
+                                    as
+                                </p>
+                                <p class="font-bold text-gray-900 dark:text-white truncate" id="user-name-dropdown">
+                                    Guest</p>
+                            </div>
+                            <div class="space-y-1" id="profile-dropdown-list"><a href="profile.html"
+                                    class="flex items-center px-3 py-2 text-xs font-semibold rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"><i
+                                        class="fas fa-user-circle w-4 mr-2 text-gray-400"></i> My Profile</a><a
+                                    href="developer.html"
+                                    class="flex items-center admin-link px-3 py-2 text-xs font-semibold rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors hidden"><i
+                                        class="fas fa-code w-4 mr-2 text-gray-400"></i> Developer</a></div>
+                            <div class="mt-1 pt-1 border-t border-gray-100 dark:border-white/10"><button
+                                    id="logout-header"
+                                    class="w-full flex items-center px-3 py-2 text-xs font-bold text-red-500 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors text-left"><i
+                                        class="fas fa-power-off w-4 mr-2"></i> Log Out</button></div>
                         </div>
                     </div>
                 </div>
             </header>
 
-            <div class="max-w-6xl mx-auto space-y-8 pb-10 animate-fade-in">
-                
-                <div class="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-indigo-500 via-purple-600 to-indigo-800 text-white p-10 mb-8 text-center shadow-glow dark:shadow-none spring-click cursor-default group">
-                    <div class="absolute inset-0 bg-white/5 opacity-20"></div>
-                    <div class="relative z-10">
-                        <h1 class="text-4xl lg:text-5xl font-extrabold mb-3 tracking-tight">Hostel Rules</h1>
-                        <p class="text-indigo-100 text-sm lg:text-base max-w-lg mx-auto opacity-90 leading-relaxed">Guidelines for a safe, disciplined, and harmonious environment.</p>
+            <div class="max-w-6xl mx-auto pb-10 animate-fade-in px-2 md:px-0">
+
+                <!-- Premium Hero Section -->
+                <div
+                    class="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-iosBlue to-premiumBlue text-white p-10 mb-10 shadow-lg group">
+                    <div class="absolute inset-0 bg-white/5 opacity-10 mix-blend-overlay">
+                    </div>
+                    <div class="relative z-10 flex flex-col md:flex-row items-center gap-8 md:gap-12">
+                        <div class="flex-1 text-center md:text-left">
+                            <span
+                                class="inline-block px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-md text-[10px] font-bold uppercase tracking-[0.2em] mb-4 border border-white/30">Official
+                                Guidelines</span>
+                            <h1 class="text-4xl lg:text-6xl font-black mb-4 tracking-tighter leading-none">NBKR Hostel
+                                Rules</h1>
+                            <p class="text-white/80 text-sm lg:text-lg max-w-xl opacity-90 leading-relaxed font-medium">
+                                Ensuring a safe, disciplined, and harmonious environment for every resident of NBKRIST
+                                Hostels.</p>
+                        </div>
+                        <div
+                            class="hidden lg:block w-48 h-48 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 p-6 shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-500">
+                            <div
+                                class="w-full h-full rounded-2xl bg-white flex items-center justify-center text-iosBlue text-5xl">
+                                <i class="fas fa-gavel"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide snap-x" id="filter-container">
-                    <button data-filter="all" class="filter-btn active snap-start px-6 py-3 rounded-2xl text-sm font-bold bg-white dark:bg-white/5 text-gray-500 dark:text-gray-400 whitespace-nowrap border border-transparent hover:bg-white/80 dark:hover:bg-white/10 spring-click">All Rules</button>
-                    <button data-filter="timings" class="filter-btn snap-start px-6 py-3 rounded-2xl text-sm font-bold bg-white dark:bg-white/5 text-gray-500 dark:text-gray-400 whitespace-nowrap border border-transparent hover:bg-white/80 dark:hover:bg-white/10 spring-click">Timings</button>
-                    <button data-filter="conduct" class="filter-btn snap-start px-6 py-3 rounded-2xl text-sm font-bold bg-white dark:bg-white/5 text-gray-500 dark:text-gray-400 whitespace-nowrap border border-transparent hover:bg-white/80 dark:hover:bg-white/10 spring-click">Conduct</button>
-                    <button data-filter="safety" class="filter-btn snap-start px-6 py-3 rounded-2xl text-sm font-bold bg-white dark:bg-white/5 text-gray-500 dark:text-gray-400 whitespace-nowrap border border-transparent hover:bg-white/80 dark:hover:bg-white/10 spring-click">Safety</button>
-                    <button data-filter="visitors" class="filter-btn snap-start px-6 py-3 rounded-2xl text-sm font-bold bg-white dark:bg-white/5 text-gray-500 dark:text-gray-400 whitespace-nowrap border border-transparent hover:bg-white/80 dark:hover:bg-white/10 spring-click">Visitors</button>
+                <!-- Search & Filters -->
+                <div class="sticky top-24 z-40 mb-10">
+                    <div
+                        class="glass-panel p-4 rounded-[2rem] flex flex-col lg:flex-row gap-4 shadow-glass border border-white/40 dark:border-white/5">
+                        <div class="relative flex-1 group">
+                            <i
+                                class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-iosBlue transition-colors"></i>
+                            <input type="text" id="rule-search"
+                                placeholder="Search rules (e.g., 'parking', 'visitors')..."
+                                class="w-full bg-gray-50 dark:bg-white/5 border-none rounded-2xl py-4 pl-14 pr-6 focus:ring-2 focus:ring-iosBlue focus:bg-white dark:focus:bg-white/10 transition-all text-sm font-semibold placeholder:text-gray-400">
+                        </div>
+                        <div class="flex gap-2 p-1 bg-gray-50/50 dark:bg-black/20 rounded-2xl overflow-x-auto scrollbar-hide no-scrollbar"
+                            id="filter-container">
+                            <button data-filter="all"
+                                class="filter-btn active px-6 py-3 rounded-xl text-xs font-bold transition-all whitespace-nowrap">All</button>
+                            <button data-filter="timings"
+                                class="filter-btn px-5 py-3 rounded-xl text-xs font-bold transition-all whitespace-nowrap">Timings</button>
+                            <button data-filter="conduct"
+                                class="filter-btn px-5 py-3 rounded-xl text-xs font-bold transition-all whitespace-nowrap">Conduct</button>
+                            <button data-filter="safety"
+                                class="filter-btn px-5 py-3 rounded-xl text-xs font-bold transition-all whitespace-nowrap">Safety</button>
+                            <button data-filter="visitors"
+                                class="filter-btn px-5 py-3 rounded-xl text-xs font-bold transition-all whitespace-nowrap">Visitors</button>
+                        </div>
+                    </div>
                 </div>
 
-                <div id="rules-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    </div>
+                <!-- Rules Display Area -->
+                <div id="rules-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                    <!-- Cards will be injected here -->
+                </div>
 
-                <div class="text-center py-8 text-xs text-gray-400 border-t border-gray-200 dark:border-white/5 mt-8">
-                    <p>Violation of any rule may lead to disciplinary action as per college policy.</p>
+                <!-- Disciplinary Note -->
+                <div
+                    class="glass-panel p-8 rounded-[2.5rem] border-2 border-dashed border-red-500/20 dark:border-red-500/10 text-center group hover:border-red-500/40 transition-colors">
+                    <div
+                        class="w-12 h-12 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h4 class="font-bold text-gray-900 dark:text-white mb-2">Disciplinary Notice</h4>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">Violation of
+                        any of the above rules may lead to disciplinary action, including fines or suspension, as per
+                        the NBKR Institute of Science & Technology policy.</p>
                 </div>
 
             </div>
         </main>
+
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <script type="module" src="main.js"></script>
-
-    <script type="module">
-        import { checkUserSession, handleLogout, db, markNotificationsAsRead } from './main.js';
-
-        window.markNotificationsAsRead = markNotificationsAsRead || function() {};
-        window.toggleSidebar = () => {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebar-overlay');
-            if (sidebar.classList.contains('-translate-x-full')) {
-                sidebar.classList.remove('-translate-x-full');
-                overlay.classList.remove('hidden');
-            } else {
-                sidebar.classList.add('-translate-x-full');
-                overlay.classList.add('hidden');
-            }
-        };
-        window.toggleTheme = () => {
-            if (document.documentElement.classList.contains('dark')) {
-                document.documentElement.classList.remove('dark');
-                localStorage.setItem('theme', 'light');
-            } else {
-                document.documentElement.classList.add('dark');
-                localStorage.setItem('theme', 'dark');
-            }
-        };
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            const user = await checkUserSession();
-            if (!user) return;
-            
-            const name = user.displayName || user.email.split('@')[0];
-            document.getElementById('user-name-display').innerText = name;
-            document.getElementById('user-name-dropdown').textContent = name;
-            if(user.photoURL) document.getElementById('user-avatar').src = user.photoURL;
-            document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-
-            document.getElementById('logout-header').addEventListener('click', handleLogout);
-            document.getElementById('logout-sidebar').addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
-
-            // NOTIFICATIONS (UPDATED CARD STYLE)
-            try {
-                db.collection('notifications').orderBy('timestamp', 'desc').limit(5).onSnapshot(snap => {
-                    const list = document.getElementById('notifications-list');
-                    const indicator = document.getElementById('unread-indicator');
-                    if (snap.empty) { list.innerHTML = '<li class="p-8 text-center text-gray-400 font-medium text-xs">No new notifications.</li>'; indicator.classList.add('hidden'); return; }
-                    let hasUnread = false; let html = '';
-                    snap.forEach(doc => {
-                        const d = doc.data();
-                        if (!d.targetUser || d.targetUser === user.uid) {
-                            if (!d.read) hasUnread = true;
-                            const time = d.timestamp ? new Date(d.timestamp.seconds * 1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Just now';
-                            html += `
-                            <li class="relative p-3 rounded-xl bg-white/40 dark:bg-white/5 border border-white/20 shadow-sm hover:bg-white/60 dark:hover:bg-white/10 transition-colors">
-                                <div class="flex gap-3">
-                                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100/50 dark:bg-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400">
-                                        <i class="fas fa-bell text-xs"></i>
-                                    </div>
-                                    <div class="flex-1 min-w-0">
-                                        <p class="text-sm font-semibold text-gray-900 dark:text-white leading-tight">${d.message || d.text || 'Notification'}</p>
-                                        <p class="text-[10px] text-gray-500 dark:text-gray-400 mt-1">${time}</p>
-                                    </div>
-                                    ${!d.read ? '<div class="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1"></div>' : ''}
-                                </div>
-                            </li>`;
-                        }
-                    });
-                    list.innerHTML = html;
-                    if (hasUnread) indicator.classList.remove('hidden'); else indicator.classList.add('hidden');
-                });
-            } catch (e) { console.error(e); }
-
-            // ADMIN LINK
-            db.collection('users').doc(user.uid).get().then(doc => {
-                if (doc.exists && doc.data().role === 'admin') {
-                    const nav = document.getElementById('sidebar-nav');
-                    nav.insertAdjacentHTML('beforeend', `<a href="admin.html" class="nav-item flex items-center px-5 py-4 rounded-[1.2rem] text-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 font-bold mt-4 spring-click"><i class="fas fa-shield-alt w-6"></i> <span>Admin Panel</span></a>`);
-                    const mob = document.getElementById('profile-dropdown-list');
-                    mob.insertAdjacentHTML('afterbegin', `<a href="admin.html" class="flex items-center px-4 py-3 text-sm font-bold text-purple-500 rounded-xl hover:bg-purple-50 dark:hover:bg-white/10 transition-colors"><i class="fas fa-shield-alt w-5 mr-3"></i> Admin Panel</a>`);
-                }
-            });
-
-            // RULES LOGIC
-            const rules = [
-                { title: 'Quiet Hours', description: 'Maintain silence from 10:00 PM to 6:00 AM.', icon: 'fa-moon', category: 'conduct' },
-                { title: 'Gate Closing', description: 'Main gates close at 9:30 PM. Late entry requires prior approval.', icon: 'fa-door-closed', category: 'timings' },
-                { title: 'Mess Timings', description: 'Breakfast: 7:30-9 AM, Lunch: 12:30-2 PM, Dinner: 7:30-9 PM.', icon: 'fa-utensils', category: 'timings' },
-                { title: 'Visitor Policy', description: 'Visitors are allowed only in designated areas from 4:00 PM to 7:00 PM.', icon: 'fa-users', category: 'visitors' },
-                { title: 'Cleanliness', description: 'Keep your room and common areas clean. Use designated bins.', icon: 'fa-broom', category: 'conduct' },
-                { title: 'Prohibited Items', description: 'Alcohol, drugs, and personal cooking appliances are forbidden.', icon: 'fa-ban', category: 'safety' },
-                { title: 'Key Security', description: 'Do not share your room keys. Report lost keys immediately.', icon: 'fa-key', category: 'safety' },
-                { title: 'Property Care', description: 'Any damage will be charged to the resident(s) responsible.', icon: 'fa-hammer', category: 'conduct' }
-            ];
-
-            const rulesGrid = document.getElementById('rules-grid');
-            const filterContainer = document.getElementById('filter-container');
-            let activeFilter = 'all';
-
-            const renderRules = () => {
-                rulesGrid.innerHTML = '';
-                let visibleCount = 0;
-                rules.forEach((rule, index) => {
-                    if (activeFilter === 'all' || rule.category === activeFilter) {
-                         visibleCount++;
-                         const ruleCard = `
-                            <div class="glass-panel p-6 rounded-[1.5rem] relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300 spring-click cursor-default">
-                                <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                                    <i class="fas ${rule.icon} text-8xl text-iosBlue"></i>
-                                </div>
-                                <div class="relative z-10">
-                                    <div class="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-iosBlue mb-4 text-xl">
-                                        <i class="fas ${rule.icon}"></i>
-                                    </div>
-                                    <h3 class="font-bold text-lg text-gray-900 dark:text-white mb-2 leading-tight">${rule.title}</h3>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">${rule.description}</p>
-                                </div>
-                            </div>
-                         `;
-                         rulesGrid.insertAdjacentHTML('beforeend', ruleCard);
-                    }
-                });
-                if(visibleCount === 0) rulesGrid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-400">No rules found.</div>`;
-            };
-            
-            filterContainer.addEventListener('click', (e) => {
-                if (e.target.tagName === 'BUTTON') {
-                    filterContainer.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-                    e.target.classList.add('active');
-                    activeFilter = e.target.dataset.filter;
-                    renderRules();
-                }
-            });
-
-            renderRules();
-        });
-    </script>
+    <script type="module" src="js/rules.js"></script>
 </body>
+
 </html>

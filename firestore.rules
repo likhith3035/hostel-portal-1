@@ -1,0 +1,172 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /* =====================
+       HELPER FUNCTIONS
+    ====================== */
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      // Check if the user has the 'admin' role in their user profile
+      return isSignedIn() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isSafeRoleChange() {
+      // Allow if admin, OR if role is not being changed, OR if the new role matches existing role
+      return isAdmin() ||
+        !('role' in request.resource.data) ||
+        request.resource.data.role == resource.data.role;
+    }
+
+    function isNotChanging(field) {
+      return !(field in request.resource.data &&
+               request.resource.data[field] != resource.data[field]);
+    }
+
+    /* =====================
+       USERS
+    ====================== */
+
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+
+      // SECURED: Prevent users from making themselves admins on creation
+      allow create: if isOwner(userId) &&
+        request.resource.data.keys().hasOnly(['name', 'email', 'role', 'createdAt']) &&
+        request.resource.data.role == 'student';
+
+      allow update: if (isOwner(userId) || isAdmin()) && isSafeRoleChange();
+
+      allow delete: if isAdmin();
+    }
+
+    /* =====================
+       BOOKINGS
+    ====================== */
+
+    match /bookings/{bookingId} {
+      allow read: if isSignedIn() &&
+        (resource.data.userId == request.auth.uid || isAdmin());
+
+      allow create: if isSignedIn() &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.keys().hasAll(['userId', 'roomId', 'status', 'createdAt']);
+
+      // Allow admins to update anything.
+      // Allow users to ONLY cancel (update leaveRequest/status properly handled by app logic usually, 
+      // but here restricted to leaveRequest for updates. 
+      // note: cancellation usually involves status change, but if logic separates it, this is fine).
+      // If user needs to cancel, they might need to update 'status' to 'cancelled'. 
+      // The user's original rule only allowed 'leaveRequest'. 
+      // Ensure this matches app logic. Assuming user knows their app logic.
+      allow update: if isAdmin() || (
+        isSignedIn() &&
+        resource.data.userId == request.auth.uid &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['leaveRequest'])
+      );
+
+      allow delete: if isAdmin() ||
+        (isOwner(resource.data.userId) &&
+         resource.data.status == 'rejected');
+    }
+
+    /* =====================
+       OUTPASSES & COMPLAINTS
+    ====================== */
+
+    match /{collection}/{docId} {
+      allow read: if collection in ['outpasses', 'complaints'] &&
+        isSignedIn() &&
+        (resource.data.userId == request.auth.uid || isAdmin());
+
+      allow create: if collection in ['outpasses', 'complaints'] &&
+        isSignedIn() &&
+        request.resource.data.userId == request.auth.uid;
+
+      allow update: if isAdmin() || (
+        collection in ['outpasses', 'complaints'] &&
+        isSignedIn() &&
+        resource.data.userId == request.auth.uid &&
+        isNotChanging('status')
+      );
+
+      allow delete: if isAdmin();
+    }
+
+    /* =====================
+       PUBLIC DATA
+    ====================== */
+
+    match /messMenu/{day} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /rooms/{roomId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /notices/{noticeId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    /* =====================
+       MEAL RATINGS
+    ====================== */
+
+    match /mealRatings/{ratingId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() &&
+        request.resource.data.userId == request.auth.uid;
+    }
+
+    /* =====================
+       NOTIFICATIONS
+    ====================== */
+
+    match /notifications/{notifId} {
+      allow read: if isSignedIn() && (
+        resource.data.recipientId == request.auth.uid ||
+        resource.data.recipientId == null ||
+        isAdmin()
+      );
+
+      allow create: if isAdmin();
+
+      allow update: if isAdmin() || (
+        isSignedIn() &&
+        (resource.data.recipientId == request.auth.uid ||
+         resource.data.recipientId == null) &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['readBy', 'deletedBy'])
+      );
+
+      allow delete: if isAdmin();
+    }
+
+    /* =====================
+       AUDIT LOGS (IMMUTABLE)
+    ====================== */
+
+    match /audit_logs/{logId} {
+      allow read: if isAdmin();
+
+      allow create: if isSignedIn() &&
+        (request.resource.data.userId == request.auth.uid ||
+         request.resource.data.adminId == request.auth.uid);
+
+      allow update, delete: if false;
+    }
+  }
+}

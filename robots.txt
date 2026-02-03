@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://nbkristhostelportal.netlify.app/sitemap.xml

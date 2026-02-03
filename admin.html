@@ -1,19 +1,40 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth antialiased">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Admin Command - NBKRIST</title>
-    
+
+
+    <title>Admin Panel | NBKRIST Hostel Portal</title>
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="description"
+        content="Official administrative gateway for NBKR all hostels. Managing NBKRIST girls hostel and boys hostels.">
+    <meta name="keywords"
+        content="nbkrist admin, nbkrist hostels, nbkrist girls hostel, nbkr all hostels, hostel management, nbkrist">
+    <link rel="canonical" href="https://nbkristhostelportal.netlify.app/admin">
+
+    <!-- PWA Meta Tags -->
+    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/en/3/3d/NBKRIST_logo.png">
+    <link rel="manifest" href="manifest.json?v=17">
+    <meta name="theme-color" content="#5E5CE6">
+    <meta name="apple-mobile-web-app-title" content="Portal Admin">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- AUTH GUARD: Must be first -->
+    <script type="module" src="js/security/auth-guard.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
     <script>
         tailwind.config = {
@@ -21,268 +42,539 @@
             theme: {
                 fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
                 extend: {
-                    colors: { iosBlue: '#007AFF', iosDark: '#000000', iosCardDark: '#1C1C1E' },
-                    boxShadow: { 'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.07)', 'glow': '0 0 40px -10px rgba(0, 122, 255, 0.3)' },
-                    animation: { 'fade-in': 'fadeIn 0.6s ease-out forwards', 'blob': 'blob 10s infinite' },
+                    colors: {
+                        iosBlue: '#5E5CE6',
+                        iosDark: '#000000',
+                        iosCardDark: '#1C1C1E'
+                    },
+                    boxShadow: {
+                        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.07)',
+                        'glow': '0 0 40px -10px rgba(94, 92, 230, 0.3)'
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out forwards',
+                        'blob': 'blob 10s infinite',
+                        'float': 'float 10s infinite ease-in-out'
+                    },
                     keyframes: {
                         fadeIn: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
-                        blob: { '0%': { transform: 'translate(0px, 0px) scale(1)' }, '33%': { transform: 'translate(30px, -50px) scale(1.1)' }, '66%': { transform: 'translate(-20px, 20px) scale(0.9)' }, '100%': { transform: 'translate(0px, 0px) scale(1)' } }
+                        blob: { '0%': { transform: 'translate(0px, 0px) scale(1)' }, '33%': { transform: 'translate(30px, -50px) scale(1.1)' }, '66%': { transform: 'translate(-20px, 20px) scale(0.9)' }, '100%': { transform: 'translate(0px, 0px) scale(1)' } },
+                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-15px)' } }
                     }
                 }
             }
         }
         if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
         }
     </script>
 
+    <!-- Custom Style System -->
+    <link rel="stylesheet" href="css/style.css">
+
     <style>
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.3); border-radius: 10px; }
-        .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.5); box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05); }
-        .dark .glass-panel { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); }
-        .nav-btn { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .nav-btn.active { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4); }
-        .blob-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; background: #f8fafc; overflow: hidden; }
-        .dark .blob-bg { background: #020617; }
-        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; }
-        .blob-1 { top: -10%; left: -10%; width: 600px; height: 600px; background: #c7d2fe; animation-delay: 0s; } .dark .blob-1 { background: #312e81; opacity: 0.4; }
-        .blob-2 { bottom: -10%; right: -10%; width: 500px; height: 500px; background: #e0e7ff; animation-delay: 2s; } .dark .blob-2 { background: #1e1b4b; opacity: 0.4; }
-        .form-input { width: 100%; padding: 0.8rem 1rem; border-radius: 0.8rem; border: 1px solid rgba(0,0,0,0.1); background-color: rgba(255,255,255,0.5); transition: all 0.2s; font-size: 0.875rem; }
-        .dark .form-input { border-color: rgba(255,255,255,0.1); background-color: rgba(255,255,255,0.05); color: white; }
-        .form-input:focus { outline: none; border-color: #6366f1; background-color: white; }
-        .dark .form-input:focus { background-color: #1e293b; }
-        .sidebar-overlay { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); }
+        /* Modern iOS Overrides */
+        .glass-panel {
+            backdrop-filter: blur(25px) saturate(180%) !important;
+        }
     </style>
 </head>
-<body class="text-slate-800 dark:text-slate-200 transition-colors duration-500 overflow-hidden" x-data="{ currentTab: 'stats', sidebarOpen: false }">
 
-    <div class="blob-bg"><div class="blob blob-1 animate-blob"></div><div class="blob blob-2 animate-blob"></div></div>
+<body class="text-slate-800 dark:text-slate-200 transition-colors duration-500 overflow-hidden"
+    x-data="{ currentTab: 'stats', sidebarOpen: false }">
 
-    <div id="loading-screen" class="fixed inset-0 z-[100] flex items-center justify-center bg-white/90 dark:bg-black/90 backdrop-blur-md transition-opacity duration-500">
-        <div class="text-center"><div class="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div><h2 class="text-lg font-bold tracking-tight">Accessing Secure Channel...</h2></div>
+    <div class="mesh-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
     </div>
 
-    <div id="admin-interface" class="flex h-screen opacity-0 transition-opacity duration-500">
-        
-        <div x-show="sidebarOpen" @click="sidebarOpen = false" x-transition.opacity class="fixed inset-0 z-40 sidebar-overlay lg:hidden"></div>
+    <div id="loading-screen"
+        class="fixed inset-0 z-[100] flex items-center justify-center bg-white/95 dark:bg-black/95 backdrop-blur-md transition-opacity duration-500">
+        <div class="text-center">
+            <div
+                class="w-12 h-12 border-[5px] border-iosBlue border-t-transparent rounded-full animate-spin mx-auto mb-6">
+            </div>
+            <h2 class="text-sm font-black tracking-widest text-gray-900 dark:text-white uppercase opacity-80">
+                Authenticating Access...</h2>
+        </div>
+    </div>
 
-        <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" class="fixed inset-y-0 left-0 z-50 w-64 glass-panel border-r border-white/20 flex flex-col transition-transform duration-300 lg:static lg:translate-x-0 lg:m-4 lg:rounded-[2rem] lg:h-[calc(100vh-2rem)]">
+    <div id="admin-interface" class="flex flex-col md:flex-row h-screen opacity-0 transition-opacity duration-500">
+
+        <div x-show="sidebarOpen" @click="sidebarOpen = false" x-transition.opacity
+            class="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden"></div>
+
+        <aside id="sidebar" :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+            class="fixed inset-y-0 left-0 z-50 w-64 flex flex-col glass-panel border-r border-gray-200 dark:border-white/5 transition-transform duration-300 md:static md:translate-x-0 md:m-4 md:rounded-xl md:h-[calc(100vh-2rem)]">
             <div class="p-6 flex items-center justify-between lg:justify-start gap-4">
-                <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-lg shadow-lg shadow-indigo-500/30"><i class="fas fa-cube"></i></div><div><h1 class="font-bold text-xl tracking-tighter">Admin<span class="text-indigo-500">OS</span></h1><p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Mobile v2.0</p></div></div>
-                <button @click="sidebarOpen = false" class="lg:hidden text-gray-500 hover:text-red-500"><i class="fas fa-times text-xl"></i></button>
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-9 h-9 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-base shadow-lg shadow-indigo-600/20">
+                        <i class="fas fa-shield-halved"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg tracking-tight">Hostel<span class="text-indigo-600">Admin</span>
+                        </h1>
+                        <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest">Management Console</p>
+                    </div>
+                </div>
+                <button @click="sidebarOpen = false" class="md:hidden text-gray-500 hover:text-red-500"><i
+                        class="fas fa-times text-xl"></i></button>
             </div>
 
             <nav class="flex-1 px-4 space-y-2 overflow-y-auto custom-scrollbar py-2">
-                <button @click="currentTab = 'stats'; sidebarOpen = false" :class="currentTab === 'stats' ? 'active' : 'hover:bg-black/5 dark:hover:bg-white/5'" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-semibold text-sm group text-gray-500 dark:text-gray-400"><i class="fas fa-chart-line w-5 text-center"></i> <span>Overview</span></button>
-                <button @click="currentTab = 'users'; sidebarOpen = false" :class="currentTab === 'users' ? 'active' : 'hover:bg-black/5 dark:hover:bg-white/5'" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-semibold text-sm group text-gray-500 dark:text-gray-400"><i class="fas fa-users w-5 text-center"></i> <span>Users</span></button>
-                <button @click="currentTab = 'bookings'; sidebarOpen = false" :class="currentTab === 'bookings' ? 'active' : 'hover:bg-black/5 dark:hover:bg-white/5'" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-semibold text-sm group text-gray-500 dark:text-gray-400"><i class="fas fa-calendar-check w-5 text-center"></i> <span>Bookings</span></button>
-                <button @click="currentTab = 'outpass'; sidebarOpen = false" :class="currentTab === 'outpass' ? 'active' : 'hover:bg-black/5 dark:hover:bg-white/5'" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-semibold text-sm group text-gray-500 dark:text-gray-400"><i class="fas fa-door-open w-5 text-center"></i> <span>Outpasses</span></button>
-                <button @click="currentTab = 'complaints'; sidebarOpen = false" :class="currentTab === 'complaints' ? 'active' : 'hover:bg-black/5 dark:hover:bg-white/5'" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-semibold text-sm group text-gray-500 dark:text-gray-400"><i class="fas fa-inbox w-5 text-center"></i> <span>Complaints</span></button>
-                <button @click="currentTab = 'menu'; sidebarOpen = false" :class="currentTab === 'menu' ? 'active' : 'hover:bg-black/5 dark:hover:bg-white/5'" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-semibold text-sm group text-gray-500 dark:text-gray-400"><i class="fas fa-utensils w-5 text-center"></i> <span>Mess Menu</span></button>
-                <button @click="currentTab = 'content'; sidebarOpen = false" :class="currentTab === 'content' ? 'active' : 'hover:bg-black/5 dark:hover:bg-white/5'" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-semibold text-sm group text-gray-500 dark:text-gray-400"><i class="fas fa-broadcast-tower w-5 text-center"></i> <span>Broadcast</span></button>
+                <button @click="currentTab = 'stats'; sidebarOpen = false"
+                    :class="currentTab === 'stats' ? 'active' : 'hover:bg-black/5 dark:hover:bg-white/5'"
+                    class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-semibold text-sm group text-gray-500 dark:text-gray-400"><i
+                        class="fas fa-chart-line w-5 text-center"></i> <span>Overview</span></button>
+                <button @click="currentTab = 'users'; sidebarOpen = false"
+                    :class="currentTab === 'users' ? 'active' : 'hover:bg-black/5 dark:hover:bg-white/5'"
+                    class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-semibold text-sm group text-gray-500 dark:text-gray-400"><i
+                        class="fas fa-users w-5 text-center"></i> <span>Users</span></button>
+                <button @click="currentTab = 'bookings'; sidebarOpen = false"
+                    :class="currentTab === 'bookings' ? 'active' : 'hover:bg-black/5 dark:hover:bg-white/5'"
+                    class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-semibold text-sm group text-gray-500 dark:text-gray-400"><i
+                        class="fas fa-calendar-check w-5 text-center"></i> <span>Bookings</span></button>
+                <button @click="currentTab = 'outpass'; sidebarOpen = false"
+                    :class="currentTab === 'outpass' ? 'active' : 'hover:bg-black/5 dark:hover:bg-white/5'"
+                    class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-semibold text-sm group text-gray-500 dark:text-gray-400"><i
+                        class="fas fa-door-open w-5 text-center"></i> <span>Outpasses</span></button>
+                <button @click="currentTab = 'complaints'; sidebarOpen = false"
+                    :class="currentTab === 'complaints' ? 'active' : 'hover:bg-black/5 dark:hover:bg-white/5'"
+                    class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-semibold text-sm group text-gray-500 dark:text-gray-400"><i
+                        class="fas fa-inbox w-5 text-center"></i> <span>Complaints</span></button>
+                <button @click="currentTab = 'menu'; sidebarOpen = false"
+                    :class="currentTab === 'menu' ? 'active' : 'hover:bg-black/5 dark:hover:bg-white/5'"
+                    class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-semibold text-sm group text-gray-500 dark:text-gray-400"><i
+                        class="fas fa-utensils w-5 text-center"></i> <span>Mess Menu</span></button>
+                <button @click="currentTab = 'content'; sidebarOpen = false"
+                    :class="currentTab === 'content' ? 'active' : 'hover:bg-black/5 dark:hover:bg-white/5'"
+                    class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-semibold text-sm group text-gray-500 dark:text-gray-400"><i
+                        class="fas fa-broadcast-tower w-5 text-center"></i> <span>Broadcast</span></button>
             </nav>
 
-            <div class="p-4 mt-auto border-t border-gray-100 dark:border-white/5">
-                <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-red-50 dark:bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all text-sm font-bold justify-center lg:justify-start"><i class="fas fa-sign-out-alt"></i> <span>Exit Console</span></a>
+            <div class="p-4 mt-auto border-t border-gray-100 dark:border-white/5 space-y-2">
+                <a href="info.html"
+                    class="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-gray-500 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 text-[10px] font-bold uppercase tracking-widest transition-all">
+                    <i class="fas fa-info-circle"></i> Info Page
+                </a>
+                <a href="developer.html"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-500 hover:bg-indigo-500 hover:text-white transition-all text-sm font-bold justify-center md:justify-start"><i
+                        class="fas fa-code"></i> <span>Developer Page</span></a>
+
+                <div class="flex justify-center space-x-6 py-2 opacity-70">
+                    <a href="https://github.com/likhith3035" target="_blank"
+                        class="hover:text-indigo-500 transition-transform hover:scale-110"><i
+                            class="fab fa-github text-xl"></i></a>
+                    <a href="https://www.instagram.com/lucky__likhith?igsh=bTgxYjZtZ2wwYmR4" target="_blank"
+                        class="hover:text-indigo-500 transition-transform hover:scale-110"><i
+                            class="fab fa-instagram text-xl"></i></a>
+                    <a href="https://www.linkedin.com/in/likhith-kami/" target="_blank"
+                        class="hover:text-indigo-500 transition-transform hover:scale-110"><i
+                            class="fab fa-linkedin text-xl"></i></a>
+                </div>
+                <a href="index.html"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl bg-red-50 dark:bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all text-sm font-bold justify-center md:justify-start"><i
+                        class="fas fa-sign-out-alt"></i> <span>Exit Console</span></a>
             </div>
         </aside>
 
-        <main class="flex-1 overflow-y-auto h-full p-4 lg:p-8 w-full">
-            
-            <div class="flex justify-between items-center mb-6 lg:mb-8 glass-panel p-3 lg:p-4 rounded-2xl sticky top-0 z-30 shadow-sm">
+        <main class="flex-1 overflow-y-auto overflow-x-hidden h-full p-4 md:p-8 w-full">
+
+            <div
+                class="flex justify-between items-center mb-6 md:mb-8 glass-panel p-3 md:p-4 rounded-2xl sticky top-0 z-30 shadow-sm">
                 <div class="flex items-center gap-3">
-                    <button @click="sidebarOpen = true" class="lg:hidden w-10 h-10 rounded-xl bg-gray-100 dark:bg-white/10 flex items-center justify-center text-gray-600 dark:text-gray-300"><i class="fas fa-bars"></i></button>
-                    <div><h2 class="text-lg font-bold dark:text-white leading-none">Dashboard</h2><p class="text-[10px] text-gray-500 dark:text-gray-400 font-mono" id="current-date-header">...</p></div>
+                    <button @click="sidebarOpen = true"
+                        class="lg:hidden w-10 h-10 rounded-xl bg-gray-100 dark:bg-white/10 flex items-center justify-center text-gray-600 dark:text-gray-300"><i
+                            class="fas fa-bars"></i></button>
+                    <div>
+                        <h2 class="text-lg font-bold dark:text-white leading-none">Dashboard</h2>
+                        <div class="flex items-center gap-2 mt-1">
+                            <p class="text-[10px] text-gray-500 dark:text-gray-400 font-mono" id="current-date">
+                                ...</p>
+                            <span class="text-gray-300 dark:text-gray-700">|</span>
+                            <p class="text-[10px] font-bold text-indigo-500 tabular-nums" id="clock-time">00:00</p>
+                            <p class="text-[8px] font-bold text-indigo-500 uppercase" id="am-pm"></p>
+                        </div>
+                    </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <span class="hidden md:inline-block text-[10px] bg-green-500/10 text-green-500 font-bold px-2 py-1 rounded">LIVE</span>
-                    <button onclick="document.documentElement.classList.toggle('dark')" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-white/10 flex items-center justify-center text-gray-500 hover:text-indigo-500 transition-colors"><i class="fas fa-moon dark:hidden"></i><i class="fas fa-sun hidden dark:block"></i></button>
+                    <span
+                        class="hidden md:inline-block text-[10px] bg-green-500/10 text-green-500 font-bold px-2 py-1 rounded">LIVE</span>
+                    <button onclick="document.documentElement.classList.toggle('dark')"
+                        class="w-10 h-10 rounded-full bg-gray-100 dark:bg-white/10 flex items-center justify-center text-gray-500 hover:text-indigo-500 transition-colors"><i
+                            class="fas fa-moon dark:hidden"></i><i class="fas fa-sun hidden dark:block"></i></button>
                 </div>
             </div>
 
             <div class="max-w-7xl mx-auto space-y-6 pb-20">
 
-                <div x-show="currentTab === 'stats'" class="animate-fade-in space-y-6">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div class="glass-panel p-5 rounded-[1.5rem] relative overflow-hidden"><div class="flex justify-between items-start relative z-10"><div><p class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Students</p><h3 id="stat-total-users" class="text-3xl font-black text-slate-800 dark:text-white mt-1">--</h3></div><div class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 flex items-center justify-center"><i class="fas fa-user-graduate"></i></div></div></div>
-                        <div class="glass-panel p-5 rounded-[1.5rem] relative overflow-hidden"><div class="flex justify-between items-start relative z-10"><div><p class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Pending</p><h3 id="stat-pending-bookings" class="text-3xl font-black text-slate-800 dark:text-white mt-1">--</h3></div><div class="w-10 h-10 rounded-full bg-yellow-100 dark:bg-yellow-500/20 text-yellow-600 flex items-center justify-center"><i class="fas fa-clock"></i></div></div></div>
-                        <div class="glass-panel p-5 rounded-[1.5rem] relative overflow-hidden"><div class="flex justify-between items-start relative z-10"><div><p class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Issues</p><h3 id="stat-open-complaints" class="text-3xl font-black text-slate-800 dark:text-white mt-1">--</h3></div><div class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-500/20 text-red-600 flex items-center justify-center"><i class="fas fa-exclamation-triangle"></i></div></div></div>
+                <div x-show="currentTab === 'stats'" class="animate-fade-in space-y-8">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div
+                            class="glass-panel p-6 rounded-[2rem] relative overflow-hidden transition-transform duration-300 hover:scale-[1.02] group">
+                            <div
+                                class="absolute top-0 right-0 w-24 h-24 bg-indigo-500/10 rounded-bl-[4rem] -mr-4 -mt-4 transition-all group-hover:bg-indigo-500/20">
+                            </div>
+                            <div class="flex flex-col relative z-10">
+                                <div
+                                    class="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-500/20 text-indigo-600 flex items-center justify-center mb-4 shadow-sm border border-indigo-100 dark:border-indigo-500/30">
+                                    <i class="fas fa-user-graduate text-xl"></i>
+                                </div>
+                                <h3 id="stat-total-users"
+                                    class="text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-1">
+                                    --
+                                </h3>
+                                <p class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
+                                    Total Students</p>
+                            </div>
+                        </div>
+                        <div
+                            class="glass-panel p-6 rounded-[2rem] relative overflow-hidden transition-transform duration-300 hover:scale-[1.02] group">
+                            <div
+                                class="absolute top-0 right-0 w-24 h-24 bg-amber-500/10 rounded-bl-[4rem] -mr-4 -mt-4 transition-all group-hover:bg-amber-500/20">
+                            </div>
+                            <div class="flex flex-col relative z-10">
+                                <div
+                                    class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-500/20 text-amber-600 flex items-center justify-center mb-4 shadow-sm border border-amber-100 dark:border-amber-500/30">
+                                    <i class="fas fa-clock text-xl"></i>
+                                </div>
+                                <h3 id="stat-pending-bookings"
+                                    class="text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-1">
+                                    <span class="skeleton inline-block w-16 h-8 rounded-md"></span>
+                                </h3>
+                                <p class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
+                                    Pending</p>
+                            </div>
+                        </div>
+                        <div
+                            class="glass-panel p-6 rounded-[2rem] relative overflow-hidden transition-transform duration-300 hover:scale-[1.02] group">
+                            <div
+                                class="absolute top-0 right-0 w-24 h-24 bg-red-500/10 rounded-bl-[4rem] -mr-4 -mt-4 transition-all group-hover:bg-red-500/20">
+                            </div>
+                            <div class="flex flex-col relative z-10">
+                                <div
+                                    class="w-12 h-12 rounded-2xl bg-red-50 dark:bg-red-500/20 text-red-600 flex items-center justify-center mb-4 shadow-sm border border-red-100 dark:border-red-500/30">
+                                    <i class="fas fa-exclamation-triangle text-xl"></i>
+                                </div>
+                                <h3 id="stat-open-complaints"
+                                    class="text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-1">
+                                    <span class="skeleton inline-block w-16 h-8 rounded-md"></span>
+                                </h3>
+                                <p class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
+                                    Issues</p>
+                            </div>
+                        </div>
+                        <!-- Added 4th card for symmetry or future use, keeping it transparent/placeholder if data not avail or duplicate -->
+                        <div
+                            class="glass-panel p-6 rounded-[2rem] relative overflow-hidden transition-transform duration-300 hover:scale-[1.02] group border-dashed border-2 border-gray-300/50 dark:border-white/10 flex items-center justify-center opacity-70">
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest text-center">
+                                System Status<br><span class="text-green-500 text-lg">Online</span></p>
+                        </div>
                     </div>
-                    <div class="glass-panel p-6 rounded-[2rem]"><h3 class="font-bold text-lg mb-4">Weekly Activity</h3><div class="h-56 w-full"><canvas id="adminChart"></canvas></div></div>
+                    <div class="glass-panel p-6 rounded-[2rem]">
+                        <h3 class="font-bold text-lg mb-4">Weekly Activity</h3>
+                        <div class="h-56 w-full"><canvas id="adminChart"></canvas></div>
+                    </div>
                 </div>
 
                 <div x-show="currentTab === 'users'" class="animate-fade-in">
                     <div class="glass-panel rounded-[1.5rem] overflow-hidden flex flex-col h-[calc(100vh-9rem)]">
-                        <div class="p-4 border-b border-gray-200 dark:border-white/10"><h3 class="font-bold text-lg mb-3">User Directory</h3><div class="relative"><input type="text" id="user-search" placeholder="Search..." class="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 text-sm outline-none"><i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i></div></div>
-                        <div class="flex-1 overflow-x-auto overflow-y-auto"><table class="w-full text-left min-w-[600px]"><thead class="bg-gray-50/50 dark:bg-white/5 text-xs uppercase text-gray-500 dark:text-gray-400 font-bold sticky top-0 backdrop-blur-md"><tr><th class="px-6 py-4">Student</th><th class="px-6 py-4">Role</th><th class="px-6 py-4 text-right">Actions</th></tr></thead><tbody id="users-list" class="divide-y divide-gray-100 dark:divide-white/5 text-sm"><tr><td colspan="3" class="p-6 text-center text-gray-400">Loading...</td></tr></tbody></table></div>
+                        <div class="p-4 border-b border-gray-200 dark:border-white/10">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="font-bold text-lg">User Directory</h3>
+                                <button id="view-archive-btn"
+                                    class="hidden text-xs font-bold bg-white dark:bg-white/10 border border-gray-200 dark:border-white/10 px-3 py-1.5 rounded-lg text-gray-500 hover:text-indigo-500 transition-colors shadow-sm">
+                                    <i class="fas fa-trash-alt mr-2"></i>View Archive
+                                </button>
+                            </div>
+                            <div class="relative"><input type="text" id="user-search" placeholder="Search..."
+                                    class="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 text-sm outline-none"><i
+                                    class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            </div>
+                        </div>
+                        <div class="flex-1 overflow-x-auto overflow-y-auto">
+                            <table class="w-full text-left min-w-[700px] border-separate border-spacing-y-2 px-4">
+                                <thead class="sticky top-0 z-10">
+                                    <tr
+                                        class="text-[10px] uppercase text-gray-400 dark:text-gray-500 font-black tracking-widest">
+                                        <th
+                                            class="px-6 py-4 pl-8 bg-white/95 dark:bg-[#1c1c1e] backdrop-blur-xl rounded-l-2xl shadow-sm border-y border-l border-gray-100 dark:border-white/5">
+                                            Student Profile</th>
+                                        <th
+                                            class="px-6 py-4 bg-white/95 dark:bg-[#1c1c1e] backdrop-blur-xl shadow-sm border-y border-gray-100 dark:border-white/5">
+                                            Role & Access</th>
+                                        <th
+                                            class="px-6 py-4 pr-8 text-right bg-white/95 dark:bg-[#1c1c1e] backdrop-blur-xl rounded-r-2xl shadow-sm border-y border-r border-gray-100 dark:border-white/5">
+                                            Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-list" class="text-sm">
+                                    <tr>
+                                        <td colspan="3" class="p-20 text-center">
+                                            <div class="flex flex-col items-center justify-center opacity-60">
+                                                <div class="relative w-16 h-16 mb-4">
+                                                    <div
+                                                        class="absolute inset-0 border-4 border-indigo-100 dark:border-indigo-500/20 rounded-full">
+                                                    </div>
+                                                    <div
+                                                        class="absolute inset-0 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin">
+                                                    </div>
+                                                </div>
+                                                <span
+                                                    class="text-xs font-bold text-gray-400 uppercase tracking-[0.2em] animate-pulse">Loading
+                                                    Directory...</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Deleted Users Archive (Super Admin Only) -->
+                    <div id="deleted-users-section" class="mt-8 hidden">
+                        <div
+                            class="p-4 border-b border-gray-200 dark:border-white/10 flex justify-between items-center bg-red-50/50 dark:bg-red-900/10 rounded-t-[1.5rem]">
+                            <h3 class="font-bold text-lg text-red-500">Deleted Users Archive</h3>
+                            <span
+                                class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Restorable</span>
+                        </div>
+                        <div class="glass-panel rounded-b-[1.5rem] overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left min-w-[300px] sm:min-w-[600px]">
+                                    <thead
+                                        class="bg-red-50 dark:bg-red-900/20 text-xs uppercase text-red-400 font-bold">
+                                        <tr>
+                                            <th class="px-4 py-3 sm:px-6 sm:py-4">Archived Student</th>
+                                            <th class="px-4 py-3 sm:px-6 sm:py-4">Deleted At</th>
+                                            <th class="px-4 py-3 sm:px-6 sm:py-4 text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="deleted-users-list"
+                                        class="divide-y divide-gray-100 dark:divide-white/5 text-sm">
+                                        <tr>
+                                            <td colspan="3" class="p-6 text-center text-gray-400">Archive empty.
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div x-show="currentTab === 'bookings'" class="animate-fade-in grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="glass-panel p-5 rounded-[1.5rem] h-[40vh] lg:h-[80vh] flex flex-col"><h3 class="font-bold text-lg mb-4 flex items-center gap-2"><span class="w-2 h-2 bg-yellow-500 rounded-full"></span> Room Requests</h3><div id="bookings-list" class="space-y-3 overflow-y-auto flex-1 custom-scrollbar pr-1"></div></div>
-                    <div class="glass-panel p-5 rounded-[1.5rem] h-[40vh] lg:h-[80vh] flex flex-col"><h3 class="font-bold text-lg mb-4 flex items-center gap-2"><span class="w-2 h-2 bg-orange-500 rounded-full"></span> Vacate Requests</h3><div id="leave-requests-list" class="space-y-3 overflow-y-auto flex-1 custom-scrollbar pr-1"></div></div>
+                <div x-show="currentTab === 'bookings'" class="animate-fade-in space-y-6">
+                    <!-- Booking Stats -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+                        <div class="glass-panel p-4 sm:p-6 rounded-[1.5rem] flex items-center justify-between">
+                            <div>
+                                <p class="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-widest">
+                                    Total Booked</p>
+                                <h3 id="stat-total-booked"
+                                    class="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white mt-1">
+                                    --</h3>
+                            </div>
+                            <div
+                                class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-blue-50 dark:bg-blue-500/10 text-blue-500 flex items-center justify-center text-lg sm:text-xl">
+                                <i class="fas fa-bed"></i>
+                            </div>
+                        </div>
+                        <div class="glass-panel p-4 sm:p-6 rounded-[1.5rem] flex items-center justify-between">
+                            <div>
+                                <p class="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-widest">
+                                    Pending Approval
+                                </p>
+                                <h3 id="stat-pending-approval"
+                                    class="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white mt-1">
+                                    --</h3>
+                            </div>
+                            <div
+                                class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-orange-50 dark:bg-orange-500/10 text-orange-500 flex items-center justify-center text-lg sm:text-xl">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                        <div class="glass-panel p-4 sm:p-6 rounded-[1.5rem] flex items-center justify-between">
+                            <div>
+                                <p class="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-widest">
+                                    Vacate Requests</p>
+                                <h3 id="stat-vacate-reqs"
+                                    class="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white mt-1">
+                                    --</h3>
+                            </div>
+                            <div
+                                class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-red-50 dark:bg-red-500/10 text-red-500 flex items-center justify-center text-lg sm:text-xl">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Booking Table -->
+                    <div class="glass-panel rounded-[1.5rem] overflow-hidden flex flex-col h-[65vh]">
+                        <div
+                            class="p-4 sm:p-5 border-b border-gray-100 dark:border-white/5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                            <h3 class="font-bold text-base sm:text-lg flex items-center gap-2"><span
+                                    class="w-2 h-2 bg-indigo-500 rounded-full"></span> Room Booking Management
+                            </h3>
+                            <div class="flex items-center gap-3 w-full sm:w-auto">
+                                <div class="relative w-full sm:w-64">
+                                    <input type="text" id="booking-search" placeholder="Search student or room..."
+                                        class="w-full pl-10 pr-4 py-2 rounded-xl bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 text-sm outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
+                                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                </div>
+                                <button onclick="loadBookings()"
+                                    class="w-10 h-10 rounded-xl bg-gray-50 dark:bg-white/5 flex items-center justify-center text-gray-500 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-all"
+                                    title="Refresh">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex-1 overflow-x-auto overflow-y-auto custom-scrollbar">
+                            <table class="w-full text-left min-w-[300px] sm:min-w-[900px]">
+                                <thead
+                                    class="bg-gray-50/50 dark:bg-white/5 text-[10px] uppercase text-gray-500 dark:text-gray-400 font-bold sticky top-0 backdrop-blur-md z-10">
+                                    <tr>
+                                        <th class="px-4 py-3 sm:px-6 sm:py-4">Student Details</th>
+                                        <th class="px-4 py-3 sm:px-6 sm:py-4">Room Info</th>
+                                        <th class="px-4 py-3 sm:px-6 sm:py-4 hidden sm:table-cell">Booking Date
+                                        </th>
+                                        <th class="px-4 py-3 sm:px-6 sm:py-4">Status</th>
+                                        <th class="px-4 py-3 sm:px-6 sm:py-4 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bookings-table-body"
+                                    class="divide-y divide-gray-100 dark:divide-white/5 text-sm">
+                                    <tr>
+                                        <td colspan="5" class="p-10 text-center">
+                                            <div class="flex flex-col items-center justify-center opacity-50">
+                                                <div
+                                                    class="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4">
+                                                </div>
+                                                <p class="text-xs font-bold uppercase tracking-widest text-gray-500">
+                                                    Loading Records...</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
 
-                <div x-show="currentTab === 'outpass'" class="animate-fade-in">
-                    <div class="glass-panel p-5 rounded-[1.5rem] h-[80vh] flex flex-col">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="font-bold text-lg flex items-center gap-2"><span class="w-2 h-2 bg-purple-500 rounded-full"></span> Pending Outpasses</h3>
-                            <button onclick="window.location.reload()" class="text-xs bg-indigo-500 text-white px-3 py-1 rounded-full font-bold">Refresh</button>
+                <div x-show="currentTab === 'outpass'" class="animate-fade-in space-y-6">
+                    <div class="glass-panel p-5 rounded-[1.5rem]">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                            <h3 class="font-bold text-lg flex items-center gap-2"><span
+                                    class="w-2 h-2 bg-purple-500 rounded-full"></span> Outpass Management</h3>
+                            <div class="flex items-center gap-3 w-full md:w-auto">
+                                <div id="outpass-bulk-actions"
+                                    class="hidden animate-slide-up flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-xl shadow-lg">
+                                    <span id="selected-count" class="text-xs font-bold">0 Selected</span>
+                                    <div class="w-px h-4 bg-white/20 mx-1"></div>
+                                    <button id="delete-selected-outpasses"
+                                        class="text-xs font-bold hover:text-red-200 transition-colors">
+                                        <i class="fas fa-trash-alt mr-1"></i> Delete
+                                    </button>
+                                </div>
+                                <div class="relative w-full md:w-64">
+                                    <input type="text" id="outpass-search" placeholder="Search by name..."
+                                        class="w-full pl-10 pr-4 py-2 rounded-xl bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 text-sm outline-none">
+                                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                </div>
+                            </div>
                         </div>
-                        <div id="admin-outpass-list" class="space-y-3 overflow-y-auto flex-1 custom-scrollbar">
-                            <p class="text-center text-gray-400 py-10">Loading outpasses...</p>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="flex flex-col h-[60vh]">
+                                <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">
+                                    Pending
+                                    Requests</h4>
+                                <div id="admin-outpass-list"
+                                    class="space-y-3 overflow-y-auto flex-1 custom-scrollbar pr-1">
+                                    <p class="text-center text-gray-400 py-10">Loading pending...</p>
+                                </div>
+                            </div>
+                            <div class="flex flex-col h-[60vh]">
+                                <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">
+                                    Recent
+                                    History</h4>
+                                <div id="admin-outpass-history"
+                                    class="space-y-3 overflow-y-auto flex-1 custom-scrollbar pr-1">
+                                    <p class="text-center text-gray-400 py-10">Loading history...</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <div x-show="currentTab === 'complaints'" class="animate-fade-in">
-                    <div class="glass-panel p-5 rounded-[1.5rem] h-[80vh] flex flex-col"><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-lg">Issues</h3><button onclick="window.location.reload()" class="text-xs bg-indigo-500 text-white px-3 py-1 rounded-full font-bold">Refresh</button></div><div id="all-complaints-list" class="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-y-auto flex-1 custom-scrollbar pb-4"></div></div>
+                    <div class="glass-panel p-5 rounded-[1.5rem] h-[80vh] flex flex-col">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-lg">Issues</h3><button onclick="window.location.reload()"
+                                class="text-xs bg-indigo-500 text-white px-3 py-1 rounded-full font-bold">Refresh</button>
+                        </div>
+                        <div id="all-complaints-list"
+                            class="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-y-auto flex-1 custom-scrollbar pb-4">
+                        </div>
+                    </div>
                 </div>
 
                 <div x-show="currentTab === 'menu'" class="animate-fade-in">
-                    <div class="glass-panel p-5 lg:p-8 rounded-[1.5rem]"><div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4"><h3 class="font-bold text-xl">Mess Menu</h3><button id="update-menu-btn" class="w-full sm:w-auto bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg flex items-center justify-center gap-2 text-sm"><i class="fas fa-save"></i> Save Changes</button></div><div id="menu-form" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6"><p class="text-center col-span-full py-10 text-gray-400">Loading menu...</p></div></div>
+                    <div class="glass-panel p-5 lg:p-8 rounded-[1.5rem]">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                            <h3 class="font-bold text-xl">Mess Menu</h3><button id="update-menu-btn"
+                                class="w-full sm:w-auto bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg flex items-center justify-center gap-2 text-sm"><i
+                                    class="fas fa-save"></i> Save Changes</button>
+                        </div>
+                        <div id="menu-form" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
+                            <p class="text-center col-span-full py-10 text-gray-400">Loading menu...</p>
+                        </div>
+                    </div>
                 </div>
 
                 <div x-show="currentTab === 'content'" class="animate-fade-in grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="lg:col-span-2 glass-panel p-5 rounded-[1.5rem]"><h3 class="font-bold text-lg mb-4">Send Broadcast</h3><form id="notification-form" class="relative mb-6"><textarea id="notification-text-input" rows="3" class="w-full p-4 rounded-xl bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 focus:ring-2 focus:ring-indigo-500 outline-none text-sm" placeholder="Push notification to all devices..."></textarea><button type="submit" class="absolute bottom-3 right-3 bg-indigo-500 text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-600 transition-colors">Send</button></form><h4 class="font-bold text-xs text-gray-400 uppercase tracking-widest mb-3">Broadcast History</h4><div id="general-notifications-list-container" class="space-y-2 max-h-64 overflow-y-auto"></div></div>
-                    <div class="glass-panel p-5 rounded-[1.5rem]"><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-lg">Notice Board</h3><button id="delete-all-notices-btn" class="text-[10px] font-bold bg-red-100 text-red-600 px-3 py-1.5 rounded-full hover:bg-red-200 transition-colors">Clear Board</button></div><form id="notice-form" class="mb-4"><input type="hidden" id="notice-id"><textarea id="notice-text" rows="4" class="w-full p-4 rounded-xl bg-yellow-50 dark:bg-yellow-500/10 border border-yellow-200 dark:border-yellow-500/20 focus:ring-2 focus:ring-yellow-400 outline-none text-sm mb-3" placeholder="New sticky notice..."></textarea><button id="notice-submit-btn" type="submit" class="w-full py-3 bg-yellow-400 text-yellow-900 font-bold rounded-xl text-sm hover:bg-yellow-500 transition-colors shadow-sm">Post Notice</button></form><div id="notices-list" class="space-y-2 max-h-60 overflow-y-auto"></div></div>
+                    <div class="lg:col-span-2 glass-panel p-5 rounded-[1.5rem]">
+                        <h3 class="font-bold text-lg mb-4">Send Broadcast</h3>
+                        <form id="notification-form" class="relative mb-6"><textarea id="notification-text-input"
+                                rows="3"
+                                class="w-full p-4 rounded-xl bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
+                                placeholder="Push notification to all devices..."></textarea><button type="submit"
+                                class="absolute bottom-3 right-3 bg-indigo-500 text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-600 transition-colors">Send</button>
+                        </form>
+                        <div class="flex justify-between items-center mb-3">
+                            <h4 class="font-bold text-xs text-gray-400 uppercase tracking-widest">Broadcast
+                                History</h4>
+                            <button id="clear-broadcasts-btn"
+                                class="text-[10px] bg-red-50 text-red-500 font-bold px-2 py-1 rounded hover:bg-red-100 transition-colors">Clear
+                                All</button>
+                        </div>
+                        <div id="general-notifications-list-container" class="space-y-2 max-h-64 overflow-y-auto"></div>
+                    </div>
+                    <div class="glass-panel p-5 rounded-[1.5rem]">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-lg">Notice Board</h3><button id="delete-all-notices-btn"
+                                class="text-[10px] font-bold bg-red-100 text-red-600 px-3 py-1.5 rounded-full hover:bg-red-200 transition-colors">Clear
+                                Board</button>
+                        </div>
+                        <form id="notice-form" class="mb-4"><input type="hidden" id="notice-id"><textarea
+                                id="notice-text" rows="4"
+                                class="w-full p-4 rounded-xl bg-yellow-50 dark:bg-yellow-500/10 border border-yellow-200 dark:border-yellow-500/20 focus:ring-2 focus:ring-yellow-400 outline-none text-sm mb-3"
+                                placeholder="New sticky notice..."></textarea><button id="notice-submit-btn"
+                                type="submit"
+                                class="w-full py-3 bg-yellow-400 text-yellow-900 font-bold rounded-xl text-sm hover:bg-yellow-500 transition-colors shadow-sm">Post
+                                Notice</button></form>
+                        <div id="notices-list" class="space-y-2 max-h-60 overflow-y-auto"></div>
+                    </div>
                 </div>
 
             </div>
         </main>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <script type="module" src="main.js"></script>
-
-    <script type="module">
-        import { checkUserSession, db, auth, showToast } from './main.js';
-
-        document.getElementById('current-date-header').innerText = new Date().toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short' });
-
-        const ctx = document.getElementById('adminChart').getContext('2d');
-        const adminChart = new Chart(ctx, {
-            type: 'line',
-            data: { labels: ['M', 'T', 'W', 'T', 'F', 'S', 'S'], datasets: [{ label: 'Reqs', data: [2, 5, 3, 8, 4, 1, 2], borderColor: '#ef4444', tension: 0.4 }, { label: 'Users', data: [5, 8, 12, 7, 15, 10, 6], borderColor: '#6366f1', tension: 0.4 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
-        });
-
-        document.addEventListener('DOMContentLoaded', () => {
-            (async () => {
-                const user = await checkUserSession();
-                if (!user) return;
-                
-                const userDoc = await db.collection('users').doc(user.uid).get();
-                if (!userDoc.exists || userDoc.data().role !== 'admin') {
-                    document.getElementById('loading-screen').innerHTML = `<div class="bg-white p-8 rounded-2xl shadow-xl text-center m-4"><i class="fas fa-lock text-4xl text-red-500 mb-4"></i><h2 class="text-xl font-bold">Access Denied</h2><a href="dashboard.html" class="mt-4 inline-block px-6 py-3 bg-gray-900 text-white rounded-xl font-bold">Go Back</a></div>`;
-                    return;
-                }
-
-                document.getElementById('loading-screen').classList.add('opacity-0', 'pointer-events-none');
-                document.getElementById('admin-interface').classList.remove('opacity-0');
-
-                // 1. User Management
-                const usersList = document.getElementById('users-list');
-                const loadUsers = async () => {
-                    const snapshot = await db.collection('users').orderBy('email').get();
-                    document.getElementById('stat-total-users').innerText = snapshot.size;
-                    let html = '';
-                    snapshot.forEach(doc => {
-                        const u = doc.data(); const role = u.role || 'student';
-                        const avatar = u.photoURL || `https://ui-avatars.com/api/?name=${u.displayName || 'User'}&background=random&color=fff`;
-                        html += `<tr class="group border-b border-gray-100 dark:border-white/5 hover:bg-indigo-50/50 dark:hover:bg-white/5 transition-colors"><td class="px-6 py-3"><div class="flex items-center gap-3"><img src="${avatar}" class="w-8 h-8 rounded-full object-cover"><div><p class="font-bold text-slate-800 dark:text-white text-sm whitespace-nowrap">${u.displayName || 'Unnamed'}</p><p class="text-[10px] text-gray-500">${u.email}</p></div></div></td><td class="px-6 py-3"><span class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-widest ${role === 'admin' ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-100 text-gray-500'}">${role}</span></td><td class="px-6 py-3 text-right"><div class="flex justify-end gap-2"><button class="make-admin-btn w-7 h-7 rounded bg-indigo-50 text-indigo-600 flex items-center justify-center hover:bg-indigo-100" data-id="${doc.id}"><i class="fas fa-user-shield text-xs"></i></button><button class="delete-user-btn w-7 h-7 rounded bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-100" data-id="${doc.id}"><i class="fas fa-trash text-xs"></i></button></div></td></tr>`;
-                    });
-                    usersList.innerHTML = html;
-                };
-                usersList.addEventListener('click', async (e) => {
-                    const btn = e.target.closest('button'); if(!btn) return;
-                    if (btn.classList.contains('make-admin-btn')) { await db.collection('users').doc(btn.dataset.id).set({ role: 'admin' }, { merge: true }); showToast('Role updated'); loadUsers(); }
-                    if (btn.classList.contains('delete-user-btn')) { if(confirm('Delete?')) { await db.collection('users').doc(btn.dataset.id).delete(); showToast('Deleted'); loadUsers(); } }
-                });
-                loadUsers();
-
-                // 2. Bookings
-                const bookingsList = document.getElementById('bookings-list');
-                const leaveList = document.getElementById('leave-requests-list');
-                db.collection('bookings').onSnapshot(snap => {
-                    let pendingHTML = '', leaveHTML = '', pendingCount = 0;
-                    snap.forEach(doc => {
-                        const b = doc.data();
-                        if (b.status === 'pending') { pendingCount++; pendingHTML += `<div class="bg-white/60 dark:bg-white/5 p-4 rounded-xl border border-white/20 shadow-sm"><div class="flex justify-between items-start mb-2"><div><p class="font-bold text-sm text-gray-900 dark:text-white truncate max-w-[150px]">${b.userEmail}</p><p class="text-xs text-gray-500">Room ${b.roomNumber} • Bed ${b.bedId}</p></div></div><div class="grid grid-cols-2 gap-2"><button class="approve-btn py-2 bg-green-500 text-white rounded-lg text-xs font-bold hover:opacity-90" data-id="${doc.id}" data-uid="${b.userId}">Approve</button><button class="reject-btn py-2 bg-red-500 text-white rounded-lg text-xs font-bold hover:opacity-90" data-id="${doc.id}" data-uid="${b.userId}">Deny</button></div></div>`; }
-                        if (b.leaveRequest && b.leaveRequest.status === 'pending') { leaveHTML += `<div class="bg-orange-50 dark:bg-orange-500/10 p-4 rounded-xl border border-orange-200 dark:border-orange-500/20"><div class="flex justify-between mb-1"><span class="text-[10px] font-bold text-orange-600 bg-orange-100 px-2 py-0.5 rounded uppercase">Vacate</span></div><p class="font-bold text-sm mb-1">${b.userEmail}</p><p class="text-xs text-gray-500 italic mb-3 bg-white/50 dark:bg-black/20 p-2 rounded">"${b.leaveRequest.reason}"</p><button class="vacate-confirm-btn w-full py-2 bg-slate-800 text-white text-xs font-bold rounded-lg" data-id="${doc.id}" data-uid="${b.userId}">Approve & Clear Bed</button></div>`; }
-                    });
-                    document.getElementById('stat-pending-bookings').innerText = pendingCount;
-                    bookingsList.innerHTML = pendingHTML || '<p class="text-center text-gray-400 text-xs py-4">All caught up!</p>';
-                    leaveList.innerHTML = leaveHTML || '<p class="text-center text-gray-400 text-xs py-4">No requests.</p>';
-                });
-                const handleBooking = async (action, dataset) => { const { uid } = dataset; const bRef = db.collection('bookings').doc(uid); try { if (action === 'approve') await bRef.update({ status: 'confirmed' }); else if (action === 'reject') await bRef.update({ status: 'rejected' }); else if (action === 'vacate') await bRef.delete(); showToast('Updated'); } catch (e) { console.error(e); } };
-                bookingsList.addEventListener('click', e => { const btn = e.target.closest('button'); if(btn) handleBooking(btn.classList.contains('approve-btn') ? 'approve' : 'reject', btn.dataset); });
-                leaveList.addEventListener('click', e => { if(e.target.classList.contains('vacate-confirm-btn')) handleBooking('vacate', e.target.dataset); });
-
-                // 3. OUTPASS LOGIC (WITH NOTIFICATIONS)
-                const outpassList = document.getElementById('admin-outpass-list');
-                db.collection('outpasses').where('status', '==', 'Pending').orderBy('timestamp', 'desc').onSnapshot(snap => {
-                    if (snap.empty) { outpassList.innerHTML = '<p class="text-center text-gray-400 py-10 text-sm">No pending requests.</p>'; return; }
-                    let html = '';
-                    snap.forEach(doc => {
-                        const d = doc.data();
-                        html += `
-                        <div class="p-4 bg-white/50 dark:bg-white/5 rounded-2xl border border-gray-200 dark:border-white/10 mb-2">
-                            <div class="flex justify-between mb-2"><div><p class="font-bold text-slate-800 dark:text-white text-sm">${d.userName}</p></div><div class="text-right"><a href="tel:${d.parentContact}" class="text-blue-500 font-bold text-xs"><i class="fas fa-phone"></i> ${d.parentContact}</a></div></div>
-                            <div class="text-xs bg-gray-100 dark:bg-white/5 p-3 rounded mb-3"><p class="mb-1"><span class="font-bold text-gray-500 uppercase">To:</span> ${d.destination}</p><p class="mb-1"><span class="font-bold text-gray-500 uppercase">Reason:</span> ${d.reason}</p><p class="mt-2 text-gray-400 font-mono">${d.fromDate} &rarr; ${d.toDate}</p></div>
-                            <div class="flex gap-2 justify-end">
-                                <button onclick="updateOutpass('${doc.id}', 'Rejected', '${d.userId}')" class="px-4 py-2 bg-red-100 text-red-600 rounded-lg text-xs font-bold hover:bg-red-200 transition-colors">Reject</button>
-                                <button onclick="updateOutpass('${doc.id}', 'Approved', '${d.userId}')" class="px-4 py-2 bg-green-500 text-white rounded-lg text-xs font-bold hover:bg-green-600 shadow-md transition-colors">Approve</button>
-                            </div>
-                        </div>`;
-                    });
-                    outpassList.innerHTML = html;
-                });
-
-                // Function to Update Status AND Send Notification
-                window.updateOutpass = async (docId, status, studentId) => {
-                    try {
-                        // 1. Update Status
-                        await db.collection('outpasses').doc(docId).update({ status: status });
-                        // 2. Send Notification to Student
-                        await db.collection('notifications').add({
-                            targetUser: studentId,
-                            message: `Your Outpass request was ${status}`,
-                            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                            read: false,
-                            type: 'outpass_update'
-                        });
-                        showToast(`Request ${status}`);
-                    } catch (error) { console.error(error); showToast('Error updating', true); }
-                };
-
-                // 4. Complaints
-                db.collection('complaints').orderBy('timestamp', 'desc').onSnapshot(snap => { document.getElementById('stat-open-complaints').innerText = snap.size; let html = ''; snap.forEach(doc => { const c = doc.data(); const color = c.urgency === 'high' ? 'border-red-500 bg-red-50/50' : 'border-gray-200 bg-white/50'; html += `<div class="p-4 rounded-2xl border-l-4 ${color} shadow-sm backdrop-blur-sm relative"><div class="flex justify-between items-start mb-2"><span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">${c.category}</span><span class="text-[10px] px-2 py-0.5 bg-white rounded shadow-sm">${c.status}</span></div><h4 class="font-bold text-sm leading-tight">${c.title}</h4><p class="text-xs text-gray-500 mt-1 line-clamp-2">${c.description}</p><div class="mt-3 pt-3 border-t border-gray-100 dark:border-white/5 flex justify-end gap-2"><button class="resolve-btn text-green-600 text-[10px] font-bold uppercase tracking-wider" data-id="${doc.id}">Mark Done</button><button class="del-complaint-btn text-red-500 text-[10px] font-bold uppercase tracking-wider" data-id="${doc.id}">Delete</button></div></div>`; }); document.getElementById('all-complaints-list').innerHTML = html; });
-                document.getElementById('all-complaints-list').addEventListener('click', e => { if(e.target.classList.contains('resolve-btn')) db.collection('complaints').doc(e.target.dataset.id).update({status: 'Resolved'}); if(e.target.classList.contains('del-complaint-btn')) db.collection('complaints').doc(e.target.dataset.id).delete(); });
-
-                // 5. Mess Menu
-                const menuForm = document.getElementById('menu-form'); const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']; const meals = ['breakfast', 'lunch', 'snacks', 'dinner'];
-                Promise.all(days.map(d => db.collection('messMenu').doc(d).get())).then(snapshots => { let formHTML = ''; snapshots.forEach((doc, index) => { const day = days[index]; const data = doc.exists ? doc.data() : {}; formHTML += `<div class="p-5 bg-white/60 dark:bg-white/5 rounded-2xl border border-white/20"><h4 class="font-bold capitalize mb-4 text-indigo-500 text-lg border-b border-gray-100 dark:border-white/10 pb-2">${day}</h4><div class="space-y-4">`; meals.forEach(meal => { const mealData = data[meal] || { item: '', isSpecial: false }; formHTML += `<div class="group"><label class="text-[10px] font-bold uppercase text-gray-400 mb-1 flex justify-between">${meal}<div class="flex items-center gap-1"><input type="checkbox" id="${day}-${meal}-special" class="w-3 h-3 rounded text-indigo-500" ${mealData.isSpecial ? 'checked' : ''}><span class="text-yellow-500">Special</span></div></label><input type="text" id="${day}-${meal}" value="${mealData.item}" class="form-input w-full text-sm font-medium" placeholder="-"></div>`; }); formHTML += `</div></div>`; }); menuForm.innerHTML = formHTML; });
-                document.getElementById('update-menu-btn').addEventListener('click', async () => { const batch = db.batch(); days.forEach(day => { const dayData = {}; meals.forEach(meal => { const item = document.getElementById(`${day}-${meal}`).value; const isSpecial = document.getElementById(`${day}-${meal}-special`).checked; dayData[meal] = { item, isSpecial }; }); batch.set(db.collection('messMenu').doc(day), dayData); }); try { await batch.commit(); showToast('Menu updated'); } catch (error) { console.error(error); showToast('Error saving', true); } });
-
-                // 6. Broadcasts & Notices
-                const notifForm = document.getElementById('notification-form');
-                notifForm.addEventListener('submit', (e) => { e.preventDefault(); const txt = document.getElementById('notification-text-input').value.trim(); if(txt) { db.collection('notifications').add({ text: txt, timestamp: firebase.firestore.FieldValue.serverTimestamp(), recipientId: null }); document.getElementById('notification-text-input').value = ''; showToast('Broadcast Sent'); } });
-                const noticeForm = document.getElementById('notice-form');
-                noticeForm.addEventListener('submit', (e) => { e.preventDefault(); const txt = document.getElementById('notice-text').value.trim(); if(txt) { db.collection('notices').add({ text: txt, timestamp: firebase.firestore.FieldValue.serverTimestamp() }); document.getElementById('notice-text').value = ''; showToast('Notice Posted'); } });
-                
-                db.collection('notifications').orderBy('timestamp', 'desc').limit(10).onSnapshot(snap => { let html = ''; snap.forEach(doc => { html += `<div class="p-3 bg-white/50 dark:bg-white/5 rounded-xl border border-white/10 text-xs flex justify-between items-center"><span class="truncate pr-2">${doc.data().text}</span> <button class="text-red-400 del-notif px-2" data-id="${doc.id}">×</button></div>`; }); document.getElementById('general-notifications-list-container').innerHTML = html; });
-                db.collection('notices').orderBy('timestamp', 'desc').onSnapshot(snap => { let html = ''; snap.forEach(doc => { html += `<div class="p-3 bg-yellow-50 dark:bg-yellow-500/10 rounded-xl border border-yellow-200 dark:border-yellow-500/20 text-xs flex justify-between items-center group"><span class="pr-2">${doc.data().text}</span> <button class="text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity del-notice" data-id="${doc.id}"><i class="fas fa-trash"></i></button></div>`; }); document.getElementById('notices-list').innerHTML = html || '<p class="text-center text-gray-400 text-xs py-2">Board is empty.</p>'; });
-                
-                document.body.addEventListener('click', e => { if(e.target.classList.contains('del-notif')) db.collection('notifications').doc(e.target.dataset.id).delete(); if(e.target.classList.contains('del-notice')) db.collection('notices').doc(e.target.dataset.id).delete(); });
-                document.getElementById('delete-all-notices-btn').addEventListener('click', () => { if(confirm('Clear board?')) db.collection('notices').get().then(snap => { const batch = db.batch(); snap.docs.forEach(d => batch.delete(d.ref)); batch.commit(); showToast('Cleared'); }); });
-
-            })();
-        });
-    </script>
+    <script type="module" src="js/admin.js"></script>
 </body>
+
 </html>

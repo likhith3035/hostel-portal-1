@@ -1,54 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Us - Hostel Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Poppins', sans-serif; background-color: #f8fafc; }
-        .nav-link { position: relative; padding-bottom: 4px; }
-        .nav-link::after { content: ''; position: absolute; width: 0; height: 2px; bottom: 0; left: 0; background-color: #1a56db; transition: width: 0.3s; }
-        .nav-link:hover::after { width: 100%; }
-        .nav-link.active { border-bottom: 2px solid #1a56db; padding-bottom: 2px; font-weight: 600; color: #1a56db; }
-        .sidebar { transition: transform 0.3s; }
-        @media (max-width: 768px) {
-            .sidebar { transform: translateX(-100%); position: fixed; z-index: 40; height: 100vh; top: 0; left: 0; }
-            .sidebar.open { transform: translateX(0); }
-            .overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.5); z-index: 30; }
-            .overlay.open { display: block; }
+        /* Modern iOS Overrides */
+        .glass-panel {
+            backdrop-filter: blur(25px) saturate(180%) !important;
         }
     </style>
+    <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="bg-slate-50">
+
+<body class="bg-slate-50 text-gray-900 dark:text-white transition-colors duration-500">
+    <div class="mesh-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
     <div class="overlay" onclick="closeSidebar()"></div>
     <nav class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
-                    <button onclick="toggleSidebar()" class="md:hidden mr-2 text-gray-600"><i class="fas fa-bars text-xl"></i></button>
-                    <a href="dashboard.html" class="flex items-center space-x-3"><img src="https://www.nbkrist.co.in/images/Emb.jpg" alt="Hostel Logo" class="h-10 w-auto"><h1 class="text-xl md:text-2xl font-bold text-gray-800">NBKRIST Hostel</h1></a>
+                    <button onclick="toggleSidebar()" class="md:hidden mr-2 text-gray-600"><i
+                            class="fas fa-bars text-xl"></i></button>
+                    <a href="index.html" class="flex items-center space-x-3"><img
+                            src="https://www.nbkrist.co.in/images/Emb.jpg" alt="Hostel Logo" class="h-10 w-auto">
+                        <h1 class="text-xl md:text-2xl font-bold text-gray-800">NBKRIST Hostel</h1>
+                    </a>
                 </div>
                 <div class="hidden md:flex space-x-8 items-center text-sm font-medium">
-                    <a href="dashboard.html" class="nav-link text-gray-600 hover:text-primary">Dashboard</a>
-                    <a href="mess-menu.html" class="nav-link text-gray-600 hover:text-primary">Mess Menu</a>
-                    <a href="complaints.html" class="nav-link text-gray-600 hover:text-primary">Complaints</a>
-                    <a href="booking.html" class="nav-link text-gray-600 hover:text-primary">Room Booking</a>
-                    <a href="rules.html" class="nav-link text-gray-600 hover:text-primary">Rules</a>
-                    <a href="about.html" class="nav-link text-gray-600 hover:text-primary">About</a>
+                    <a href="index.html" class="nav-link text-gray-600 hover:text-iosBlue">Dashboard</a>
+                    <a href="mess-menu.html" class="nav-link text-gray-600 hover:text-iosBlue">Mess Menu</a>
+                    <a href="complaints.html" class="nav-link text-gray-600 hover:text-iosBlue">Complaints</a>
+                    <a href="booking.html" class="nav-link text-gray-600 hover:text-iosBlue">Room Booking</a>
+                    <a href="rules.html" class="nav-link text-gray-600 hover:text-iosBlue">Rules</a>
+                    <a href="about.html" class="nav-link text-gray-600 hover:text-iosBlue">About</a>
                     <a href="contact.html" class="nav-link active">Contact</a>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <div x-data="{ open: false }" class="relative">
-                        <button @click="open = !open" class="flex items-center space-x-2 focus:outline-none"><img id="user-avatar" class="w-9 h-9 rounded-full ring-2 ring-offset-2 ring-primary/50" src="https://placehold.co/100x100/E2E8F0/4A5568?text=U" alt="User profile"></button>
-                        <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl z-50 py-1" x-transition>
-                            <div class="px-4 py-3 border-b"><p class="text-sm text-gray-600">Signed in as</p><p id="user-name-dropdown" class="font-semibold text-gray-800 truncate">Loading...</p></div>
-                            <a href="profile.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-user-circle w-5 mr-2 text-gray-500"></i>My Profile</a>
-                            <button id="logout-button" class="w-full text-left flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50"><i class="fas fa-sign-out-alt w-5 mr-2"></i> Logout</button>
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open"
+                            class="w-10 h-10 lg:w-12 lg:h-12 rounded-full glass-panel flex items-center justify-center relative spring-click p-0.5 hover:scale-105 transition-all active:scale-95">
+                            <img id="user-avatar" src="https://placehold.co/100"
+                                class="w-full h-full rounded-full object-cover shadow-sm">
+                        </button>
+                        <div x-show="open" @click.away="open = false" x-transition
+                            class="fixed left-4 right-4 top-24 sm:absolute sm:left-auto sm:right-0 sm:top-12 sm:w-80 liquid-glass-dropdown p-2 shadow-2xl z-[100] border border-white/20 origin-top-right rounded-3xl">
+                            <div class="p-3 border-b border-gray-100 dark:border-white/10 mb-1">
+                                <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Signed in
+                                    as
+                                </p>
+                                <p class="font-bold text-gray-900 dark:text-white truncate" id="user-name-dropdown">
+                                    Guest</p>
+                            </div>
+                            <div class="space-y-1" id="profile-dropdown-list"><a href="profile.html"
+                                    class="flex items-center px-3 py-2 text-xs font-semibold rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"><i
+                                        class="fas fa-user-circle w-4 mr-2 text-gray-400"></i> My Profile</a><a
+                                    href="developer.html"
+                                    class="flex items-center admin-link px-3 py-2 text-xs font-semibold rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors hidden"><i
+                                        class="fas fa-code w-4 mr-2 text-gray-400"></i> Developer</a></div>
+                            <div class="mt-1 pt-1 border-t border-gray-100 dark:border-white/10"><button
+                                    id="logout-header"
+                                    class="w-full flex items-center px-3 py-2 text-xs font-bold text-red-500 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors text-left"><i
+                                        class="fas fa-power-off w-4 mr-2"></i> Log Out</button></div>
                         </div>
                     </div>
                 </div>
@@ -56,21 +79,40 @@
         </div>
     </nav>
     <div class="flex">
-      <aside class="sidebar bg-white shadow-lg w-64 fixed md:relative md:translate-x-0 z-40 h-screen">
-        <div class="p-4">
-            <ul id="sidebar-menu" class="space-y-2 mt-4">
-                <li><a href="dashboard.html" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-gray-100"><i class="fas fa-home w-6 mr-3 text-gray-500"></i> Dashboard</a></li>
-                <li><a href="profile.html" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-gray-100"><i class="fas fa-user-alt w-6 mr-3 text-gray-500"></i> Profile</a></li>
-                <li><a href="mess-menu.html" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-gray-100"><i class="fas fa-utensils w-6 mr-3 text-gray-500"></i> Mess Menu</a></li>
-                <li><a href="complaints.html" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-gray-100"><i class="fas fa-comment-dots w-6 mr-3 text-gray-500"></i> Complaints</a></li>
-                <li><a href="booking.html" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-gray-100"><i class="fas fa-bed w-6 mr-3 text-gray-500"></i> Room Booking</a></li>
-                <li><a href="rules.html" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-gray-100"><i class="fas fa-gavel w-6 mr-3 text-gray-500"></i> Rules</a></li>
-                <li><a href="about.html" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-gray-100"><i class="fas fa-info-circle w-6 mr-3 text-gray-500"></i> About</a></li>
-                <li><a href="contact.html" class="flex items-center p-3 rounded-lg text-white bg-primary font-semibold shadow"><i class="fas fa-headset w-6 mr-3 text-white"></i> Contact</a></li>
-                <li class="pt-4 mt-4 border-t"><a id="logout-sidebar" href="#" class="flex items-center p-3 rounded-lg text-red-600 hover:bg-red-50"><i class="fas fa-sign-out-alt w-6 mr-3"></i> Logout</a></li>
-            </ul>
-        </div>
-    </aside>
+        <aside
+            class="sidebar glass-panel w-64 fixed md:relative md:translate-x-0 z-40 h-screen mt-24 md:mt-0 pt-4 md:pt-0 border-r border-white/20">
+            <div class="p-4">
+                <ul id="sidebar-menu" class="space-y-2 mt-4">
+                    <li><a href="index.html"
+                            class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-gray-100/50 dark:hover:bg-white/10 transition-all spring-click"><i
+                                class="fas fa-home w-6 mr-3 text-gray-500"></i> Dashboard</a></li>
+                    <li><a href="profile.html"
+                            class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-gray-100/50 dark:hover:bg-white/10 transition-all spring-click"><i
+                                class="fas fa-user-alt w-6 mr-3 text-gray-500"></i> Profile</a></li>
+                    <li><a href="mess-menu.html"
+                            class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-gray-100/50 dark:hover:bg-white/10 transition-all spring-click"><i
+                                class="fas fa-utensils w-6 mr-3 text-gray-500"></i> Mess Menu</a></li>
+                    <li><a href="complaints.html"
+                            class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-gray-100/50 dark:hover:bg-white/10 transition-all spring-click"><i
+                                class="fas fa-comment-dots w-6 mr-3 text-gray-500"></i> Complaints</a></li>
+                    <li><a href="booking.html"
+                            class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-gray-100/50 dark:hover:bg-white/10 transition-all spring-click"><i
+                                class="fas fa-bed w-6 mr-3 text-gray-500"></i> Room Booking</a></li>
+                    <li><a href="rules.html"
+                            class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-gray-100/50 dark:hover:bg-white/10 transition-all spring-click"><i
+                                class="fas fa-gavel w-6 mr-3 text-gray-500"></i> Rules</a></li>
+                    <li><a href="about.html"
+                            class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-gray-100/50 dark:hover:bg-white/10 transition-all spring-click"><i
+                                class="fas fa-info-circle w-6 mr-3 text-gray-500"></i> About</a></li>
+                    <li><a href="contact.html"
+                            class="flex items-center p-3 rounded-lg text-white bg-iosBlue text-white shadow-lg active:scale-95 transition-transform"><i
+                                class="fas fa-headset w-6 mr-3 text-white"></i> Contact</a></li>
+                    <li class="pt-4 mt-4 border-t"><a id="logout-sidebar" href="#"
+                            class="flex items-center p-3 rounded-lg text-red-600 hover:bg-red-50"><i
+                                class="fas fa-sign-out-alt w-6 mr-3"></i> Logout</a></li>
+                </ul>
+            </div>
+        </aside>
 
         <main class="flex-1 p-6 md:p-8">
             <h1 class="text-3xl font-bold text-gray-800 mb-2">Contact Us</h1>
@@ -79,17 +121,30 @@
             <div class="max-w-lg mx-auto">
                 <div class="space-y-8">
                     <div class="bg-white p-6 rounded-xl shadow-lg">
-                        <div class="flex items-center mb-4"><div class="bg-blue-100 p-3 rounded-full mr-4"><i class="fas fa-envelope text-2xl text-primary"></i></div><h3 class="text-xl font-bold text-gray-800">Email Us</h3></div>
+                        <div class="flex items-center mb-4">
+                            <div class="bg-blue-100 p-3 rounded-full mr-4"><i
+                                    class="fas fa-envelope text-2xl text-iosBlue"></i></div>
+                            <h3 class="text-xl font-bold text-gray-800">Email Us</h3>
+                        </div>
                         <p class="text-gray-600">For general inquiries, please email us.</p>
-                        <a href="mailto:kamilikhith@gmail.com" class="text-primary font-semibold hover:underline">kamilikhith@gmail.com</a>
+                        <a href="mailto:kamilikhith@gmail.com"
+                            class="text-iosBlue font-semibold hover:underline">kamilikhith@gmail.com</a>
                     </div>
                     <div class="bg-white p-6 rounded-xl shadow-lg">
-                        <div class="flex items-center mb-4"><div class="bg-green-100 p-3 rounded-full mr-4"><i class="fas fa-phone text-2xl text-green-600"></i></div><h3 class="text-xl font-bold text-gray-800">Call Us</h3></div>
+                        <div class="flex items-center mb-4">
+                            <div class="bg-green-100 p-3 rounded-full mr-4"><i
+                                    class="fas fa-phone text-2xl text-green-600"></i></div>
+                            <h3 class="text-xl font-bold text-gray-800">Call Us</h3>
+                        </div>
                         <p class="text-gray-600">For urgent matters, please call.</p>
                         <a href="tel:+918885426155" class="text-green-700 font-semibold hover:underline">8885426155</a>
                     </div>
                     <div class="bg-white p-6 rounded-xl shadow-lg">
-                        <div class="flex items-center mb-4"><div class="bg-indigo-100 p-3 rounded-full mr-4"><i class="fas fa-map-marker-alt text-2xl text-indigo-600"></i></div><h3 class="text-xl font-bold text-gray-800">Our Location</h3></div>
+                        <div class="flex items-center mb-4">
+                            <div class="bg-indigo-100 p-3 rounded-full mr-4"><i
+                                    class="fas fa-map-marker-alt text-2xl text-indigo-600"></i></div>
+                            <h3 class="text-xl font-bold text-gray-800">Our Location</h3>
+                        </div>
                         <p class="text-gray-600">NBKRIST, Vidyanagar,</p>
                         <p class="text-gray-600">SPSR Nellore District, A.P.</p>
                     </div>
@@ -102,44 +157,64 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script type="module" src="main.js"></script>
-    
+
     <script type="module">
         // Fix #1: Import the necessary functions from main.js
         import { checkUserSession, handleLogout, db } from './main.js';
+        import { doc, getDoc } from './js/firebase/firebase-firestore.js';
 
         // Make sidebar functions available globally for onclick attributes
         window.toggleSidebar = () => { document.querySelector('.sidebar').classList.toggle('open'); document.querySelector('.overlay').classList.toggle('open'); }
         window.closeSidebar = () => { document.querySelector('.sidebar').classList.remove('open'); document.querySelector('.overlay').classList.remove('open'); }
-        
-        document.addEventListener('DOMContentLoaded', () => { (async () => {
-            const user = await checkUserSession(); 
-            if (!user) return;
-            
-            const userNameDropdown = document.getElementById('user-name-dropdown');
-            const userAvatar = document.getElementById('user-avatar');
-            const logoutButton = document.getElementById('logout-button');
-            const logoutSidebar = document.getElementById('logout-sidebar');
 
-            const name = user.displayName || user.email.split('@')[0];
-            userNameDropdown.textContent = name;
-            userAvatar.src = user.photoURL || `https://placehold.co/100x100/E2E8F0/4A5568?text=${name.charAt(0).toUpperCase()}`;
+        document.addEventListener('DOMContentLoaded', () => {
+            (async () => {
+                const user = await checkUserSession();
+                if (!user) return;
 
-            logoutButton.addEventListener('click', handleLogout);
-            logoutSidebar.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
-            
-            db.collection('users').doc(user.uid).get().then(userDoc => {
-                if (userDoc.exists && userDoc.data().role === 'admin') {
-                    const logoutLi = document.getElementById('logout-sidebar').parentElement;
-                    const adminLi = document.createElement('li');
-                    adminLi.innerHTML = `<a href="admin.html" class="flex items-center p-3 rounded-lg hover:bg-gray-100 text-gray-700"><i class="fas fa-user-shield w-6 mr-3 text-gray-500"></i> Admin Panel</a>`;
-                    
-                    // Fix #2: Use the .after() method to safely add the admin button below logout
-                    logoutLi.after(adminLi);
-                }
-            });
-        })(); });
+                const userNameDropdown = document.getElementById('user-name-dropdown');
+                const userAvatar = document.getElementById('user-avatar');
+                const logoutButton = document.getElementById('logout-button');
+                const logoutSidebar = document.getElementById('logout-sidebar');
+
+                const name = user.displayName || user.email.split('@')[0];
+                userNameDropdown.textContent = name;
+                userAvatar.src = user.photoURL || `https://placehold.co/100x100/E2E8F0/4A5568?text=${name.charAt(0).toUpperCase()}`;
+
+                logoutButton.addEventListener('click', handleLogout);
+                logoutSidebar.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
+
+                getDoc(doc(db, 'users', user.uid)).then(userDoc => {
+                    if (userDoc.exists && userDoc.data().role === 'admin') {
+                        // 1. Sidebar Injection
+                        const logoutLi = document.getElementById('logout-sidebar').parentElement;
+                        if (logoutLi && !document.querySelector('#sidebar-menu a[href="admin.html"]')) {
+                            const adminLi = document.createElement('li');
+                            adminLi.innerHTML = `<a href="admin.html" class="flex items-center p-3 rounded-lg hover:bg-gray-100/50 dark:hover:bg-white/10 transition-all spring-click text-gray-700"><i class="fas fa-user-shield w-6 mr-3 text-gray-500"></i> Admin Panel</a>`;
+                            logoutLi.after(adminLi);
+                        }
+
+                        // 2. Dropdown Injection
+                        const mob = document.getElementById('profile-dropdown-list');
+                        if (mob && !mob.querySelector('a[href="admin.html"]')) {
+                            mob.insertAdjacentHTML('afterbegin', `<a href="admin.html" class="flex items-center px-4 py-3 text-sm font-bold text-purple-500 rounded-xl hover:bg-purple-50 dark:hover:bg-white/10 transition-colors"><i class="fas fa-shield-alt w-5 mr-3"></i> Admin Panel</a>`);
+                        }
+
+                        // 3. Unhide Admin Elements
+                        document.querySelectorAll('.admin-badge').forEach(el => {
+                            el.classList.remove('hidden');
+                            el.style.display = 'block';
+                        });
+                        document.querySelectorAll('.admin-link').forEach(el => {
+                            el.classList.remove('hidden');
+                            el.style.display = 'flex';
+                        });
+                    }
+                });
+            })();
+        });
     </script>
-     <footer class="bg-white border-t">
+    <footer class="bg-white border-t">
         <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col sm:flex-row justify-between items-center text-center sm:text-left">
                 <p class="text-sm text-gray-500 mb-4 sm:mb-0">
@@ -149,10 +224,12 @@
                     <a href="https://github.com/likhith3035" class="text-gray-400 hover:text-primary transition-colors">
                         <i class="fab fa-github text-lg"></i>
                     </a>
-                    <a href="https://www.linkedin.com/in/likhith-kami/" class="text-gray-400 hover:text-primary transition-colors">
+                    <a href="https://www.linkedin.com/in/likhith-kami/"
+                        class="text-gray-400 hover:text-primary transition-colors">
                         <i class="fab fa-linkedin text-lg"></i>
                     </a>
-                    <a href="https://www.instagram.com/lucky__likhith?igsh=bTgxYjZtZ2wwYmR4" class="text-gray-400 hover:text-primary transition-colors">
+                    <a href="https://www.instagram.com/lucky__likhith?igsh=bTgxYjZtZ2wwYmR4"
+                        class="text-gray-400 hover:text-primary transition-colors">
                         <i class="fab fa-instagram text-lg"></i>
                     </a>
                 </div>
@@ -160,4 +237,5 @@
         </div>
     </footer>
 </body>
+
 </html>

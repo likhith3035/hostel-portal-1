@@ -1,186 +1,504 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth antialiased">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About - Hostel Portal</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                fontFamily: {
+                    sans: ['Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                },
+                extend: {
+                    colors: {
+                        iosBlue: '#007AFF',
+                        iosDark: '#000000',
+                        iosCardDark: '#1C1C1E',
+                    },
+                    boxShadow: {
+                        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.07)',
+                        'glow': '0 0 40px -10px rgba(0, 122, 255, 0.3)',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out forwards',
+                        'float': 'float 10s infinite ease-in-out',
+                    },
+                    keyframes: {
+                        fadeIn: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } }
+                    }
+                }
+            }
+        }
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+    <title>NBKR Hostel | About</title> <!-- CHANGED TITLE -->
+    <!-- Favicon -->
+    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/en/3/3d/NBKRIST_logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="js/vendor/alpine.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
-        body { font-family: 'Poppins', sans-serif; background-color: #f8fafc; }
-        .nav-link { position: relative; padding-bottom: 4px; }
-        .nav-link::after { content: ''; position: absolute; width: 0; height: 2px; bottom: 0; left: 0; background-color: #1a56db; transition: width: 0.3s; }
-        .nav-link:hover::after { width: 100%; }
-        .nav-link.active { border-bottom: 2px solid #1a56db; padding-bottom: 2px; font-weight: 600; color: #1a56db; }
-        .sidebar { transition: transform 0.3s; }
-        .gradient-text {
-            background: linear-gradient(to right, #3b82f6, #1e40af);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
         }
-        @media (max-width: 768px) {
-            .sidebar { transform: translateX(-100%); position: fixed; z-index: 40; height: 100vh; top: 0; left: 0; }
-            .sidebar.open { transform: translateX(0); }
-            .overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.5); z-index: 30; }
-            .overlay.open { display: block; }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(156, 163, 175, 0.5);
+            border-radius: 10px;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.05);
+        }
+
+        .dark .glass-panel {
+            background: rgba(20, 20, 20, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-item.active {
+            background: #007AFF;
+            color: white;
+            box-shadow: 0 8px 25px -6px rgba(0, 122, 255, 0.5);
+        }
+
+        .nav-item.active i {
+            color: white;
+        }
+
+        .mesh-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.5;
+            z-index: -1;
+            transition: opacity 0.5s ease;
+        }
+
+        .dark .orb {
+            opacity: 0.3;
+            filter: blur(120px);
+        }
+
+        .orb-1 {
+            top: -10%;
+            left: -10%;
+            width: 60vw;
+            height: 60vw;
+            background: radial-gradient(circle, rgba(0, 122, 255, 0.25) 0%, transparent 70%);
+            animation: float 12s infinite ease-in-out;
+        }
+
+        .orb-2 {
+            bottom: -10%;
+            right: -10%;
+            width: 70vw;
+            height: 70vw;
+            background: radial-gradient(circle, rgba(94, 92, 230, 0.1) 0%, transparent 70%);
+            animation: float 15s infinite ease-in-out reverse;
+        }
+
+        .spring-click {
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .spring-click:active {
+            transform: scale(0.95);
         }
     </style>
 </head>
-<body class="bg-slate-50">
-    <div class="overlay" onclick="closeSidebar()"></div>
-    <nav class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex items-center">
-                    <button onclick="toggleSidebar()" class="md:hidden mr-2 text-gray-600"><i class="fas fa-bars text-xl"></i></button>
-                    <a href="dashboard.html" class="flex items-center space-x-3"><img src="https://www.nbkrist.co.in/images/Emb.jpg" alt="Hostel Logo" class="h-10 w-auto"><h1 class="text-xl md:text-2xl font-bold text-gray-800">NBKRIST Hostel</h1></a>
-                </div>
-                <div class="hidden md:flex space-x-8 items-center text-sm font-medium">
-                    <a href="dashboard.html" class="nav-link text-gray-600 hover:text-primary">Dashboard</a>
-                    <a href="mess-menu.html" class="nav-link text-gray-600 hover:text-primary">Mess Menu</a>
-                    <a href="complaints.html" class="nav-link text-gray-600 hover:text-primary">Complaints</a>
-                    <a href="booking.html" class="nav-link text-gray-600 hover:text-primary">Room Booking</a>
-                    <a href="rules.html" class="nav-link text-gray-600 hover:text-primary">Rules</a>
-                    <a href="contact.html" class="nav-link text-gray-600 hover:text-primary">Contact</a>
-                    <a href="about.html" class="nav-link active">About</a>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <div x-data="{ open: false }" class="relative">
-                        <button @click="open = !open" class="flex items-center space-x-2 focus:outline-none"><img id="user-avatar" class="w-9 h-9 rounded-full ring-2 ring-offset-2 ring-primary/50" src="https://placehold.co/100x100/E2E8F0/4A5568?text=U" alt="User profile"></button>
-                        <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl z-50 py-1" x-transition>
-                            <div class="px-4 py-3 border-b"><p class="text-sm text-gray-600">Signed in as</p><p id="user-name-dropdown" class="font-semibold text-gray-800 truncate">Loading...</p></div>
-                            <a href="profile.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-user-circle w-5 mr-2 text-gray-500"></i>My Profile</a>
-                            <button id="logout-button" class="w-full text-left flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50"><i class="fas fa-sign-out-alt w-5 mr-2"></i> Logout</button>
-                        </div>
-                    </div>
+
+<body class="text-gray-900 dark:text-white transition-colors duration-500">
+    <div class="mesh-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+    <div class="layout-wrapper flex flex-col md:flex-row h-screen overflow-hidden">
+        <div id="sidebar-overlay" onclick="toggleSidebar()"
+            class="fixed inset-0 bg-black/40 z-40 hidden backdrop-blur-sm transition-opacity"></div>
+        <aside id="sidebar"
+            class="fixed md:static top-0 left-0 h-full w-72 flex flex-col glass-panel z-50 md:m-5 md:rounded-[2.5rem] md:h-[calc(100vh-2.5rem)] transition-transform duration-300 transform -translate-x-full md:translate-x-0 border-r md:border-none border-white/20">
+            <div class="p-8 flex items-center gap-4">
+                <img src="https://upload.wikimedia.org/wikipedia/en/3/3d/NBKRIST_logo.png"
+                    class="w-12 h-12 object-contain filter drop-shadow-md" alt="Logo">
+                <div>
+                    <h1 class="font-bold text-2xl tracking-tight">NBKRIST</h1>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Student Portal</p>
                 </div>
             </div>
-        </div>
-    </nav>
-    <div class="flex">
-        <aside class="sidebar bg-white shadow-lg w-64 fixed md:relative md:translate-x-0 z-40 h-screen">
-            <div class="p-4">
-                <ul id="sidebar-menu" class="space-y-2 mt-4">
-                    <li><a href="dashboard.html" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-gray-100"><i class="fas fa-home w-6 mr-3 text-gray-500"></i> Dashboard</a></li>
-                    <li><a href="profile.html" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-gray-100"><i class="fas fa-user-alt w-6 mr-3 text-gray-500"></i> Profile</a></li>
-                    <li><a href="mess-menu.html" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-gray-100"><i class="fas fa-utensils w-6 mr-3 text-gray-500"></i> Mess Menu</a></li>
-                    <li><a href="complaints.html" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-gray-100"><i class="fas fa-comment-dots w-6 mr-3 text-gray-500"></i> Complaints</a></li>
-                    <li><a href="booking.html" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-gray-100"><i class="fas fa-bed w-6 mr-3 text-gray-500"></i> Room Booking</a></li>
-                    <li><a href="rules.html" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-gray-100"><i class="fas fa-gavel w-6 mr-3 text-gray-500"></i> Rules</a></li>
-                    <li><a href="contact.html" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-gray-100"><i class="fas fa-headset w-6 mr-3 text-gray-500"></i> Contact</a></li>
-                    <li><a href="about.html" class="flex items-center p-3 rounded-lg text-white bg-primary font-semibold shadow"><i class="fas fa-info-circle w-6 mr-3"></i> About</a></li>
-                    <li class="pt-4 mt-4 border-t"><a id="logout-sidebar" href="#" class="flex items-center p-3 rounded-lg text-red-600 hover:bg-red-50"><i class="fas fa-sign-out-alt w-6 mr-3"></i> Logout</a></li>
-                </ul>
+            <nav class="flex-1 px-5 space-y-3 overflow-y-auto" id="sidebar-nav">
+                <a href="index.html"
+                    class="nav-item flex items-center px-5 py-4 rounded-[1.2rem] text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all spring-click"><i
+                        class="fas fa-grid-2 w-6"></i> <span>Overview</span></a>
+                <a href="mess-menu.html"
+                    class="nav-item flex items-center px-5 py-4 rounded-[1.2rem] text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all spring-click"><i
+                        class="fas fa-utensils w-6"></i> <span>Mess Menu</span></a>
+                <a href="booking.html"
+                    class="nav-item flex items-center px-5 py-4 rounded-[1.2rem] text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all spring-click"><i
+                        class="fas fa-bed w-6"></i> <span>Room Booking</span></a>
+                <a href="outpass.html"
+                    class="nav-item flex items-center px-5 py-4 rounded-[1.2rem] text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all spring-click"><i
+                        class="fas fa-ticket-alt w-6"></i> <span>Outpass</span></a>
+                <a href="complaints.html"
+                    class="nav-item flex items-center px-5 py-4 rounded-[1.2rem] text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all spring-click"><i
+                        class="fas fa-comment-alt w-6"></i> <span>Complaints</span></a>
+                <a href="rules.html"
+                    class="nav-item flex items-center px-5 py-4 rounded-[1.2rem] text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all spring-click"><i
+                        class="fas fa-book w-6"></i> <span>Rules</span></a>
+                <a href="about.html"
+                    class="nav-item active flex items-center px-5 py-4 rounded-[1.2rem] font-semibold transition-all spring-click"><i
+                        class="fas fa-info-circle w-6"></i> <span>About</span></a> <!-- CHANGED LINK -->
+                <a href="developer.html"
+                    class="nav-item admin-link flex items-center px-5 py-4 rounded-[1.2rem] text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all spring-click hidden"><i
+                        class="fas fa-code w-6"></i> <span>Developer</span></a> <!-- ADDED admin-link CLASS -->
+            </nav>
+            <div class="p-5 mt-auto">
+                <div class="flex justify-center space-x-6 mb-6 opacity-70">
+                    <a href="https://github.com/likhith3035" target="_blank"
+                        class="hover:text-iosBlue transition-transform hover:scale-110"><i
+                            class="fab fa-github text-xl"></i></a>
+                    <a href="https://www.instagram.com/lucky__likhith?igsh=bTgxYjZtZ2wwYmR4" target="_blank"
+                        class="hover:text-iosBlue transition-transform hover:scale-110"><i
+                            class="fab fa-instagram text-xl"></i></a>
+                    <a href="https://www.linkedin.com/in/likhith-kami/" target="_blank"
+                        class="hover:text-iosBlue transition-transform hover:scale-110"><i
+                            class="fab fa-linkedin text-xl"></i></a>
+                </div>
+                <button id="logout-sidebar"
+                    class="w-full flex items-center px-6 py-4 rounded-[1.2rem] bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all text-sm font-bold spring-click"><i
+                        class="fas fa-sign-out-alt w-6"></i> Sign Out</button>
             </div>
         </aside>
 
-        <main class="flex-1 p-6 md:p-10">
-            <div class="text-center mb-12">
-                <h1 class="text-5xl md:text-6xl font-extrabold gradient-text">Your Digital Hostel Companion</h1>
-                <p class="text-lg text-slate-500 mt-4 max-w-3xl mx-auto">Welcome to the NBKRIST Hostel Portal, designed to make your stay simple, smart, and seamless.</p>
-            </div>
-
-            <div class="bg-white p-8 rounded-2xl shadow-xl space-y-12">
-                
-                <div>
-                    <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Your Journey Through the Portal</h2>
-                    <div class="grid md:grid-cols-3 gap-8 text-center">
-                        <div class="p-6">
-                            <div class="bg-blue-100 text-blue-600 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4"><i class="fas fa-sign-in-alt text-3xl"></i></div>
-                            <h3 class="font-bold text-xl mb-2">Step 1: Settle In</h3>
-                            <p class="text-slate-600">Log in and visit your **Profile** page. Fill in your details so the administration knows who you are. This is your digital ID card for the hostel.</p>
+        <main class="flex-1 overflow-y-auto overflow-x-hidden h-full scroll-smooth p-4 md:p-8">
+            <header class="flex justify-between items-center mb-6 px-1 sticky top-0 z-30 py-3">
+                <div class="flex items-center gap-2">
+                    <button onclick="toggleSidebar()"
+                        class="lg:hidden w-10 h-10 rounded-full glass-panel flex items-center justify-center text-gray-500 hover:text-iosBlue transition-colors spring-click">
+                        <i class="fas fa-bars text-base"></i>
+                    </button>
+                    <div class="flex items-center gap-2">
+                        <div class="glass-panel px-3 py-1.5 rounded-full flex items-center gap-2 flex-shrink-0">
+                            <img src="https://upload.wikimedia.org/wikipedia/en/3/3d/NBKRIST_logo.png"
+                                class="w-6 h-6 md:w-7 md:h-7 object-contain">
+                            <span
+                                class="font-bold text-xs md:text-base tracking-tight text-gray-900 dark:text-white whitespace-nowrap">NBKRIST</span>
                         </div>
-                        <div class="p-6">
-                            <div class="bg-green-100 text-green-600 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4"><i class="fas fa-desktop text-3xl"></i></div>
-                            <h3 class="font-bold text-xl mb-2">Step 2: Stay Informed</h3>
-                            <p class="text-slate-600">Your **Dashboard** is your best friend. Check it daily for the latest news on the **Notice Board** and to see what's on the **Mess Menu** for the day.</p>
-                        </div>
-                         <div class="p-6">
-                            <div class="bg-yellow-100 text-yellow-600 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4"><i class="fas fa-tasks text-3xl"></i></div>
-                            <h3 class="font-bold text-xl mb-2">Step 3: Take Action</h3>
-                            <p class="text-slate-600">Need a room? Go to **Room Booking**. Have a problem? File a **Complaint**. All your needs are just a click away.</p>
+                        <div class="hidden lg:block ml-2">
+                            <h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">About & Info
+                            </h2>
+                            <div class="flex items-center gap-2">
+                                <p class="text-sm text-gray-500 dark:text-gray-400 font-medium" id="current-date">
+                                    Loading...</p>
+                                <span class="text-gray-300 dark:text-gray-700">|</span>
+                                <p class="text-sm font-bold text-iosBlue tabular-nums" id="clock-time">00:00</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="border-t pt-12">
-                    <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">A World of Features at Your Fingertips</h2>
-                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <div class="bg-slate-50 p-6 rounded-lg text-center transition hover:shadow-lg hover:-translate-y-1"><div class="bg-green-100 text-green-600 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3"><i class="fas fa-bed"></i></div><h3 class="font-bold mb-1">Room Booking</h3><p class="text-sm text-slate-600">Book your bed and request to leave, all online.</p></div>
-                        <div class="bg-slate-50 p-6 rounded-lg text-center transition hover:shadow-lg hover:-translate-y-1"><div class="bg-red-100 text-red-600 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3"><i class="fas fa-comment-dots"></i></div><h3 class="font-bold mb-1">Complaint System</h3><p class="text-sm text-slate-600">Report issues and track their status in real-time.</p></div>
-                        <div class="bg-slate-50 p-6 rounded-lg text-center transition hover:shadow-lg hover:-translate-y-1"><div class="bg-orange-100 text-orange-600 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3"><i class="fas fa-utensils"></i></div><h3 class="font-bold mb-1">Mess Menu</h3><p class="text-sm text-slate-600">View the food menu for the entire week.</p></div>
-                        <div class="bg-slate-50 p-6 rounded-lg text-center transition hover:shadow-lg hover:-translate-y-1"><div class="bg-indigo-100 text-indigo-600 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3"><i class="fas fa-bell"></i></div><h3 class="font-bold mb-1">Instant Notifications</h3><p class="text-sm text-slate-600">Get important news and private messages from the admin.</p></div>
-                        <div class="bg-slate-50 p-6 rounded-lg text-center transition hover:shadow-lg hover:-translate-y-1"><div class="bg-sky-100 text-sky-600 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3"><i class="fas fa-gavel"></i></div><h3 class="font-bold mb-1">Hostel Rules</h3><p class="text-sm text-slate-600">Access all the rules and regulations anytime.</p></div>
-                        <div class="bg-slate-50 p-6 rounded-lg text-center transition hover:shadow-lg hover:-translate-y-1"><div class="bg-emerald-100 text-emerald-600 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3"><i class="fas fa-user-shield"></i></div><h3 class="font-bold mb-1">Admin Panel</h3><p class="text-sm text-slate-600">A powerful dashboard for staff to manage the hostel.</p></div>
+                <div class="flex items-center gap-2 lg:gap-4 relative">
+                    <button onclick="toggleTheme()"
+                        class="w-10 h-10 lg:w-12 lg:h-12 rounded-full glass-panel flex items-center justify-center text-gray-500 hover:text-iosBlue transition-colors spring-click">
+                        <i class="fas fa-sun dark:hidden text-base lg:text-lg"></i>
+                        <i class="fas fa-moon hidden dark:block text-base lg:text-lg"></i>
+                    </button>
+                    <!-- Notifications -->
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open; markNotificationsAsRead()"
+                            class="w-10 h-10 lg:w-12 lg:h-12 rounded-full glass-panel flex items-center justify-center text-gray-500 hover:text-iosBlue transition-colors relative spring-click">
+                            <i class="fas fa-bell text-base lg:text-lg"></i>
+                            <span id="unread-indicator"
+                                class="hidden absolute top-2.5 right-3 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white dark:ring-iosCardDark"></span>
+                        </button>
+                        <div x-show="open" @click.away="open = false"
+                            class="fixed left-4 right-4 top-24 sm:absolute sm:left-auto sm:right-0 sm:top-14 sm:w-96 glass-panel rounded-2xl shadow-2xl z-[100] border border-white/20 origin-top-right">
+                            <div
+                                class="p-5 border-b border-gray-100 dark:border-white/10 flex justify-between items-center">
+                                <span class="font-bold text-lg tracking-tight">Notifications</span><button
+                                    onclick="window.location.reload()"
+                                    class="bg-gray-100 dark:bg-white/10 p-2 rounded-full w-8 h-8 flex items-center justify-center text-gray-500 hover:text-iosBlue transition-colors"><i
+                                        class="fas fa-sync-alt text-xs"></i></button>
+                            </div>
+                            <ul id="notifications-list"
+                                class="max-h-[60vh] overflow-y-auto custom-scrollbar p-3 space-y-2">
+                                <li class="p-8 text-center text-gray-400 text-sm font-medium">Loading notifications...
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- Profile Dropdown -->
+                    <!-- Profile Dropdown -->
+                    <!-- Profile Dropdown -->
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open"
+                            class="w-10 h-10 lg:w-12 lg:h-12 rounded-full glass-panel flex items-center justify-center relative spring-click p-0.5 hover:scale-105 transition-all active:scale-95">
+                            <img id="user-avatar" src="https://placehold.co/100"
+                                class="w-full h-full rounded-full object-cover shadow-sm">
+                        </button>
+                        <div x-show="open" @click.away="open = false" x-transition
+                            class="absolute right-0 top-12 w-64 liquid-glass-dropdown p-2 shadow-2xl z-[100] border border-white/20 origin-top-right rounded-3xl">
+                            <div class="p-3 border-b border-gray-100 dark:border-white/10 mb-1">
+                                <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Signed in
+                                    as
+                                </p>
+                                <p class="font-bold text-gray-900 dark:text-white truncate" id="user-name-dropdown">
+                                    Guest</p>
+                            </div>
+                            <div class="space-y-1" id="profile-dropdown-list"><a href="profile.html"
+                                    class="flex items-center px-3 py-2 text-xs font-semibold rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"><i
+                                        class="fas fa-user-circle w-4 mr-2 text-gray-400"></i> My Profile</a><a
+                                    href="developer.html"
+                                    class="flex items-center admin-link px-3 py-2 text-xs font-semibold rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors hidden"><i
+                                        class="fas fa-code w-4 mr-2 text-gray-400"></i> Developer</a></div>
+                            <div class="mt-1 pt-1 border-t border-gray-100 dark:border-white/10"><button
+                                    id="logout-header"
+                                    class="w-full flex items-center px-3 py-2 text-xs font-bold text-red-500 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors text-left"><i
+                                        class="fas fa-power-off w-4 mr-2"></i> Log Out</button></div>
+                        </div>
                     </div>
                 </div>
+            </header>
 
-                <div class="border-t pt-12 text-center">
-                     <h2 class="text-2xl font-bold text-gray-800 mb-4">Meet the Creators</h2>
-                     <p class="text-slate-600">This portal was proudly developed and is maintained by</p>
-                     <p class="font-bold text-xl text-primary mt-2">Likhith and his team, <span class="font-extrabold gradient-text">Script Sync</span>.</p>
-                </div>
+            <div class="max-w-6xl mx-auto pb-20 animate-fade-in space-y-16">
+
+                <!-- Hero Section -->
+                <section class="text-center relative py-10 md:py-20">
+                    <div
+                        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-500/20 rounded-full blur-[100px] -z-10 animate-pulse">
+                    </div>
+
+                    <div
+                        class="inline-block px-5 py-2 rounded-full bg-white/50 dark:bg-white/10 border border-white/20 backdrop-blur-md text-xs font-black uppercase tracking-[0.2em] mb-8 text-gray-500 dark:text-gray-300 shadow-sm">
+                        Experience The Future
+                    </div>
+
+                    <h1 class="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-8 leading-[0.9]">
+                        <span
+                            class="block text-transparent bg-clip-text bg-gradient-to-br from-gray-900 via-gray-700 to-gray-900 dark:from-white dark:via-gray-300 dark:to-gray-500">Student
+                            Living.</span>
+                        <span
+                            class="block text-transparent bg-clip-text bg-gradient-to-r from-iosBlue to-cyan-500">Reimagined.</span>
+                    </h1>
+
+                    <p
+                        class="text-xl md:text-2xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto font-medium leading-relaxed">
+                        The NBKRIST Hostel Portal combines stunning aesthetics with powerful utility to create a
+                        seamless campus
+                        experience.
+                    </p>
+                </section>
+
+                <!-- Bento Grid Features -->
+                <section class="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[250px]">
+                    <!-- Large Card -->
+                    <div
+                        class="md:col-span-2 glass-panel p-10 relative overflow-hidden group hover:scale-[1.01] transition-transform duration-500">
+                        <div
+                            class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-iosBlue/20 to-transparent rounded-bl-full -mr-16 -mt-16 transition-all group-hover:scale-110 duration-700">
+                        </div>
+                        <div class="relative z-10 h-full flex flex-col justify-between">
+                            <div
+                                class="w-16 h-16 rounded-3xl bg-iosBlue/10 text-iosBlue flex items-center justify-center text-3xl mb-6 shadow-sm">
+                                <i class="fas fa-bed"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-3xl font-bold mb-2 text-gray-900 dark:text-white">Smart Booking</h3>
+                                <p class="text-gray-500 dark:text-gray-400 text-lg font-medium">Real-time room
+                                    availability with
+                                    instant confirmation and seamless allocation logic.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tall Card -->
+                    <div
+                        class="md:row-span-2 glass-panel p-10 relative overflow-hidden group hover:scale-[1.01] transition-transform duration-500 flex flex-col justify-between">
+                        <div
+                            class="absolute bottom-0 right-0 w-full h-1/2 bg-gradient-to-t from-emerald-500/10 to-transparent">
+                        </div>
+                        <div>
+                            <div
+                                class="w-16 h-16 rounded-3xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-3xl mb-6 shadow-sm">
+                                <i class="fas fa-utensils"></i>
+                            </div>
+                            <h3 class="text-3xl font-bold mb-2 text-gray-900 dark:text-white">Mess Menu</h3>
+                            <p class="text-gray-500 dark:text-gray-400 font-medium">Daily nutritional updates with
+                                premium
+                                "Like" interactions.</p>
+                        </div>
+                        <div class="mt-8 space-y-3">
+                            <div
+                                class="glass-panel p-3 rounded-xl flex items-center gap-3 bg-white/40 dark:bg-black/20">
+                                <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+                                <span class="text-xs font-bold uppercase tracking-wider opacity-70">Breakfast</span>
+                            </div>
+                            <div
+                                class="glass-panel p-3 rounded-xl flex items-center gap-3 bg-white/40 dark:bg-black/20">
+                                <div class="w-2 h-2 rounded-full bg-orange-500"></div>
+                                <span class="text-xs font-bold uppercase tracking-wider opacity-70">Lunch</span>
+                            </div>
+                            <div
+                                class="glass-panel p-3 rounded-xl flex items-center gap-3 bg-white/40 dark:bg-black/20">
+                                <div class="w-2 h-2 rounded-full bg-indigo-500"></div>
+                                <span class="text-xs font-bold uppercase tracking-wider opacity-70">Dinner</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Small Card 1 -->
+                    <div
+                        class="glass-panel p-8 relative overflow-hidden group hover:scale-[1.02] transition-transform duration-500">
+                        <div
+                            class="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-500 flex items-center justify-center text-2xl mb-4 shadow-sm">
+                            <i class="fas fa-ticket-alt"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-1 text-gray-900 dark:text-white">E-Outpass</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 font-medium leading-tight">Digital gate
+                            passes with
+                            QR-ready receipts.</p>
+                    </div>
+
+                    <!-- Small Card 2 -->
+                    <div
+                        class="glass-panel p-8 relative overflow-hidden group hover:scale-[1.02] transition-transform duration-500">
+                        <div
+                            class="w-12 h-12 rounded-2xl bg-red-500/10 text-red-500 flex items-center justify-center text-2xl mb-4 shadow-sm">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-1 text-gray-900 dark:text-white">Complaints</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 font-medium leading-tight">Direct maintenance
+                            tracking & resolution.</p>
+                    </div>
+                </section>
+
+                <!-- Developer Spotlight -->
+                <section class="mt-16">
+                    <div
+                        class="glass-panel p-8 md:p-12 rounded-[3rem] relative overflow-hidden border border-white/40 dark:border-white/10">
+                        <div
+                            class="absolute top-0 right-0 w-[400px] h-[400px] bg-gradient-to-b from-indigo-500/20 to-transparent rounded-full blur-3xl -mr-32 -mt-32">
+                        </div>
+
+                        <div class="flex flex-col md:flex-row items-center gap-10 relative z-10">
+                            <div class="relative group">
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full blur opacity-40 group-hover:opacity-60 transition-opacity duration-500">
+                                </div>
+                                <img src="images/developer.jpg"
+                                    class="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover border-4 border-white dark:border-white/10 shadow-2xl relative z-10 hover:scale-105 transition-transform duration-500"
+                                    alt="Developer">
+                                <!-- Verified Badge -->
+                                <div
+                                    class="absolute bottom-2 right-2 z-20 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center border-2 border-white dark:border-[#1c1c1e] shadow-lg">
+                                    <i class="fas fa-check text-xs"></i>
+                                </div>
+                            </div>
+
+                            <div class="text-center md:text-left flex-1">
+                                <div
+                                    class="inline-block px-3 py-1 rounded-lg bg-indigo-500/10 text-indigo-500 text-[10px] font-black uppercase tracking-widest mb-3">
+                                    Lead Project Architecture</div>
+                                <h2
+                                    class="text-3xl md:text-4xl font-black text-gray-900 dark:text-white mb-3 tracking-tight">
+                                    Likhith Kami</h2>
+                                <p class="text-lg text-gray-500 dark:text-gray-400 mb-6 font-medium max-w-xl">
+                                    Full-stack developer passionate about building intuitive, high-performance digital
+                                    experiences. Bringing the NBKRIST campus closer together through code.
+                                </p>
+
+                                <div class="flex flex-wrap justify-center md:justify-start gap-4">
+                                    <a href="https://github.com/likhith3035" target="_blank"
+                                        class="flex items-center gap-3 px-6 py-3 rounded-2xl bg-gray-900 text-white hover:bg-black transition-all hover:scale-105 shadow-lg shadow-gray-900/20 active:scale-95">
+                                        <i class="fab fa-github text-xl"></i>
+                                        <span class="font-bold text-sm">GitHub</span>
+                                    </a>
+                                    <a href="https://www.linkedin.com/in/likhith-kami/" target="_blank"
+                                        class="flex items-center gap-3 px-6 py-3 rounded-2xl bg-[#0077b5] text-white hover:bg-[#006396] transition-all hover:scale-105 shadow-lg shadow-blue-500/20 active:scale-95">
+                                        <i class="fab fa-linkedin text-xl"></i>
+                                        <span class="font-bold text-sm">LinkedIn</span>
+                                    </a>
+                                    <a href="https://www.instagram.com/lucky__likhith?igsh=bTgxYjZtZ2wwYmR4"
+                                        target="_blank"
+                                        class="flex items-center gap-3 px-6 py-3 rounded-2xl bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500 text-white transition-all hover:scale-105 shadow-lg shadow-pink-500/20 active:scale-95">
+                                        <i class="fab fa-instagram text-xl"></i>
+                                        <span class="font-bold text-sm">Instagram</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Tech Stack Ticker -->
+                <section class="glass-panel p-6 rounded-[2rem] overflow-hidden">
+                    <div
+                        class="flex justify-center items-center gap-4 md:gap-12 flex-wrap opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
+                        <div class="flex items-center gap-2">
+                            <i class="fab fa-html5 text-2xl text-orange-500"></i>
+                            <span class="font-bold text-sm">HTML5</span>
+                        </div>
+                        <div class="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600"></div>
+                        <div class="flex items-center gap-2">
+                            <i class="fab fa-css3-alt text-2xl text-blue-500"></i>
+                            <span class="font-bold text-sm">Tailwind</span>
+                        </div>
+                        <div class="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600"></div>
+                        <div class="flex items-center gap-2">
+                            <i class="fab fa-js text-2xl text-yellow-400"></i>
+                            <span class="font-bold text-sm">Alpine.js</span>
+                        </div>
+                        <div class="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600"></div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-fire text-2xl text-orange-400"></i>
+                            <span class="font-bold text-sm">Firebase</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Footer -->
+                <footer class="text-center pt-10 pb-5">
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Developed with ❤️ by
+                        Likhith</p>
+                    <p class="text-[10px] text-gray-500 font-medium opacity-50">NBKRIST Hostel Portal v2.0 &copy; 2026
+                    </p>
+                </footer>
+
             </div>
         </main>
     </div>
-
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <script type="module" src="main.js"></script>
-
-    <script type="module">
-        // Import functions from main.js
-        import { checkUserSession, handleLogout, db } from './main.js';
-
-        // Make functions available globally for onclick attributes
-        window.toggleSidebar = () => { document.querySelector('.sidebar').classList.toggle('open'); document.querySelector('.overlay').classList.toggle('open'); }
-        window.closeSidebar = () => { document.querySelector('.sidebar').classList.remove('open'); document.querySelector('.overlay').classList.remove('open'); }
-
-        document.addEventListener('DOMContentLoaded', () => { (async () => {
-            const user = await checkUserSession(); 
-            if (!user) return;
-
-            const userNameDropdown = document.getElementById('user-name-dropdown');
-            const userAvatar = document.getElementById('user-avatar');
-            const logoutButton = document.getElementById('logout-button');
-            const logoutSidebar = document.getElementById('logout-sidebar');
-
-            const name = user.displayName || user.email.split('@')[0];
-            userNameDropdown.textContent = name;
-            userAvatar.src = user.photoURL || `https://placehold.co/100x100/E2E8F0/4A5568?text=${name.charAt(0).toUpperCase()}`;
-
-            logoutButton.addEventListener('click', handleLogout);
-            logoutSidebar.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
-
-            db.collection('users').doc(user.uid).get().then(userDoc => {
-                if (userDoc.exists && userDoc.data().role === 'admin') {
-                    const logoutLi = document.getElementById('logout-sidebar').parentElement;
-                    const adminLi = document.createElement('li');
-                    adminLi.innerHTML = `<a href="admin.html" class="flex items-center p-3 rounded-lg hover:bg-gray-100 text-gray-700"><i class="fas fa-user-shield w-6 mr-3 text-gray-500"></i> Admin Panel</a>`;
-                    
-                    // This line places the admin button AFTER the logout button.
-                    logoutLi.after(adminLi);
-                }
-            });
-        })(); });
-    </script>
-     <footer class="bg-white border-t">
-        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col sm:flex-row justify-between items-center text-center sm:text-left">
-                <p class="text-sm text-gray-500 mb-4 sm:mb-0">
-                    &copy; 2025 Likhith. All Rights Reserved.
-                </p>
-                <div class="flex space-x-6">
-                    <a href="https://github.com/likhith3035" class="text-gray-400 hover:text-primary transition-colors"><i class="fab fa-github text-lg"></i></a>
-                    <a href="https://www.linkedin.com/in/likhith-kami/" class="text-gray-400 hover:text-primary transition-colors"><i class="fab fa-linkedin text-lg"></i></a>
-                    <a href="https://www.instagram.com/lucky__likhith?igsh=bTgxYjZtZ2wwYmR4" class="text-gray-400 hover:text-primary transition-colors"><i class="fab fa-instagram text-lg"></i></a>
-                </div>
-            </div>
-        </div>
-    </footer>
+    <script type="module" src="js/about.js"></script> <!-- CHANGED SCRIPT -->
 </body>
+
 </html>

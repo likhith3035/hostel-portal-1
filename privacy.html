@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth antialiased">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    
+    <title>Privacy Policy | NBKRIST Hostel Portal</title>
+    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/en/3/3d/NBKRIST_logo.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com" data-cmp-ignore="1" class="cmp-ignore"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                fontFamily: {
+                    sans: ['Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                },
+                extend: {
+                    colors: {
+                        iosBlue: '#007AFF',
+                        iosDark: '#000000',
+                        iosCardDark: '#1C1C1E',
+                    },
+                    boxShadow: {
+                        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.07)',
+                        'glow': '0 0 40px -10px rgba(0, 122, 255, 0.3)',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out forwards',
+                        'float': 'float 10s infinite ease-in-out',
+                    },
+                    keyframes: {
+                        fadeIn: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } }
+                    }
+                }
+            }
+        }
+
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+
+    <style>
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.05);
+        }
+
+        .dark .glass-panel {
+            background: rgba(28, 28, 30, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.3);
+        }
+
+        .mesh-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.5;
+            z-index: -1;
+            transition: opacity 0.5s ease;
+        }
+
+        .dark .orb {
+            opacity: 0.3;
+            filter: blur(120px);
+        }
+
+        .orb-1 {
+            top: -10%;
+            left: -10%;
+            width: 60vw;
+            height: 60vw;
+            background: radial-gradient(circle, rgba(0, 122, 255, 0.25) 0%, transparent 70%);
+            animation: float 12s infinite ease-in-out;
+        }
+
+        .orb-2 {
+            bottom: -10%;
+            right: -10%;
+            width: 70vw;
+            height: 70vw;
+            background: radial-gradient(circle, rgba(94, 92, 230, 0.1) 0%, transparent 70%);
+            animation: float 15s infinite ease-in-out reverse;
+        }
+    </style>
+</head>
+
+<body
+    class="text-gray-900 dark:text-white transition-colors duration-500 min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div class="mesh-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+
+    <!-- Header / Nav -->
+    <nav class="fixed top-0 left-0 w-full p-6 flex justify-between items-center z-50">
+        <div class="glass-panel px-4 py-2 rounded-full flex items-center gap-3">
+            <img src="https://upload.wikimedia.org/wikipedia/en/3/3d/NBKRIST_logo.png" class="w-8 h-8 object-contain">
+            <span class="font-bold text-sm tracking-tight text-gray-900 dark:text-white">NBKRIST</span>
+        </div>
+        <a href="index.html"
+            class="glass-panel w-10 h-10 rounded-full flex items-center justify-center text-gray-500 hover:text-iosBlue transition-colors shadow-lg">
+            <i class="fas fa-times"></i>
+        </a>
+    </nav>
+
+    <main class="w-full max-w-2xl glass-panel rounded-[2.5rem] p-8 md:p-12 shadow-2xl animate-fade-in my-20">
+        <div class="text-center mb-10">
+            <div
+                class="w-16 h-16 bg-blue-500/10 text-iosBlue rounded-full flex items-center justify-center text-2xl mx-auto mb-6">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-bold tracking-tight mb-2">Privacy Policy</h1>
+            <p class="text-sm font-bold text-gray-400 uppercase tracking-widest">Academic Project Disclaimer</p>
+        </div>
+
+        <div class="space-y-8 text-gray-700 dark:text-gray-300 leading-relaxed">
+            <section>
+                <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                    <span class="w-1.5 h-6 bg-iosBlue rounded-full"></span> Academic Project Status
+                </h2>
+                <p class="text-sm md:text-base">
+                    This website is a student academic project created solely for educational and demonstration
+                    purposes. It is <strong class="text-gray-900 dark:text-white">NOT</strong> an official portal of
+                    NBKR Institute of Science and Technology or any hostel authority. No real-world services are
+                    provided.
+                </p>
+            </section>
+
+            <section>
+                <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                    <span class="w-1.5 h-6 bg-purple-500 rounded-full"></span> Data Collection & Usage
+                </h2>
+                <p class="text-sm md:text-base">
+                    Any data entered into this system (such as names, emails, or booking details) is used strictly for
+                    demonstrating the functionality of the project. We do not sell, trade, or commercially exploit any
+                    user data.
+                </p>
+            </section>
+
+            <section>
+                <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                    <span class="w-1.5 h-6 bg-yellow-500 rounded-full"></span> Firebase & Third-Party
+                </h2>
+                <p class="text-sm md:text-base">
+                    This project uses <strong class="text-gray-900 dark:text-white">Google Firebase</strong> for
+                    authentication and database services. Your interaction with these services is subject to Google's
+                    Privacy Policy. We act as a data controller only within the scope of this educational exercise.
+                </p>
+            </section>
+
+            <section>
+                <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                    <span class="w-1.5 h-6 bg-red-500 rounded-full"></span> No Commercial Use
+                </h2>
+                <p class="text-sm md:text-base">
+                    This platform is non-commercial. There are no payment gateways, advertisements, or monetization
+                    mechanisms involved.
+                </p>
+            </section>
+        </div>
+
+        <div class="mt-12 pt-8 border-t border-gray-200 dark:border-white/10 text-center">
+            <p class="text-xs text-gray-400">Last updated: January 2026</p>
+        </div>
+    </main>
+
+    <footer class="fixed bottom-0 w-full p-4 flex justify-center pointer-events-none z-40">
+        <div
+            class="glass-panel px-6 py-2 rounded-full pointer-events-auto flex items-center gap-4 text-[10px] font-bold tracking-wide">
+            <span class="text-gray-400">© 2026 NBKRIST Hostel Project</span>
+            <div class="h-3 w-[1px] bg-gray-300 dark:bg-white/20"></div>
+            <a href="terms.html" class="text-iosBlue hover:underline">Terms of Service</a>
+        </div>
+    </footer>
+
+</body>
+
+</html>
+

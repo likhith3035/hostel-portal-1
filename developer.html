@@ -1,313 +1,384 @@
 <!DOCTYPE html>
-<html lang="en" class="antialiased selection:bg-violet-500 selection:text-white">
+<html lang="en" class="antialiased selection:bg-iosBlue selection:text-white">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Likhith Kami | Portfolio</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Likhith Kami | Full Stack Developer</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <script src="https://cdn.tailwindcss.com"></script>
 
+    <script src="https://cdn.tailwindcss.com" data-cmp-ignore="1" class="cmp-ignore"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
-                fontFamily: { 
-                    sans: ['Plus Jakarta Sans', 'sans-serif'],
-                    mono: ['JetBrains Mono', 'monospace']
+                fontFamily: {
+                    sans: ['Outfit', 'sans-serif'],
+                    mono: ['JetBrains Mono', 'monospace'],
                 },
                 extend: {
                     colors: {
-                        dark: '#050505',
-                        glass: 'rgba(255, 255, 255, 0.7)',
-                        glassDark: 'rgba(10, 10, 10, 0.6)',
+                        iosBlue: '#007AFF',
+                        iosDark: '#1C1C1E',
+                        iosGray: '#8E8E93',
+                        glass: 'rgba(255, 255, 255, 0.05)',
+                        glassBorder: 'rgba(255, 255, 255, 0.1)',
                     },
                     animation: {
-                        'aurora': 'aurora 20s linear infinite',
-                        'shimmer': 'shimmer 2s linear infinite',
-                        'float': 'float 6s ease-in-out infinite',
+                        'blob': 'blob 7s infinite',
+                        'tilt': 'tilt 10s infinite linear',
                     },
                     keyframes: {
-                        aurora: {
-                            '0%': { backgroundPosition: '0% 50%' },
-                            '50%': { backgroundPosition: '100% 50%' },
-                            '100%': { backgroundPosition: '0% 50%' },
-                        },
-                        shimmer: {
-                            '0%': { backgroundPosition: '-200% 0' },
-                            '100%': { backgroundPosition: '200% 0' }
-                        },
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-10px)' }
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
                         }
                     }
                 }
             }
         }
-        
-        // Theme Init
-        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
     </script>
 
     <style>
-        /* --- GLOBAL & SCROLLBAR --- */
         body {
-            background-color: #f3f4f6;
-            transition: background-color 0.5s ease;
-            overflow-x: hidden; /* Prevent horizontal scroll on mobile */
+            background-color: #050505;
+            color: #ffffff;
+            overflow-x: hidden;
         }
-        .dark body { background-color: #030303; }
 
-        /* Hide Scrollbar but allow scrolling */
-        ::-webkit-scrollbar { width: 0px; background: transparent; }
-
-        /* --- BACKGROUND AURORA --- */
+        /* --- AURORA BACKGROUND --- */
         .aurora-bg {
-            position: fixed; inset: 0; z-index: -1;
-            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-            background-size: 400% 400%;
-            animation: aurora 15s ease infinite;
-            opacity: 0.1;
-        }
-        .dark .aurora-bg {
-            background: linear-gradient(-45deg, #4c1d95, #312e81, #1e3a8a, #0f172a);
-            opacity: 0.4;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            background:
+                radial-gradient(circle at 15% 50%, rgba(76, 29, 149, 0.15), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(59, 130, 246, 0.15), transparent 25%);
+            filter: blur(60px);
+            animation: pulse-aurora 10s ease-in-out infinite alternate;
         }
 
-        /* --- GLASSMOPHISM CARDS --- */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.65);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            border-radius: 1.5rem;
-            position: relative;
-            overflow: hidden;
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        @keyframes pulse-aurora {
+            0% {
+                opacity: 0.5;
+                transform: scale(1);
+            }
+
+            100% {
+                opacity: 0.8;
+                transform: scale(1.1);
+            }
         }
-        
-        .dark .glass-card {
-            background: rgba(20, 20, 20, 0.6);
+
+        /* --- GLASSMOPHISM --- */
+        .glass-panel {
+            background: rgba(20, 20, 25, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
         }
 
-        /* Mobile Touch State (Active) instead of Hover */
-        .glass-card:active { transform: scale(0.98); }
-        
-        /* Desktop Hover only */
-        @media (min-width: 1024px) {
-            .glass-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
-            /* 3D Tilt is applied via JS for desktop only */
+        /* --- HOLOGRAPHIC CARD --- */
+        .holo-card {
+            transform-style: preserve-3d;
+            transition: all 0.1s ease;
         }
 
-        /* --- UTILS --- */
-        .scroller-mask { mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); }
-        
-        .typing-cursor::after {
-            content: '|';
-            animation: blink 1s step-end infinite;
-            color: #8b5cf6;
+        .holo-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(125deg,
+                    transparent 0%,
+                    rgba(255, 255, 255, 0.05) 30%,
+                    transparent 30%,
+                    transparent 100%);
+            background-size: 200% 200%;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 10;
         }
-        @keyframes blink { 50% { opacity: 0; } }
 
-        /* Shimmer Loading Effect for Text */
-        .shimmer-text {
-            background: linear-gradient(90deg, #333 0%, #888 50%, #333 100%);
-            background-size: 200% auto;
-            color: transparent;
+        .holo-card:hover::before {
+            opacity: 1;
+            animation: hologram-shine 2s infinite;
+        }
+
+        @keyframes hologram-shine {
+            0% {
+                background-position: 200% 0%;
+            }
+
+            100% {
+                background-position: -200% 0%;
+            }
+        }
+
+        /* --- TERMINAL WIDGET --- */
+        .terminal-header {
+            background: #2d2d2d;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+
+        /* --- SKILL PILLS --- */
+        .skill-pill {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .skill-pill:hover {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+
+        /* --- TEXT GRADIENT --- */
+        .text-gradient {
+            background: linear-gradient(to right, #60a5fa, #a78bfa);
             -webkit-background-clip: text;
-            background-clip: text;
-            animation: shimmer 3s linear infinite;
-        }
-        .dark .shimmer-text {
-            background: linear-gradient(90deg, #fff 0%, #888 50%, #fff 100%);
-            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
     </style>
 </head>
+
 <body class="min-h-screen flex flex-col items-center justify-start pt-8 pb-12 px-4 sm:px-8">
 
     <div class="aurora-bg"></div>
 
-    <nav class="w-full max-w-5xl flex justify-between items-center mb-6 z-50 sticky top-4">
-        <a href="dashboard.html" class="flex items-center gap-3 pl-1 pr-4 py-1.5 rounded-full bg-white/80 dark:bg-black/60 border border-white/40 dark:border-white/10 backdrop-blur-xl shadow-sm hover:scale-105 transition-transform">
-            <div class="w-8 h-8 rounded-full bg-gray-100 dark:bg-white/10 flex items-center justify-center">
-                <i class="fas fa-arrow-left text-xs text-gray-700 dark:text-white"></i>
-            </div>
-            <span class="text-[10px] font-bold uppercase tracking-widest text-gray-800 dark:text-gray-200">Dashboard</span>
-        </a>
-        
-        <button onclick="toggleTheme()" class="w-11 h-11 rounded-full bg-white/80 dark:bg-black/60 border border-white/40 dark:border-white/10 backdrop-blur-xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">
-            <i class="fas fa-sun block dark:hidden text-amber-500"></i>
-            <i class="fas fa-moon hidden dark:block text-violet-400"></i>
-        </button>
-    </nav>
-
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 w-full max-w-5xl z-10">
-
-        <div class="glass-card col-span-2 row-span-2 p-6 md:p-8 flex flex-col justify-between tilt-enabled group">
-            <div class="flex justify-between items-start">
-                <div class="relative">
-                    <img src="https://ui-avatars.com/api/?name=Likhith+Kami&background=0f172a&color=fff&size=128&bold=true" class="w-20 h-20 md:w-24 md:h-24 rounded-2xl object-cover shadow-lg border-2 border-white dark:border-white/10">
-                    <div class="absolute -bottom-1 -right-1 bg-white dark:bg-black p-1 rounded-full">
-                        <div class="w-3 h-3 bg-green-500 rounded-full border border-white dark:border-black animate-pulse"></div>
-                    </div>
-                </div>
-                <div class="text-right">
-                    <div class="inline-block px-3 py-1 rounded-lg bg-gray-100/50 dark:bg-white/5 border border-gray-200 dark:border-white/5">
-                        <p class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Creator</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="mt-6 md:mt-8">
-                <h1 class="text-3xl md:text-5xl font-black tracking-tight text-gray-900 dark:text-white mb-2 leading-tight">
-                    Likhith Kami
-                </h1>
-                <div class="flex items-center mb-3 h-6">
-                    <span class="text-violet-600 dark:text-violet-400 font-mono font-bold text-sm md:text-base typing-cursor" id="typing-text"></span>
-                </div>
-                <p class="text-xs md:text-sm text-gray-600 dark:text-gray-400 leading-relaxed font-medium">
-                    Designing the future with <span class="text-gray-900 dark:text-white font-bold border-b border-violet-500/50">Gen AI</span> & <span class="text-gray-900 dark:text-white font-bold border-b border-violet-500/50">Full Stack</span> wizardry.
-                </p>
+    <nav class="w-full max-w-5xl flex justify-between items-center mb-6 z-50 sticky top-4 px-2">
+        <div class="flex items-center gap-2 md:gap-4">
+            <a href="index.html"
+                class="w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:bg-white/10 transition-colors group">
+                <i class="fas fa-arrow-left text-gray-400 group-hover:text-white transition-colors"></i>
+            </a>
+            <div class="hidden md:flex flex-col">
+                <span class="text-xs text-gray-400 uppercase tracking-wider font-bold">Return to</span>
+                <span class="text-sm font-semibold text-white">Dashboard</span>
             </div>
         </div>
 
-        <div class="glass-card col-span-2 md:col-span-1 min-h-[140px] md:min-h-[180px] p-0 relative group">
-            <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1605649487215-28c0497f2220?q=80&w=800&auto=format&fit=crop')] bg-cover bg-center transition-transform duration-700 group-hover:scale-110"></div>
-            <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
-            
-            <div class="relative z-10 p-5 h-full flex flex-row md:flex-col justify-between items-end md:items-start">
-                <div class="w-full">
-                    <div class="flex justify-between items-start w-full mb-auto md:mb-0">
-                        <div class="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 animate-float">
-                            <i class="fas fa-map-marker-alt text-white text-xs"></i>
+        <div class="glass-panel px-4 py-2 rounded-full flex items-center gap-3">
+            <div class="relative w-2 h-2">
+                <div class="absolute inset-0 bg-green-500 rounded-full animate-ping opacity-75"></div>
+                <div class="relative w-2 h-2 bg-green-500 rounded-full"></div>
+            </div>
+            <span class="text-xs font-mono text-green-400">System Online</span>
+        </div>
+    </nav>
+
+    <main class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mt-4 lg:mt-12 items-start">
+
+        <!-- Left Column: Image & Contact (4 cols) -->
+        <div class="lg:col-span-4 flex flex-col gap-6">
+
+            <!-- Holographic Profile Card -->
+            <div class="holo-card glass-panel rounded-2xl p-2 relative group overflow-hidden" id="profile-card">
+                <div class="relative w-full aspect-[4/5] rounded-xl overflow-hidden">
+                    <img src="images/developer.jpg" alt="Likhith Kami"
+                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+
+                    <!-- Overlay Gradient -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
+
+                    <!-- Name & Title -->
+                    <div class="absolute bottom-0 left-0 w-full p-6">
+                        <h1 class="text-3xl font-bold text-white mb-1 font-sans">Likhith Kami</h1>
+                        <p class="text-sm text-blue-400 font-mono mb-4">@likhith3035</p>
+
+                        <div class="flex gap-3">
+                            <a href="https://github.com/likhith3035" target="_blank"
+                                class="w-10 h-10 rounded-lg bg-white/10 backdrop-blur-md flex items-center justify-center hover:bg-white hover:text-black transition-all">
+                                <i class="fab fa-github text-lg"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/in/likhith-kami/" target="_blank"
+                                class="w-10 h-10 rounded-lg bg-[#0077b5]/80 backdrop-blur-md flex items-center justify-center hover:bg-[#0077b5] hover:text-white transition-all">
+                                <i class="fab fa-linkedin-in text-lg"></i>
+                            </a>
+                            <a href="https://www.instagram.com/lucky__likhith?igsh=bTgxYjZtZ2wwYmR4" target="_blank"
+                                class="w-10 h-10 rounded-lg bg-pink-600/80 backdrop-blur-md flex items-center justify-center hover:bg-pink-600 hover:text-white transition-all">
+                                <i class="fab fa-instagram text-lg"></i>
+                            </a>
                         </div>
                     </div>
                 </div>
-                <div class="text-right md:text-left">
-                    <p class="text-[9px] uppercase font-bold text-gray-300 tracking-widest">Base Ops</p>
-                    <p class="text-lg font-bold text-white">India</p>
-                    <p id="clock" class="text-[10px] font-mono text-gray-400 mt-1">00:00:00</p>
+            </div>
+
+            <!-- Mini Status Card -->
+            <div class="glass-panel rounded-2xl p-6 flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Current Status</p>
+                    <p class="text-white font-semibold flex items-center gap-2">
+                        <i class="fas fa-code text-blue-400"></i> Building
+                    </p>
+                </div>
+                <div class="h-10 w-[1px] bg-white/10"></div>
+                <div class="text-right">
+                    <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Location</p>
+                    <p class="text-white font-semibold">India 🇮🇳</p>
                 </div>
             </div>
+
         </div>
 
-        <a href="mailto:kamilikhith@gmail.com" class="glass-card col-span-1 p-4 md:p-6 flex flex-col items-center justify-center text-center group tilt-enabled">
-            <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform mb-3">
-                <i class="fas fa-envelope text-white text-lg"></i>
-            </div>
-            <p class="text-[10px] md:text-xs font-bold text-gray-900 dark:text-white">Email Me</p>
-        </a>
+        <!-- Right Column: Bio & Skills (8 cols) -->
+        <div class="lg:col-span-8 flex flex-col gap-8">
 
-        <a href="https://www.instagram.com/lucky__likhith?igsh=bTgxYjZtZ2wwYmR4" target="_blank" class="glass-card col-span-1 p-4 md:p-0 flex flex-col items-center justify-center relative overflow-hidden group">
-            <div class="absolute inset-0 bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            <div class="relative z-10 flex flex-col items-center">
-                <i class="fab fa-instagram text-2xl md:text-3xl text-gray-800 dark:text-white group-hover:text-white mb-2 transition-colors"></i>
-                <p class="text-[9px] font-bold text-gray-600 dark:text-gray-300 group-hover:text-white uppercase">Insta</p>
-            </div>
-        </a>
-
-        <a href="https://www.linkedin.com/in/likhith-kami/" target="_blank" class="glass-card col-span-1 p-4 md:p-0 bg-[#0077b5] md:bg-transparent flex flex-col items-center justify-center relative overflow-hidden group md:hover:bg-[#0077b5] transition-colors">
-            <div class="relative z-10 flex flex-col items-center">
-                <i class="fab fa-linkedin text-2xl md:text-3xl text-white md:text-[#0077b5] md:dark:text-white md:group-hover:text-white mb-2"></i>
-                <p class="text-[9px] font-bold text-white md:text-gray-600 md:dark:text-gray-300 md:group-hover:text-white uppercase">LinkedIn</p>
-            </div>
-        </a>
-
-        <a href="https://github.com/likhith3035" target="_blank" class="glass-card col-span-1 p-4 md:p-0 bg-[#171515] md:bg-[#171515] flex flex-col items-center justify-center group text-white">
-            <i class="fab fa-github text-2xl md:text-3xl mb-2 group-hover:rotate-12 transition-transform"></i>
-            <p class="text-[9px] font-bold uppercase">GitHub</p>
-        </a>
-
-        <div class="glass-card col-span-2 md:col-span-2 p-0 flex flex-col justify-center bg-gray-50/50 dark:bg-white/5">
-            <div class="px-5 pt-4 pb-2 border-b border-gray-200/50 dark:border-white/5 flex justify-between items-center">
-                <span class="text-[9px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Arsenal</span>
-                <i class="fas fa-code text-[10px] text-gray-400"></i>
-            </div>
-            <div class="scroller-mask w-full overflow-hidden py-5 md:py-6">
-                <div class="flex gap-6 animate-[marquee_20s_linear_infinite] text-2xl md:text-3xl text-gray-400 dark:text-gray-500">
-                    <i class="fab fa-python"></i><i class="fab fa-js"></i><i class="fab fa-react"></i>
-                    <i class="fab fa-node"></i><i class="fab fa-docker"></i><i class="fab fa-aws"></i>
-                    <i class="fas fa-database"></i><i class="fab fa-html5"></i>
-                    <i class="fab fa-python"></i><i class="fab fa-js"></i><i class="fab fa-react"></i>
-                    <i class="fab fa-node"></i><i class="fab fa-docker"></i><i class="fab fa-aws"></i>
+            <!-- Terminal Widget -->
+            <div class="w-full rounded-xl overflow-hidden shadow-2xl border border-white/5 bg-[#1e1e1e]">
+                <div class="terminal-header px-4 py-2 flex items-center gap-2">
+                    <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                    <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                    <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                    <span class="ml-4 text-xs font-mono text-gray-400">likhith@portfolio:~/about</span>
+                </div>
+                <div class="p-6 font-mono text-sm md:text-base leading-relaxed text-gray-300">
+                    <p class="mb-2"><span class="text-green-400">likhith@portfolio:~$</span> cat about_me.md</p>
+                    <p class="typing-text mb-4 text-white"></p>
+                    <p class="animate-pulse cursor-block"><span class="text-green-400">likhith@portfolio:~$</span> <span
+                            class="w-2 h-4 bg-gray-400 inline-block align-middle"></span></p>
                 </div>
             </div>
+
+            <!-- About Text -->
+            <div class="space-y-4">
+                <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+                    <span class="w-8 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></span>
+                    The Architect
+                </h2>
+                <p class="text-gray-400 leading-relaxed text-lg">
+                    I'm a passionate full-stack developer who loves building products that solve real-world problems.
+                    From conceptualizing elegant <span class="text-gradient font-bold">User Interfaces</span> to
+                    architecting robust <span class="text-gradient font-bold">Backend Systems</span>,
+                    I thrive on the challenge of bringing ideas to life through code.
+                </p>
+            </div>
+
+            <!-- Tech Arsenal -->
+            <div>
+                <h2 class="text-2xl font-bold text-white flex items-center gap-3 mb-6">
+                    <span class="w-8 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></span>
+                    Tech Arsenal
+                </h2>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <!-- Frontend -->
+                    <div class="skill-pill p-3 rounded-xl flex items-center gap-3">
+                        <i class="fab fa-html5 text-orange-500 text-xl"></i>
+                        <span class="text-sm font-medium">HTML5</span>
+                    </div>
+                    <div class="skill-pill p-3 rounded-xl flex items-center gap-3">
+                        <i class="fab fa-css3-alt text-blue-500 text-xl"></i>
+                        <span class="text-sm font-medium">Tailwind</span>
+                    </div>
+                    <div class="skill-pill p-3 rounded-xl flex items-center gap-3">
+                        <i class="fab fa-js text-yellow-400 text-xl"></i>
+                        <span class="text-sm font-medium">JavaScript</span>
+                    </div>
+                    <div class="skill-pill p-3 rounded-xl flex items-center gap-3">
+                        <i class="fab fa-react text-cyan-400 text-xl"></i>
+                        <span class="text-sm font-medium">React</span>
+                    </div>
+
+                    <!-- Backend & Tools -->
+                    <div class="skill-pill p-3 rounded-xl flex items-center gap-3">
+                        <i class="fab fa-node text-green-500 text-xl"></i>
+                        <span class="text-sm font-medium">Node.js</span>
+                    </div>
+                    <div class="skill-pill p-3 rounded-xl flex items-center gap-3">
+                        <i class="fas fa-database text-yellow-500 text-xl"></i>
+                        <span class="text-sm font-medium">Firebase</span>
+                    </div>
+                    <div class="skill-pill p-3 rounded-xl flex items-center gap-3">
+                        <i class="fab fa-git-alt text-red-500 text-xl"></i>
+                        <span class="text-sm font-medium">Git</span>
+                    </div>
+                    <div class="skill-pill p-3 rounded-xl flex items-center gap-3">
+                        <i class="fas fa-brain text-purple-500 text-xl"></i>
+                        <span class="text-sm font-medium">AI/LLMs</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact CTA -->
+            <a href="mailto:contact@example.com"
+                class="group relative w-full p-8 rounded-2xl overflow-hidden glass-panel hover:bg-white/5 transition-all">
+                <div
+                    class="absolute top-0 right-0 w-32 h-32 bg-blue-500 rounded-full filter blur-[60px] opacity-20 group-hover:opacity-40 transition-opacity">
+                </div>
+                <div class="flex items-center justify-between relative z-10">
+                    <div>
+                        <h3 class="text-2xl font-bold text-white mb-1">Let's build something crazy.</h3>
+                        <p class="text-gray-400">Open for collaborations and freelance projects.</p>
+                    </div>
+                    <div
+                        class="w-12 h-12 rounded-full bg-white flex items-center justify-center transform group-hover:scale-110 group-hover:rotate-45 transition-all duration-300">
+                        <i class="fas fa-arrow-right text-black"></i>
+                    </div>
+                </div>
+            </a>
+
         </div>
 
-        <a href="https://nbkrhostel1.netlify.app/" target="_blank" class="glass-card col-span-2 md:col-span-1 p-5 md:p-6 flex flex-row md:flex-col justify-between items-center md:items-start border-orange-200 dark:border-orange-900/30 bg-orange-50/50 dark:bg-orange-900/10 group">
-            <div class="flex flex-col">
-                <span class="text-[9px] font-bold text-orange-600 dark:text-orange-400 uppercase tracking-wide mb-1 flex items-center gap-1">
-                    <span class="w-1.5 h-1.5 bg-orange-500 rounded-full"></span> Legacy
-                </span>
-                <p class="text-sm font-bold text-gray-900 dark:text-white group-hover:underline">Hostel Portal</p>
-            </div>
-            <div class="w-8 h-8 rounded-full border border-orange-200 dark:border-orange-800 flex items-center justify-center text-orange-500 group-hover:-rotate-45 transition-transform">
-                <i class="fas fa-arrow-right text-xs"></i>
-            </div>
-        </a>
-
-    </div>
-
-    <div class="mt-8 text-center opacity-60">
-        <p class="text-[9px] font-mono text-gray-500 dark:text-gray-500">SECURE CONNECTION ESTABLISHED</p>
-    </div>
+    </main>
 
     <script>
-        // --- 1. TYPING EFFECT ---
-        const phrases = ["Prompt Engineer", "Full Stack Dev", "UI Designer", "Student"];
-        const el = document.getElementById("typing-text");
-        let pIdx = 0, cIdx = 0, isDeleting = false;
+        // Typing Effect
+        const text = "Hello! I create high-performance web applications with a focus on seamless user experiences. Currently experimenting with AI-driven interfaces.";
+        const typingElement = document.querySelector('.typing-text');
+        let index = 0;
 
-        function type() {
-            const current = phrases[pIdx];
-            el.textContent = current.substring(0, cIdx);
-            
-            let speed = isDeleting ? 40 : 80;
-            if(!isDeleting && cIdx === current.length) { isDeleting=true; speed=2000; }
-            else if(isDeleting && cIdx===0) { isDeleting=false; pIdx=(pIdx+1)%phrases.length; speed=500; }
-            
-            cIdx += isDeleting ? -1 : 1;
-            setTimeout(type, speed);
-        }
-        setTimeout(type, 1000);
-
-        // --- 2. LIVE CLOCK ---
-        setInterval(() => {
-            document.getElementById('clock').textContent = new Date().toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', hour12:true}) + " IST";
-        }, 1000);
-
-        // --- 3. THEME TOGGLE ---
-        function toggleTheme() {
-            document.documentElement.classList.toggle('dark');
-            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        function typeWriter() {
+            if (index < text.length) {
+                typingElement.innerHTML += text.charAt(index);
+                index++;
+                setTimeout(typeWriter, 30); // Typing speed
+            }
         }
 
-        // --- 4. DESKTOP TILT (Disabled on Mobile) ---
-        if (window.matchMedia("(min-width: 1024px)").matches) {
-            document.querySelectorAll('.tilt-enabled').forEach(card => {
-                card.addEventListener('mousemove', e => {
-                    const rect = card.getBoundingClientRect();
-                    const x = (e.clientX - rect.left) / rect.width - 0.5;
-                    const y = (e.clientY - rect.top) / rect.height - 0.5;
-                    card.style.transform = `perspective(1000px) rotateX(${y * 10}deg) rotateY(${x * -10}deg) scale3d(1.02, 1.02, 1.02)`;
-                });
-                card.addEventListener('mouseleave', () => {
-                    card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
-                });
-            });
-        }
+        // Start typing after a slight delay
+        setTimeout(typeWriter, 500);
+
+        // 3D Tilt Effect for Profile Card
+        const card = document.getElementById('profile-card');
+
+        document.addEventListener('mousemove', (e) => {
+            if (window.innerWidth > 768) { // Only on desktop
+                const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+                const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+                card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+            }
+        });
+
+        document.addEventListener('mouseenter', () => {
+            if (window.innerWidth > 768) {
+                card.style.transition = 'none';
+            }
+        });
+
+        document.addEventListener('mouseleave', () => {
+            if (window.innerWidth > 768) {
+                card.style.transition = 'all 0.5s ease';
+                card.style.transform = `rotateY(0deg) rotateX(0deg)`;
+            }
+        });
     </script>
 </body>
+
 </html>
