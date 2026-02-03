@@ -15,6 +15,16 @@ window.markNotificationsAsRead = markNotificationsAsRead;
 window.toggleTheme = toggleTheme;
 window.toggleSidebar = toggleSidebar;
 
+// Generate unique Student ID
+function generateStudentId() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const randomNum = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+    return `${year}-${month}-${day}-NBKRIST-${randomNum}`;
+}
+
 // Global function for redirect to personal tab
 window.editProfile = () => {
     // Find and click the "Personal" tab button
@@ -91,6 +101,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const idComplete = document.getElementById('id-complete-state');
         const idName = document.getElementById('id-card-name');
         const idRole = document.getElementById('id-card-role');
+        const idStudentId = document.getElementById('id-card-student-id');
         const qrContainer = document.getElementById('qrcode-container');
 
         // Check if profile is complete (Name, Phone, Photo required)
@@ -110,6 +121,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 if (idName) idName.textContent = name;
                 if (idRole && userData?.firestoreData?.role) idRole.textContent = userData.firestoreData.role;
+                if (idStudentId && userData?.firestoreData?.studentId) {
+                    idStudentId.textContent = userData.firestoreData.studentId;
+                }
 
                 if (qrContainer && userData?.uid) {
                     const verificationUrl = `https://nbkristhostelportal.netlify.app/id-card.html?uid=${userData.uid}`;
@@ -155,12 +169,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         try {
             await updateProfile(user, { displayName: newDisplayName, photoURL: newPhotoURL });
+
+            // Generate Student ID if it doesn't exist
+            const studentId = localFirestoreData.studentId || generateStudentId();
+
             await setDoc(userDocRef, {
                 email: user.email,
                 displayName: newDisplayName,
                 photoURL: newPhotoURL,
                 phone: newPhone,
                 gender: newGender,
+                studentId: studentId,
                 role: localFirestoreData.role || 'student'
             }, { merge: true });
             showToast('Profile updated successfully!');

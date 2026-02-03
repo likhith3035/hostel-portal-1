@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('user-phone').textContent = data.phone || 'Not Provided';
         document.getElementById('user-gender').textContent = data.gender || 'Not Specified';
         document.getElementById('user-role').textContent = data.role || 'Student';
+        document.getElementById('user-student-id').textContent = data.studentId || 'No ID';
 
         if (data.photoURL) {
             document.getElementById('user-photo').src = data.photoURL;
