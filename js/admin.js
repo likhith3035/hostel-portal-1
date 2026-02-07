@@ -788,15 +788,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         bookingsTableBody.innerHTML = filtered.map(b => {
             const meta = roomMetadata[b.roomNumber] || { id: null, hostelName: 'Unknown' };
             const statusBadge = `<span class="px-2 py-1 rounded-lg text-[10px] font-bold uppercase ${b.status === CONSTANTS.STATUS.APPROVED ? 'bg-green-100 text-green-600' : 'bg-amber-100 text-amber-600'}">${b.status}</span>`;
+
+            const hasVacateRequest = b.leaveRequest && b.leaveRequest.status === 'pending';
+
             return `
-                <tr class="border-b border-gray-100 dark:border-white/5">
-                    <td class="px-6 py-4 text-sm font-bold">${escapeHTML(b.userName || b.userEmail)}<br><span class="text-[10px] text-gray-400">${escapeHTML(b.userEmail)}</span></td>
+                <tr class="border-b border-gray-100 dark:border-white/5 ${hasVacateRequest ? 'bg-red-50 dark:bg-red-900/10' : ''}">
+                    <td class="px-6 py-4 text-sm font-bold">
+                        ${escapeHTML(b.userName || b.userEmail)}
+                        ${hasVacateRequest ? '<span class="ml-2 px-2 py-0.5 rounded-full bg-red-100 text-red-600 text-[10px] uppercase tracking-widest animate-pulse">Requested Vacate</span>' : ''}
+                        <br><span class="text-[10px] text-gray-400">${escapeHTML(b.userEmail)}</span>
+                    </td>
                     <td class="px-6 py-4 text-sm">Room ${escapeHTML(b.roomNumber)}<br><span class="text-[10px] text-indigo-500">${meta.hostelName}</span></td>
                     <td class="px-6 py-4">${statusBadge}</td>
                     <td class="px-6 py-4 text-right">
                         ${b.status === CONSTANTS.STATUS.PENDING ?
-                    `<button onclick="window.handleBookingAction('approve', '${b.id}')" class="text-green-600 text-xs font-bold mr-2">Approve</button>` : ''}
-                        <button onclick="window.handleBookingAction('force-vacate', '${b.id}', '${b.roomId || meta.id}', '${b.bedId}')" class="text-red-500 text-xs font-bold">Vacate</button>
+                    `<button onclick="window.handleBookingAction('approve', '${b.id}')" class="text-green-600 text-xs font-bold mr-2 hover:bg-green-50 px-2 py-1 rounded">Approve</button>` : ''}
+                        
+                        <button onclick="window.handleBookingAction('force-vacate', '${b.id}', '${b.roomId || meta.id}', '${b.bedId}')" 
+                                class="${hasVacateRequest ? 'bg-red-600 text-white shadow-lg shadow-red-500/30' : 'text-red-500 hover:bg-red-50'} text-xs font-bold px-3 py-1.5 rounded-lg transition-all">
+                            ${hasVacateRequest ? 'Confirm Vacate' : 'Vacate'}
+                        </button>
                     </td>
                 </tr>
             `;
@@ -812,7 +823,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (statPendingApproval) statPendingApproval.innerText = pendingCount;
 
         // Update Main Dashboard Stats
+        // Update Main Dashboard Stats
         if (statMainPending) statMainPending.innerText = pendingCount;
+
+        // Count Vacate Requests
+        const vacateReqCount = allBookingsData.filter(b => b.leaveRequest && b.leaveRequest.status === 'pending').length;
+        if (statVacateReqs) statVacateReqs.innerText = vacateReqCount;
 
         renderBookings();
     });

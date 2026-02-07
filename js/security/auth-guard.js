@@ -14,9 +14,6 @@ import { doc, getDoc, onSnapshot } from '../firebase/firebase-firestore.js';
  */
 
 const PROTECTED_PAGES = [
-    'booking.html',
-    'outpass.html',
-    'complaints.html',
     'profile.html',
     'change-room.html'
 ];
@@ -37,6 +34,9 @@ const PUBLIC_PAGES = [
     'privacy.html',
     'terms.html',
     'id-checker.html', // Public ID verification
+    'booking.html',
+    'outpass.html',
+    'complaints.html',
     '404.html'
 ];
 

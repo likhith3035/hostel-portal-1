@@ -44,7 +44,7 @@ export const showToast = (message, isError = false) => {
             background: isDark ? '#1C1C1E' : '#FFFFFF',
             color: isDark ? '#FFFFFF' : '#000000',
             customClass: {
-                popup: 'rounded-2xl border border-white/20 shadow-2xl backdrop-blur-xl'
+                popup: 'rounded-2xl border border-white/20 shadow-2xl'
             }
         });
     } else {
@@ -78,7 +78,7 @@ export const errorHandler = (error, customMsg = null) => {
             background: isDark ? '#1C1C1E' : '#FFFFFF',
             color: isDark ? '#fff' : '#000',
             customClass: {
-                popup: 'rounded-[2rem] border border-white/20 backdrop-blur-xl'
+                popup: 'rounded-[2rem] border border-white/20'
             }
         });
     } else {

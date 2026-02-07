@@ -1,4 +1,4 @@
-import { checkUserSession, handleLogout, db, markNotificationsAsRead, toggleTheme, toggleSidebar, showToast, triggerLoginModal, CONSTANTS } from '../main.js?v=2';
+import { checkUserSession, handleLogout, db, markNotificationsAsRead, toggleTheme, toggleSidebar, showToast, triggerLoginModal, CONSTANTS } from '../main.js?v=3';
 import { dbService } from './core/db-service.js';
 import {
     collection,
@@ -149,8 +149,24 @@ document.addEventListener('DOMContentLoaded', async () => {
                 console.error("Error loading history:", e);
             }
         } else {
-            // Demo mode for guests
-            renderOutpasses(DEMO_OUTPASSES.map((d, i) => ({ id: `demo-${i}`, data: d })));
+            // Guest mode - Login Prompt
+            outpassHistory.innerHTML = `
+                <div class="col-span-full flex flex-col items-center justify-center py-12 px-6 text-center glass-panel rounded-[2rem] animate-fade-in border border-white/20">
+                    <div class="relative mb-6">
+                        <div class="absolute inset-0 bg-iosBlue/20 rounded-full blur-2xl animate-pulse"></div>
+                        <div class="w-20 h-20 bg-gradient-to-tr from-iosBlue to-blue-600 rounded-[1.5rem] flex items-center justify-center text-3xl text-white shadow-xl relative animate-float shadow-blue-500/30">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-black mb-3 tracking-tight text-gray-900 dark:text-white">Login Required</h3>
+                    <p class="text-gray-500 dark:text-gray-400 max-w-xs mb-8 font-medium text-sm leading-relaxed">
+                        Sign in to view your outpass history and apply for new passes.
+                    </p>
+                    <button onclick="window.triggerInlineLogin()" class="bg-gray-900 dark:bg-white text-white dark:text-black px-8 py-3 rounded-xl font-black uppercase tracking-widest text-xs shadow-lg hover:scale-105 transition-all spring-click">
+                        Authenticate Now
+                    </button>
+                </div>
+            `;
         }
 
         function renderOutpasses(outpasses) {

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hostel-portal-v21';
+const CACHE_NAME = 'hostel-portal-v23';
 const ASSETS_TO_CACHE = [
     '/',
     '/index.html',
@@ -12,6 +12,7 @@ const ASSETS_TO_CACHE = [
     '/about.html',
     '/id-checker.html',
     '/id-card.html',
+    '/offline.html',
     '/contact.html',
     '/admin.html',
     '/developer.html',
@@ -117,8 +118,10 @@ self.addEventListener('fetch', (event) => {
                 }
                 return networkResponse;
             }).catch(() => {
-                // Return cached version of the exact page if exists, or return index.html for extensionless/missing
-                return caches.match(event.request) || caches.match('/index.html');
+                // Return cached version of the exact page if exists, or return offline.html for navigation requests
+                return caches.match(event.request)
+                    .then(response => response || caches.match('/offline.html'))
+                    .catch(() => caches.match('/index.html'));
             })
         );
         return;

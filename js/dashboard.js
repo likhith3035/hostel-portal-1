@@ -233,6 +233,23 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
                 complaintsWidget.innerHTML = html;
             });
+        } else {
+            // GUEST VIEW for Complaints Widget
+            if (complaintsWidget) {
+                complaintsWidget.innerHTML = `
+                <div class="flex flex-col items-center justify-center text-center h-full py-4 gap-3">
+                    <div class="w-10 h-10 bg-amber-500/10 rounded-full flex items-center justify-center text-amber-500 text-lg">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-gray-900 dark:text-white">Login Required</p>
+                        <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">View your complaints history.</p>
+                    </div>
+                    <button onclick="window.triggerInlineLogin()" class="text-[10px] font-black text-iosBlue hover:underline uppercase tracking-wider block mt-2">
+                        Sign In &rarr;
+                    </button>
+                </div>`;
+            }
         }
 
 

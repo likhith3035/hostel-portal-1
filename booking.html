@@ -97,26 +97,16 @@
 
     <!-- Custom Style System -->
     <link rel="stylesheet" href="css/style.css">
-
-    <style>
-        /* Modern iOS Overrides */
-        .glass-panel {
-            backdrop-filter: blur(25px) saturate(180%) !important;
-        }
-    </style>
 </head>
 
 <body class="text-gray-900 dark:text-white transition-colors duration-500">
 
-    <div class="mesh-bg">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-    </div>
+
 
     <div class="flex flex-col md:flex-row h-screen overflow-hidden">
 
         <div id="sidebar-overlay" onclick="toggleSidebar()"
-            class="fixed inset-0 bg-black/40 z-40 hidden backdrop-blur-sm transition-opacity"></div>
+            class="fixed inset-0 bg-black/40 z-40 hidden transition-opacity"></div>
 
         <aside id="sidebar"
             class="fixed md:static top-0 left-0 h-full w-72 flex flex-col glass-panel z-50 md:m-5 md:rounded-[2.5rem] md:h-[calc(100vh-2.5rem)] transition-transform duration-300 transform -translate-x-full md:translate-x-0 border-r md:border-none border-white/20">
@@ -272,6 +262,46 @@
                 <div id="booking-status-container"></div>
 
                 <div id="booking-interface" class="space-y-8 hidden">
+                    <div class="flex justify-between items-center mb-8">
+                        <div>
+                            <h2 class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">Room Booking
+                            </h2>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Select your preferred space
+                            </p>
+                        </div>
+                        <div
+                            class="hidden md:flex items-center gap-2 px-4 py-2 bg-white dark:bg-white/5 rounded-2xl shadow-sm border border-gray-100 dark:border-white/10">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                                <span
+                                    class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Available</span>
+                            </div>
+                            <div class="w-px h-3 bg-gray-200 dark:bg-white/10"></div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-orange-500"></span>
+                                <span
+                                    class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Filling</span>
+                            </div>
+                            <div class="w-px h-3 bg-gray-200 dark:bg-white/10"></div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                                <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Full</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Campus Heatmap -->
+                    <div id="campus-map-container" class="mb-8 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                        <!-- Heatmap items injected by JS -->
+                        <div class="col-span-full py-8 text-center animate-pulse">
+                            <div
+                                class="inline-block w-8 h-8 border-4 border-iosBlue border-t-transparent rounded-full animate-spin mb-2">
+                            </div>
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Scanning Campus...</p>
+                        </div>
+                    </div>
+
+                    <!-- Search & Filter Bar -->
                     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 px-2">
                         <div>
                             <h3 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Available Rooms
@@ -284,7 +314,7 @@
                                 <i
                                     class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-iosBlue transition-colors z-10"></i>
                                 <input type="text" id="room-search"
-                                    class="w-full sm:w-72 pl-11 pr-4 py-3 bg-white/50 dark:bg-black/20 backdrop-blur-md rounded-2xl border border-gray-200 dark:border-white/10 focus:outline-none focus:ring-4 focus:ring-iosBlue/10 focus:border-iosBlue transition-all shadow-sm text-sm font-semibold"
+                                    class="w-full sm:w-72 pl-11 pr-4 py-3 bg-white/90 dark:bg-black/80 rounded-2xl border border-gray-200 dark:border-white/10 focus:outline-none focus:ring-4 focus:ring-iosBlue/10 focus:border-iosBlue transition-all shadow-sm text-sm font-semibold"
                                     placeholder="Search room number...">
                             </div>
                         </div>
@@ -309,7 +339,17 @@
 
     </div>
 
-    <script type="module" src="js/booking.js?v=2" data-cmp-ignore="1"></script>
+    <script>
+        // Force unregister Service Worker to clear stale caches
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function (registrations) {
+                for (let registration of registrations) {
+                    registration.unregister();
+                }
+            });
+        }
+    </script>
+    <script type="module" src="js/booking.js?v=1007" data-cmp-ignore="1"></script>
 </body>
 
 </html>

@@ -1,6 +1,9 @@
 // Import centralized Firebase instances
 import { auth, db } from './firebase-config.js';
-import { onAuthStateChanged, signOut } from './js/firebase/firebase-auth.js';
+import {
+    signInWithPopup,
+    GoogleAuthProvider
+} from './js/firebase/firebase-auth.js';
 import {
     collection,
     doc,
@@ -29,7 +32,7 @@ window.showLoading = (message = 'Processing...') => {
     if (!loader) {
         loader = document.createElement('div');
         loader.id = 'global-loader';
-        loader.className = 'fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-md transition-opacity duration-300';
+        loader.className = 'fixed inset-0 z-[100] flex items-center justify-center bg-black/20 transition-opacity duration-300';
         loader.innerHTML = `
             <div class="glass-panel p-10 rounded-[2.5rem] shadow-2xl flex flex-col items-center border border-white/20">
                 <div class="w-12 h-12 border-[5px] border-iosBlue border-t-transparent rounded-full animate-spin mb-6"></div>
@@ -217,9 +220,7 @@ style.textContent = `
             position: relative !important;
             display: flex !important;
             margin: 1.25rem !important;
-            background: rgba(255, 255, 255, 0.7) !important;
-            backdrop-filter: blur(25px) !important;
-            -webkit-backdrop-filter: blur(25px) !important;
+            background: rgba(255, 255, 255, 0.9) !important;
             border: 1px solid rgba(255, 255, 255, 0.4) !important;
             border-radius: 2.5rem !important;
             box-shadow: 0 10px 40px -10px rgba(0,0,0,0.05) !important;
@@ -445,13 +446,13 @@ export function setupGuestUI() {
         logoutSidebar.classList.replace('bg-red-500/10', 'bg-blue-500/10');
         logoutSidebar.classList.replace('text-red-500', 'text-blue-500');
         logoutSidebar.innerHTML = '<i class="fas fa-sign-in-alt w-6"></i> Sign In';
-        logoutSidebar.onclick = (e) => { e.preventDefault(); window.location.href = 'login.html?auth=true'; };
+        logoutSidebar.onclick = (e) => { e.preventDefault(); window.triggerInlineLogin(); };
     }
 
     const logoutHeader = document.getElementById('logout-header');
     if (logoutHeader) {
         logoutHeader.innerHTML = '<i class="fas fa-sign-in-alt w-5 mr-3"></i> Log In';
-        logoutHeader.onclick = () => window.location.href = 'login.html?auth=true';
+        logoutHeader.onclick = () => window.triggerInlineLogin();
     }
 
     const nameDisplay = document.getElementById('user-name-display');
@@ -462,14 +463,14 @@ export function setupGuestUI() {
         loginBtn.onclick = (e) => {
             e.preventDefault();
             e.stopPropagation();
-            window.location.href = 'login.html?auth=true';
+            window.triggerInlineLogin();
         };
     }
 
     // Update Profile Dropdown for Guest
     const dropdownList = document.getElementById('profile-dropdown-list');
     if (dropdownList) {
-        dropdownList.innerHTML = `<a href="login.html?auth=true" class="flex items-center px-4 py-3 text-sm font-semibold rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors text-iosBlue"><i class="fas fa-sign-in-alt w-5 mr-3"></i> Log In to Access Profile</a>`;
+        dropdownList.innerHTML = `<button onclick="window.triggerInlineLogin()" class="w-full flex items-center px-4 py-3 text-sm font-semibold rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors text-iosBlue text-left"><i class="fas fa-sign-in-alt w-5 mr-3"></i> Log In to Access Profile</button>`;
     }
 
     const nameDropdown = document.getElementById('user-name-dropdown');
@@ -600,20 +601,100 @@ export async function handleLogout() {
 
 export async function triggerLoginModal() {
     const isDark = document.documentElement.classList.contains('dark');
+
+    // Check if auth is already initialized to avoid errors
+    if (!auth) {
+        console.error("Auth not initialized");
+        window.location.href = 'login.html?auth=true';
+        return;
+    }
+
     const result = await Swal.fire({
         title: 'Authentication Required',
-        text: 'You must login to continue with this action.',
-        icon: 'info',
-        showCancelButton: true,
-        confirmButtonText: '<i class="fas fa-sign-in-alt mr-2"></i> Login',
-        cancelButtonText: 'Cancel',
-        confirmButtonColor: '#007AFF', // iOS Blue
-        background: isDark ? '#1C1C1E' : '#FFFFFF',
+        html: `
+            <div class="flex flex-col gap-3 mt-4">
+                <button id="swal-google-login" class="flex items-center justify-center gap-3 w-full bg-white dark:bg-white/10 text-gray-700 dark:text-white py-3.5 rounded-xl border border-gray-200 dark:border-white/20 hover:bg-gray-50 dark:hover:bg-white/20 transition-all font-bold shadow-sm group">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5 group-hover:scale-110 transition-transform" alt="Google">
+                    <span>Sign in with Google</span>
+                </button>
+                
+                <div class="relative py-2">
+                    <div class="absolute inset-0 flex items-center"><span class="w-full border-t border-gray-200 dark:border-white/10"></span></div>
+                    <div class="relative flex justify-center text-xs uppercase"><span class="bg-transparent px-2 text-gray-400 font-bold">Or</span></div>
+                </div>
+
+                <button id="swal-email-login" class="flex items-center justify-center gap-3 w-full bg-iosBlue text-white py-3.5 rounded-xl hover:bg-blue-600 transition-all font-bold shadow-lg shadow-blue-500/30 active:scale-95">
+                    <i class="fas fa-envelope"></i>
+                    <span>Continue with Email</span>
+                </button>
+            </div>
+            <p class="text-xs text-gray-400 mt-6 mb-2">Secure authentication via Firebase</p>
+        `,
+        showConfirmButton: false,
+        showCloseButton: true,
+        background: isDark ? '#1C1C1E' : '#ffffff',
         color: isDark ? '#FFFFFF' : '#000000',
         customClass: {
-            popup: 'rounded-3xl border border-white/20 shadow-2xl backdrop-blur-2xl',
-            confirmButton: 'rounded-2xl px-8 py-3 font-black uppercase tracking-widest text-xs',
-            cancelButton: 'rounded-2xl px-8 py-3 font-bold'
+            popup: 'rounded-[2.5rem] glass-panel border border-white/20 shadow-2xl p-0 overflow-hidden main-auth-modal',
+            title: 'pt-8 text-2xl font-black tracking-tight',
+            htmlContainer: 'px-8 pb-8',
+            closeButton: 'focus:outline-none'
+        },
+        showClass: {
+            popup: 'animate-none' // Disable default Swal animation so CSS takes over
+        },
+        hideClass: {
+            popup: 'animate-none'
+        },
+        didOpen: () => {
+            // Handle Google Login
+            const googleBtn = document.getElementById('swal-google-login');
+            if (googleBtn) {
+                googleBtn.addEventListener('click', async () => {
+                    try {
+                        // Show loading state directly in button
+                        googleBtn.innerHTML = '<div class="w-5 h-5 border-2 border-gray-500 border-t-transparent rounded-full animate-spin"></div>';
+
+                        const provider = new GoogleAuthProvider();
+                        await signInWithPopup(auth, provider);
+
+                        Swal.close();
+
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 1500,
+                            timerProgressBar: true,
+                            background: isDark ? '#1C1C1E' : '#FFFFFF',
+                            color: isDark ? '#FFFFFF' : '#000000'
+                        });
+
+                        await Toast.fire({
+                            icon: 'success',
+                            title: 'Signed in successfully'
+                        });
+
+                        // Reload to apply auth state
+                        window.location.reload();
+                    } catch (error) {
+                        console.error("Login Error:", error);
+                        googleBtn.innerHTML = `
+                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5" alt="Google">
+                            <span>Sign in with Google</span>
+                         `;
+                        Swal.showValidationMessage(`Login Failed: ${error.message}`);
+                    }
+                });
+            }
+
+            // Handle Email Redirect
+            const emailBtn = document.getElementById('swal-email-login');
+            if (emailBtn) {
+                emailBtn.addEventListener('click', () => {
+                    window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
+                });
+            }
         }
     });
 
@@ -642,21 +723,32 @@ const showSoftGateBanner = () => {
     if (!document.getElementById(bannerID)) {
         const banner = document.createElement('div');
         banner.id = bannerID;
-        banner.className = 'fixed top-0 left-0 right-0 z-[100] bg-amber-500 text-white px-4 py-3 shadow-lg flex items-center justify-center sm:justify-between animate-fade-in-down';
+        banner.className = 'fixed top-0 left-0 right-0 z-[100] bg-amber-500 text-white px-4 py-3 shadow-lg flex items-center justify-between animate-fade-in-down';
         banner.innerHTML = `
             <div class="flex items-center gap-3 container max-w-7xl mx-auto">
                 <div class="bg-white/20 p-2 rounded-lg hidden sm:block"><i class="fas fa-exclamation-triangle"></i></div>
                 <div class="flex-1 text-center sm:text-left">
                     <p class="font-bold text-sm">Action Required: Profile Incomplete</p>
-                    <p class="text-xs opacity-90 hidden sm:block">Please complete your profile to access all hostel features (Digital ID, Outpasses, etc).</p>
+                    <p class="text-xs opacity-90 hidden sm:block">Please complete your profile to access all hostel features.</p>
                 </div>
-                <a href="profile.html" class="ml-4 bg-white text-amber-600 px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest hover:bg-amber-50 transition-colors shadow-sm whitespace-nowrap">
-                    Complete Now &rarr;
-                </a>
+                <div class="flex items-center gap-2">
+                    <a href="profile.html" class="bg-white text-amber-600 px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest hover:bg-amber-50 transition-colors shadow-sm whitespace-nowrap">
+                        Complete Now &rarr;
+                    </a>
+                    <button id="close-soft-gate" class="text-white/70 hover:text-white p-2 transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
             </div>
         `;
         document.body.prepend(banner);
         document.body.style.paddingTop = '60px';
+
+        // Add Close Listener
+        document.getElementById('close-soft-gate').addEventListener('click', () => {
+            sessionStorage.setItem('soft-gate:skipped', 'true');
+            hideSoftGateBanner();
+        });
     }
 };
 
@@ -668,10 +760,44 @@ const hideSoftGateBanner = () => {
     }
 };
 
+const showFeatureLockPopup = () => {
+    // Only show if not already shown
+    if (document.getElementById('feature-lock-popup')) return;
+
+    Swal.fire({
+        title: 'Profile Incomplete',
+        text: 'Please enter details to see and use features.',
+        icon: 'warning',
+        confirmButtonText: 'Enter Details',
+        confirmButtonColor: '#007AFF', // iOS Blue
+        showCancelButton: true,
+        cancelButtonText: 'Not Now',
+        background: document.documentElement.classList.contains('dark') ? '#1C1C1E' : '#FFFFFF',
+        color: document.documentElement.classList.contains('dark') ? '#FFFFFF' : '#000000',
+        customClass: {
+            popup: 'rounded-3xl border border-white/20 shadow-2xl',
+            confirmButton: 'rounded-2xl px-6 py-3 font-bold',
+            cancelButton: 'rounded-2xl px-6 py-3 font-medium'
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = 'profile.html';
+        } else {
+            // Optional: Redirect away if they refuse? Or just let them be stuck?
+            // "tell if they remove give small popup enter details to see and use features"
+            // If they cancel, they stay on the page but might see it again if they reload or navigate back.
+            window.location.href = 'index.html'; // Redirect to home if they don't want to complete
+        }
+    });
+};
+
 // 0. INSTANT CHECK: Run immediately based on LocalStorage (prevents flash)
 if (localStorage.getItem('soft-gate:active') === 'true' && !window.location.pathname.includes('profile.html')) {
-    console.log('[SoftGate] Restoring banner from LocalStorage cache');
-    showSoftGateBanner();
+    // Check if previously skipped in this session
+    if (sessionStorage.getItem('soft-gate:skipped') !== 'true') {
+        console.log('[SoftGate] Restoring banner from LocalStorage cache');
+        showSoftGateBanner();
+    }
 }
 
 const checkSoftGate = (user, userData) => {
@@ -679,10 +805,7 @@ const checkSoftGate = (user, userData) => {
 
     // Debugging: Check what data we actually have
     console.log('[SoftGate] Checking profile for:', user.email);
-    console.log('[SoftGate] UserData:', userData);
 
-    // If we only have cached role data (partial), we might assume incomplete OR fetch fresh data.
-    // For now, let's strictly check content.
     const hasId = userData && userData.studentId && userData.studentId !== 'undefined' && String(userData.studentId).trim() !== '';
     const hasName = userData && userData.displayName && userData.displayName !== 'undefined' && String(userData.displayName).trim() !== '';
     const hasPhone = userData && userData.phone && userData.phone !== 'undefined' && String(userData.phone).trim() !== '';
@@ -690,19 +813,36 @@ const checkSoftGate = (user, userData) => {
     const isProfileComplete = hasId && hasName && hasPhone;
     const isProfilePage = window.location.pathname.includes('profile.html');
 
-    console.log(`[SoftGate] Status: ID=${hasId}, Name=${hasName}, Phone=${hasPhone} -> Complete? ${isProfileComplete}`);
+    // Restricted Pages where Popup is MANDATORY even if banner skipped
+    const restrictedPages = ['booking.html', 'outpass.html', 'complaints.html'];
+    const currentPath = window.location.pathname;
+    const isRestrictedPage = restrictedPages.some(page => currentPath.includes(page));
 
-    // --- CHECK: Complete or Incomplete? ---
     if (isProfileComplete || isProfilePage) {
-        // Condition met: User is allowed access without nagging.
+        // Condition met: User is allowed access.
         console.log('[SoftGate] Profile completed! Removing banner.');
-        localStorage.removeItem('soft-gate:active'); // Clear cache
+        localStorage.removeItem('soft-gate:active'); // Clear persistence
         hideSoftGateBanner();
     } else {
-        // Condition failed: Profile INCOMPLETE and not on profile page.
-        console.warn('[SoftGate] Profile incomplete, showing banner.');
-        localStorage.setItem('soft-gate:active', 'true'); // Set cache
-        showSoftGateBanner();
+        // Profile INCOMPLETE
+        console.warn('[SoftGate] Profile incomplete.');
+        localStorage.setItem('soft-gate:active', 'true'); // Persist incomplete status
+
+        if (isRestrictedPage) {
+            // STRICT MODE: User is trying to access a feature.
+            // Show Popup regardless of skip status.
+            console.warn('[SoftGate] Restricted feature accessed. Showing Popup.');
+            hideSoftGateBanner(); // Hide banner if it exists to avoid clutter
+            showFeatureLockPopup();
+        } else {
+            // NORMAL MODE: Browse other pages.
+            // Show banner ONLY if not skipped.
+            if (sessionStorage.getItem('soft-gate:skipped') !== 'true') {
+                showSoftGateBanner();
+            } else {
+                console.log('[SoftGate] Banner skipped by user.');
+            }
+        }
     }
 };
 
@@ -822,3 +962,6 @@ if (window.currentUser) {
 
 // Auto-start clock on all pages
 startClock();
+
+// Alias for HTML event handlers
+window.triggerInlineLogin = triggerLoginModal;

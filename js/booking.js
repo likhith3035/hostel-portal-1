@@ -1,4 +1,4 @@
-import { auth, checkUserSession, handleLogout, db, markNotificationsAsRead, setupNotificationListener, toggleTheme, toggleSidebar, showToast, triggerLoginModal } from '../main.js?v=2';
+import { auth, checkUserSession, handleLogout, db, markNotificationsAsRead, setupNotificationListener, toggleTheme, toggleSidebar, showToast, triggerLoginModal } from '../main.js?v=3';
 import {
     collection,
     doc,
@@ -14,7 +14,7 @@ import {
 } from './firebase/firebase-firestore.js';
 
 import { dbService } from './core/db-service.js';
-import { CONSTANTS } from '../main.js?v=2';
+import { CONSTANTS } from '../main.js?v=3';
 
 const ROOM_PRICES = {
     // This constant was introduced in the provided snippet, adding it here.
@@ -238,29 +238,74 @@ document.addEventListener('DOMContentLoaded', async () => {
             // For simplicity in this migration, I will set a window function for this specific action.
 
             window.requestLeave = (id) => {
-                Swal.fire({ title: 'Request Leave?', text: 'Are you vacating this room?', icon: 'warning', showCancelButton: true }).then(r => {
-                    if (r.isConfirmed) {
-                        window.safeAsync(async () => {
+                const isDark = document.documentElement.classList.contains('dark');
+                Swal.fire({
+                    title: 'Request Vacation?',
+                    text: 'Are you sure you want to vacate your room? This action will notify the warden.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, Notify Warden',
+                    cancelButtonText: 'Cancel',
+                    background: isDark ? '#1C1C1E' : '#ffffff',
+                    color: isDark ? '#FFFFFF' : '#000000',
+                    customClass: {
+                        popup: 'rounded-[2.5rem] glass-panel border border-white/20 shadow-2xl main-auth-modal',
+                        title: 'pt-8 text-2xl font-black tracking-tight',
+                        htmlContainer: 'p-4 text-gray-500 font-medium',
+                        actions: 'gap-3 pb-8',
+                        confirmButton: 'bg-iosBlue text-white font-bold py-3 px-6 rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 transition-all !m-0',
+                        cancelButton: 'bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-gray-400 font-bold py-3 px-6 rounded-2xl hover:bg-gray-200 dark:hover:bg-white/20 transition-all !m-0'
+                    },
+                    buttonsStyling: false,
+                    showClass: { popup: 'animate-none' },
+                    hideClass: { popup: 'animate-none' },
+                    showLoaderOnConfirm: true,
+                    preConfirm: async () => {
+                        try {
                             await updateDoc(doc(db, 'bookings', id), {
                                 'leaveRequest': { status: 'pending', timestamp: serverTimestamp() }
                             });
-                            Swal.fire('Request Sent', 'Warden notified', 'success');
-                        }, 'Submitting Request...');
+                            return true;
+                        } catch (error) {
+                            Swal.showValidationMessage(`Request failed: ${error.message}`);
+                            return false;
+                        }
+                    },
+                    allowOutsideClick: () => !Swal.isLoading()
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true,
+                            background: isDark ? '#1C1C1E' : '#FFFFFF',
+                            color: isDark ? '#FFFFFF' : '#000000',
+                            didOpen: (toast) => {
+                                toast.addEventListener('mouseenter', Swal.stopTimer)
+                                toast.addEventListener('mouseleave', Swal.resumeTimer)
+                            }
+                        });
+
+                        Toast.fire({
+                            icon: 'success',
+                            title: 'Warden Notified'
+                        });
                     }
                 });
             };
 
-            window.dismissVacation = () => {
-                if (bookingStatusContainer) bookingStatusContainer.innerHTML = '';
-                bookingInterface?.classList.remove('hidden');
-                fetchAndDisplayRooms();
+            window.dismissVacation = (id) => {
+                window.safeAsync(async () => {
+                    await deleteDoc(doc(db, 'bookings', id));
+                    showToast('Ready for new booking');
+                }, 'Processing...');
             };
 
             bookingStatusContainer.innerHTML = `
                 <div class="glass-panel p-8 md:p-14 rounded-[3rem] relative overflow-hidden text-center animate-fade-in border border-white/20 shadow-2xl">
                     <!-- Dynamic Background -->
-                    <div class="absolute -top-32 -right-32 w-96 h-96 bg-${config.color}-500/10 rounded-full blur-[100px] animate-pulse"></div>
-                    <div class="absolute -bottom-32 -left-32 w-96 h-96 bg-blue-500/10 rounded-full blur-[100px]"></div>
                     <div class="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none"></div>
                     
                     <div class="relative z-10 flex flex-col items-center">
@@ -295,16 +340,24 @@ document.addEventListener('DOMContentLoaded', async () => {
                         </div>
 
                         ${booking.status === CONSTANTS.STATUS.CONFIRMED || booking.status === CONSTANTS.STATUS.APPROVED ? `
-                            <button onclick="window.requestLeave('${bookingDoc.id}')" 
-                                    class="mt-14 px-12 py-5 bg-gray-900 dark:bg-white text-white dark:text-black rounded-3xl text-sm font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl spring-click shadow-gray-500/20 hover:shadow-2xl group flex items-center gap-3 relative overflow-hidden">
-                                <span class="relative z-10">Request to Vacate</span>
-                                <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform relative z-10"></i>
-                                <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-                            </button>
+                            ${booking.leaveRequest && booking.leaveRequest.status === 'pending' ? `
+                                <button disabled
+                                        class="mt-14 px-12 py-5 bg-gray-100 dark:bg-white/10 text-gray-400 rounded-3xl text-sm font-black uppercase tracking-widest cursor-not-allowed flex items-center gap-3">
+                                    <span class="animate-pulse">Request Pending...</span>
+                                    <i class="fas fa-clock animate-spin-slow"></i>
+                                </button>
+                            ` : `
+                                <button onclick="window.requestLeave('${bookingDoc.id}')" 
+                                        class="mt-14 px-12 py-5 bg-gray-900 dark:bg-white text-white dark:text-black rounded-3xl text-sm font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl spring-click shadow-gray-500/20 hover:shadow-2xl group flex items-center gap-3 relative overflow-hidden">
+                                    <span class="relative z-10">Request to Vacate</span>
+                                    <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform relative z-10"></i>
+                                    <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                                </button>
+                            `}
                         ` : ''}
 
                         ${booking.status === CONSTANTS.STATUS.VACATED ? `
-                            <button onclick="window.dismissVacation()" 
+                            <button onclick="window.dismissVacation('${bookingDoc.id}')" 
                                     class="mt-14 px-12 py-5 bg-iosBlue text-white rounded-3xl text-sm font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl spring-click shadow-blue-500/30 group flex items-center gap-3">
                                 <span>Browse Rooms</span>
                                 <i class="fas fa-search group-hover:rotate-12 transition-transform"></i>
@@ -351,7 +404,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </div>
                 <h3 class="text-3xl font-black mb-4 tracking-tight">Login Required</h3>
                 <p class="text-gray-500 max-w-sm mb-10 font-medium">Please sign in to your student account to access the room booking and allocation system.</p>
-                <button onclick="window.location.href='login.html?auth=true'" class="bg-gray-900 dark:bg-white text-white dark:text-black px-10 py-4 rounded-2xl font-black uppercase tracking-widest text-sm shadow-2xl hover:scale-105 transition-all spring-click">
+                <button onclick="window.triggerInlineLogin()" class="bg-gray-900 dark:bg-white text-white dark:text-black px-10 py-4 rounded-2xl font-black uppercase tracking-widest text-sm shadow-2xl hover:scale-105 transition-all spring-click">
                     Authenticate Now
                 </button>
             `;
