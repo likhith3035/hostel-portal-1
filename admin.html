@@ -28,7 +28,7 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
 
     <!-- AUTH GUARD: Must be first -->
     <script type="module" src="js/security/auth-guard.js"></script>
@@ -85,8 +85,8 @@
 <body class="text-slate-800 dark:text-slate-200 transition-colors duration-500 overflow-hidden"
     x-data="{ currentTab: 'stats', sidebarOpen: false }" x-init="$watch('currentTab', value => {
         if(value === 'users' && window.loadUsers) window.loadUsers();
-        // Add other checks if needed
-    })">
+        if(value === 'bookings' && window.loadBookings) window.loadBookings();
+    })">>
 
     <div class="mesh-bg">
         <div class="orb orb-1"></div>

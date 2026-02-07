@@ -1,3 +1,4 @@
+/** "use client"; **/
 import { checkUserSession, handleLogout, db, markNotificationsAsRead, toggleTheme, toggleSidebar, showToast, triggerLoginModal, CONSTANTS } from '../main.js?v=3';
 import { dbService } from './core/db-service.js';
 import {
@@ -38,11 +39,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const user = await checkUserSession(false);
 
 
-    // Date pickers
-    if (window.flatpickr) {
-        flatpickr("#fromDate", { enableTime: true, dateFormat: "Y-m-d H:i", minDate: "today" });
-        flatpickr("#toDate", { enableTime: true, dateFormat: "Y-m-d H:i", minDate: "today" });
-    }
+    // Custom Animated Calendar is initialized via Alpine.js in outpass.html
 
     // Outpass Logic
     const outpassForm = document.getElementById('outpass-form');
@@ -311,32 +308,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         const id = targetElement.dataset.id;
 
         if (targetElement.classList.contains('withdraw-btn')) {
-            Swal.fire({ title: 'Withdraw?', text: "Action cannot be undone.", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Yes, Withdraw' }).then((r) => {
-                if (r.isConfirmed) {
-                    window.safeAsync(async () => {
-                        await deleteDoc(doc(db, CONSTANTS.COLLECTIONS.OUTPASSES, id));
-                        showToast("Request withdrawn");
-                    }, 'Withdrawing Request...');
-                }
-            });
+            if (window.confirm('Withdraw? Action cannot be undone.')) {
+                window.safeAsync(async () => {
+                    await deleteDoc(doc(db, CONSTANTS.COLLECTIONS.OUTPASSES, id));
+                    showToast("Request withdrawn");
+                }, 'Withdrawing Request...');
+            }
         }
 
         if (targetElement.classList.contains('delete-outpass-btn')) {
-            Swal.fire({
-                title: 'Delete Record?',
-                text: "This will permanently remove this outpass from your history.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                confirmButtonText: 'Yes, Delete'
-            }).then((r) => {
-                if (r.isConfirmed) {
-                    window.safeAsync(async () => {
-                        await deleteDoc(doc(db, CONSTANTS.COLLECTIONS.OUTPASSES, id));
-                        showToast("Record deleted");
-                    }, 'Deleting Record...');
-                }
-            });
+            if (window.confirm('Delete Record? This will permanently remove this outpass from your history.')) {
+                window.safeAsync(async () => {
+                    await deleteDoc(doc(db, CONSTANTS.COLLECTIONS.OUTPASSES, id));
+                    showToast("Record deleted");
+                }, 'Deleting Record...');
+            }
         }
 
         if (targetElement.classList.contains('download-btn')) {

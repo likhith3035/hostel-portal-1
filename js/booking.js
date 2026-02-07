@@ -1,3 +1,4 @@
+/** "use client"; **/
 import { auth, checkUserSession, handleLogout, db, markNotificationsAsRead, setupNotificationListener, toggleTheme, toggleSidebar, showToast, triggerLoginModal } from '../main.js?v=3';
 import {
     collection,
@@ -238,62 +239,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             // For simplicity in this migration, I will set a window function for this specific action.
 
             window.requestLeave = (id) => {
-                const isDark = document.documentElement.classList.contains('dark');
-                Swal.fire({
-                    title: 'Request Vacation?',
-                    text: 'Are you sure you want to vacate your room? This action will notify the warden.',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes, Notify Warden',
-                    cancelButtonText: 'Cancel',
-                    background: isDark ? '#1C1C1E' : '#ffffff',
-                    color: isDark ? '#FFFFFF' : '#000000',
-                    customClass: {
-                        popup: 'rounded-[2.5rem] glass-panel border border-white/20 shadow-2xl main-auth-modal',
-                        title: 'pt-8 text-2xl font-black tracking-tight',
-                        htmlContainer: 'p-4 text-gray-500 font-medium',
-                        actions: 'gap-3 pb-8',
-                        confirmButton: 'bg-iosBlue text-white font-bold py-3 px-6 rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 transition-all !m-0',
-                        cancelButton: 'bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-gray-400 font-bold py-3 px-6 rounded-2xl hover:bg-gray-200 dark:hover:bg-white/20 transition-all !m-0'
-                    },
-                    buttonsStyling: false,
-                    showClass: { popup: 'animate-none' },
-                    hideClass: { popup: 'animate-none' },
-                    showLoaderOnConfirm: true,
-                    preConfirm: async () => {
-                        try {
-                            await updateDoc(doc(db, 'bookings', id), {
-                                'leaveRequest': { status: 'pending', timestamp: serverTimestamp() }
-                            });
-                            return true;
-                        } catch (error) {
-                            Swal.showValidationMessage(`Request failed: ${error.message}`);
-                            return false;
-                        }
-                    },
-                    allowOutsideClick: () => !Swal.isLoading()
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const Toast = Swal.mixin({
-                            toast: true,
-                            position: 'top-end',
-                            showConfirmButton: false,
-                            timer: 3000,
-                            timerProgressBar: true,
-                            background: isDark ? '#1C1C1E' : '#FFFFFF',
-                            color: isDark ? '#FFFFFF' : '#000000',
-                            didOpen: (toast) => {
-                                toast.addEventListener('mouseenter', Swal.stopTimer)
-                                toast.addEventListener('mouseleave', Swal.resumeTimer)
-                            }
+                if (window.confirm('Request Vacation? This will notify the warden.')) {
+                    window.safeAsync(async () => {
+                        await updateDoc(doc(db, 'bookings', id), {
+                            'leaveRequest': { status: 'pending', timestamp: serverTimestamp() }
                         });
-
-                        Toast.fire({
-                            icon: 'success',
-                            title: 'Warden Notified'
-                        });
-                    }
-                });
+                        showToast('Vacation Request Sent');
+                        if (typeof init === 'function') init();
+                    }, 'Sending Request...');
+                }
             };
 
             window.dismissVacation = (id) => {
@@ -435,19 +389,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const bedId = btn.dataset.bed;
         const room = allRooms.find(r => r.id === roomId);
 
-        const result = await Swal.fire({
-            title: 'Confirm Booking',
-            html: `Book <b>Room ${room.data.roomNumber} - Bed ${bedId.toUpperCase()}</b>?`,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#007AFF',
-            cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Yes, Book it!',
-            background: document.documentElement.classList.contains('dark') ? '#1c1c1e' : '#fff',
-            color: document.documentElement.classList.contains('dark') ? '#fff' : '#000'
-        });
-
-        if (result.isConfirmed) {
+        if (window.confirm(`Book Room ${room.data.roomNumber} - Bed ${bedId.toUpperCase()}?`)) {
             window.safeAsync(async () => {
                 await dbService.bookRoom(room, bedId);
                 showToast('Application submitted!');

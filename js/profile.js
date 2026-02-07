@@ -1,3 +1,4 @@
+/** "use client"; **/
 import { checkUserSession, handleLogout, db, markNotificationsAsRead, toggleTheme, toggleSidebar, showToast, triggerLoginModal } from '../main.js?v=2';
 import {
     doc,
@@ -79,13 +80,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // URL Parameter Handling for Auth Guard
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('msg') === 'verify_email') {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Email Verification Required',
-            text: 'Please verify your email address to access restricted features. Check your inbox.',
-            confirmButtonText: 'OK',
-            confirmButtonColor: '#007AFF'
-        });
+        showToast('Please verify your email address to access restricted features. Check your inbox.', true);
     }
 
     // UI Elements

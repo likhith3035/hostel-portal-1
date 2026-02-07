@@ -2,7 +2,8 @@
 import { auth, db } from './firebase-config.js';
 import {
     signInWithPopup,
-    GoogleAuthProvider
+    GoogleAuthProvider,
+    signOut
 } from './js/firebase/firebase-auth.js';
 import {
     collection,
@@ -19,15 +20,19 @@ import {
 } from './js/firebase/firebase-firestore.js';
 
 import * as CONSTANTS from './js/core/constants.js';
+import './js/components/toast.js';
 export { CONSTANTS };
 
-// --- GLOBAL LOADERS ---
-window.markNotificationsAsRead = () => {
-    import('./js/main.js').then(m => m.markNotificationsAsRead());
-}; // Placeholder until module loads, usually module overrides this or we export directly.
-// Actually, since this file IS main.js, we should assign it inside the file.
 
+// --- GLOBAL LOADERS ---
+
+let globalLoaderTimeout = null;
 window.showLoading = (message = 'Processing...') => {
+    if (globalLoaderTimeout) {
+        clearTimeout(globalLoaderTimeout);
+        globalLoaderTimeout = null;
+    }
+
     let loader = document.getElementById('global-loader');
     if (!loader) {
         loader = document.createElement('div');
@@ -41,7 +46,7 @@ window.showLoading = (message = 'Processing...') => {
         document.body.appendChild(loader);
     } else {
         document.getElementById('global-loader-msg').innerText = message;
-        loader.classList.remove('hidden', 'opacity-0');
+        loader.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
     }
 };
 
@@ -94,8 +99,12 @@ window.safeAsync = async (fn, loadingMsg = 'Processing...') => {
 window.hideLoading = () => {
     const loader = document.getElementById('global-loader');
     if (loader) {
-        loader.classList.add('opacity-0');
-        setTimeout(() => loader.classList.add('hidden'), 300);
+        loader.classList.add('opacity-0', 'pointer-events-none');
+        if (globalLoaderTimeout) clearTimeout(globalLoaderTimeout);
+        globalLoaderTimeout = setTimeout(() => {
+            loader.classList.add('hidden');
+            globalLoaderTimeout = null;
+        }, 300);
     }
 };
 
@@ -144,7 +153,7 @@ export const startClock = () => {
 // PWA Service Worker Registration with aggressive cache management
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
+        navigator.serviceWorker.register('sw.js')
             .then(registration => {
                 console.log('Service Worker registered successfully');
 
@@ -600,107 +609,8 @@ export async function handleLogout() {
 
 
 export async function triggerLoginModal() {
-    const isDark = document.documentElement.classList.contains('dark');
-
-    // Check if auth is already initialized to avoid errors
-    if (!auth) {
-        console.error("Auth not initialized");
-        window.location.href = 'login.html?auth=true';
-        return;
-    }
-
-    const result = await Swal.fire({
-        title: 'Authentication Required',
-        html: `
-            <div class="flex flex-col gap-3 mt-4">
-                <button id="swal-google-login" class="flex items-center justify-center gap-3 w-full bg-white dark:bg-white/10 text-gray-700 dark:text-white py-3.5 rounded-xl border border-gray-200 dark:border-white/20 hover:bg-gray-50 dark:hover:bg-white/20 transition-all font-bold shadow-sm group">
-                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5 group-hover:scale-110 transition-transform" alt="Google">
-                    <span>Sign in with Google</span>
-                </button>
-                
-                <div class="relative py-2">
-                    <div class="absolute inset-0 flex items-center"><span class="w-full border-t border-gray-200 dark:border-white/10"></span></div>
-                    <div class="relative flex justify-center text-xs uppercase"><span class="bg-transparent px-2 text-gray-400 font-bold">Or</span></div>
-                </div>
-
-                <button id="swal-email-login" class="flex items-center justify-center gap-3 w-full bg-iosBlue text-white py-3.5 rounded-xl hover:bg-blue-600 transition-all font-bold shadow-lg shadow-blue-500/30 active:scale-95">
-                    <i class="fas fa-envelope"></i>
-                    <span>Continue with Email</span>
-                </button>
-            </div>
-            <p class="text-xs text-gray-400 mt-6 mb-2">Secure authentication via Firebase</p>
-        `,
-        showConfirmButton: false,
-        showCloseButton: true,
-        background: isDark ? '#1C1C1E' : '#ffffff',
-        color: isDark ? '#FFFFFF' : '#000000',
-        customClass: {
-            popup: 'rounded-[2.5rem] glass-panel border border-white/20 shadow-2xl p-0 overflow-hidden main-auth-modal',
-            title: 'pt-8 text-2xl font-black tracking-tight',
-            htmlContainer: 'px-8 pb-8',
-            closeButton: 'focus:outline-none'
-        },
-        showClass: {
-            popup: 'animate-none' // Disable default Swal animation so CSS takes over
-        },
-        hideClass: {
-            popup: 'animate-none'
-        },
-        didOpen: () => {
-            // Handle Google Login
-            const googleBtn = document.getElementById('swal-google-login');
-            if (googleBtn) {
-                googleBtn.addEventListener('click', async () => {
-                    try {
-                        // Show loading state directly in button
-                        googleBtn.innerHTML = '<div class="w-5 h-5 border-2 border-gray-500 border-t-transparent rounded-full animate-spin"></div>';
-
-                        const provider = new GoogleAuthProvider();
-                        await signInWithPopup(auth, provider);
-
-                        Swal.close();
-
-                        const Toast = Swal.mixin({
-                            toast: true,
-                            position: 'top-end',
-                            showConfirmButton: false,
-                            timer: 1500,
-                            timerProgressBar: true,
-                            background: isDark ? '#1C1C1E' : '#FFFFFF',
-                            color: isDark ? '#FFFFFF' : '#000000'
-                        });
-
-                        await Toast.fire({
-                            icon: 'success',
-                            title: 'Signed in successfully'
-                        });
-
-                        // Reload to apply auth state
-                        window.location.reload();
-                    } catch (error) {
-                        console.error("Login Error:", error);
-                        googleBtn.innerHTML = `
-                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5" alt="Google">
-                            <span>Sign in with Google</span>
-                         `;
-                        Swal.showValidationMessage(`Login Failed: ${error.message}`);
-                    }
-                });
-            }
-
-            // Handle Email Redirect
-            const emailBtn = document.getElementById('swal-email-login');
-            if (emailBtn) {
-                emailBtn.addEventListener('click', () => {
-                    window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
-                });
-            }
-        }
-    });
-
-    if (result.isConfirmed) {
-        window.location.href = 'login.html?auth=true';
-    }
+    // Standardizing: No more SweetAlert modals for auth. Redirect to dedicated login page.
+    window.location.href = 'login.html?auth=true';
 }
 
 // Initialize Theme
@@ -761,34 +671,21 @@ const hideSoftGateBanner = () => {
 };
 
 const showFeatureLockPopup = () => {
-    // Only show if not already shown
-    if (document.getElementById('feature-lock-popup')) return;
-
-    Swal.fire({
-        title: 'Profile Incomplete',
-        text: 'Please enter details to see and use features.',
-        icon: 'warning',
-        confirmButtonText: 'Enter Details',
-        confirmButtonColor: '#007AFF', // iOS Blue
-        showCancelButton: true,
-        cancelButtonText: 'Not Now',
-        background: document.documentElement.classList.contains('dark') ? '#1C1C1E' : '#FFFFFF',
-        color: document.documentElement.classList.contains('dark') ? '#FFFFFF' : '#000000',
-        customClass: {
-            popup: 'rounded-3xl border border-white/20 shadow-2xl',
-            confirmButton: 'rounded-2xl px-6 py-3 font-bold',
-            cancelButton: 'rounded-2xl px-6 py-3 font-medium'
-        }
-    }).then((result) => {
-        if (result.isConfirmed) {
-            window.location.href = 'profile.html';
-        } else {
-            // Optional: Redirect away if they refuse? Or just let them be stuck?
-            // "tell if they remove give small popup enter details to see and use features"
-            // If they cancel, they stay on the page but might see it again if they reload or navigate back.
-            window.location.href = 'index.html'; // Redirect to home if they don't want to complete
-        }
-    });
+    // Standardizing: Using Premium Toast for Feature Lock instead of SweetAlert
+    if (window.addToast) {
+        window.addToast({
+            title: 'Profile Incomplete',
+            message: 'Please enter details to use core features.',
+            type: 'warning',
+            duration: 6000,
+            action: {
+                label: 'Enter Details',
+                onClick: () => {
+                    window.location.href = 'profile.html';
+                }
+            }
+        });
+    }
 };
 
 // 0. INSTANT CHECK: Run immediately based on LocalStorage (prevents flash)
@@ -960,8 +857,49 @@ if (window.currentUser) {
     setupCommonUI(window.currentUser, role, userData);
 }
 
-// Auto-start clock on all pages
-startClock();
+// Custom Premium Toasts Initialization
+const initToastSystem = () => {
+    if (document.getElementById('premium-toast-container')) return;
 
-// Alias for HTML event handlers
+    const container = document.createElement('div');
+    container.id = 'premium-toast-container';
+    container.className = 'fixed top-4 right-4 z-[10000] toast-container flex flex-col items-end';
+    container.setAttribute('x-data', "animatedToasts({ position: 'top-right', maxToasts: 5 })");
+    container.innerHTML = `
+        <template x-for="toast in toasts" :key="toast.id">
+            <div class="toast-item" :class="['toast-' + toast.type, toast.isClosing ? 'closing' : '']">
+                <div class="toast-icon">
+                    <i :class="toast.icon"></i>
+                </div>
+                <div class="toast-content">
+                    <div class="toast-title" x-text="toast.title"></div>
+                    <div class="toast-message" x-text="toast.message"></div>
+                    <template x-if="toast.action">
+                        <button @click="toast.action.onClick()" 
+                                class="mt-2 px-3 py-1.5 rounded-lg bg-black/5 dark:bg-white/5 text-[10px] font-bold uppercase tracking-wider hover:bg-black/10 transition-colors"
+                                x-text="toast.action.label">
+                        </button>
+                    </template>
+                </div>
+                <button @click="remove(toast.id)" class="toast-close">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="toast-progress-track">
+                    <div class="toast-progress-bar" :style="'width: ' + toast.progress + '%'"></div>
+                </div>
+            </div>
+        </template>
+    `;
+    document.body.appendChild(container);
+};
+
+// Expose essential functions to window for early access and inline handlers
+window.handleLogout = handleLogout;
+window.startClock = startClock;
+window.triggerLoginModal = triggerLoginModal;
+window.initToastSystem = initToastSystem;
 window.triggerInlineLogin = triggerLoginModal;
+
+// Auto-start systems
+startClock();
+setTimeout(initToastSystem, 100);

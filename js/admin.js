@@ -1,3 +1,4 @@
+/** "use client"; **/
 import { checkUserSession, db, auth, showToast } from '../main.js?v=2';
 import * as CONSTANTS from './core/constants.js';
 import {
@@ -168,7 +169,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // AlpineJS will trigger this on tab switch if we bind it
         const currentTab = document.querySelector('[x-data]').__x.$data.currentTab;
         if (currentTab === 'users') loadUsers();
-        // Add other tab loaders here if needed, e.g., loadBookings()
+        if (currentTab === 'bookings' && window.loadBookings) window.loadBookings();
     };
 
 
@@ -352,52 +353,37 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Restore
         const restoreBtn = e.target.closest('.restore-user-btn');
         if (restoreBtn) {
-            Swal.fire({
-                title: 'Restore User?',
-                icon: 'question',
-                showCancelButton: true
-            }).then(res => {
-                if (res.isConfirmed) {
-                    window.safeAsync(async () => {
-                        const id = restoreBtn.dataset.id;
-                        const docSnap = await getDoc(doc(db, 'deletedUsers', id));
-                        if (docSnap.exists()) {
-                            const data = docSnap.data();
-                            delete data.deletedAt;
-                            delete data.deletedBy;
-                            await setDoc(doc(db, CONSTANTS.COLLECTIONS.USERS, id), data);
-                            await deleteDoc(doc(db, 'deletedUsers', id));
-                            showToast('User Restored');
-                            loadDeletedUsers();
-                            loadUsers();
-                            auditService.logAction('RESTORE_USER', id, 'user', { restoredBy: auth.currentUser.email });
-                        }
-                    }, 'Restoring User...');
-                }
-            });
+            if (window.confirm('Restore User?')) {
+                window.safeAsync(async () => {
+                    const id = restoreBtn.dataset.id;
+                    const docSnap = await getDoc(doc(db, 'deletedUsers', id));
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        delete data.deletedAt;
+                        delete data.deletedBy;
+                        await setDoc(doc(db, CONSTANTS.COLLECTIONS.USERS, id), data);
+                        await deleteDoc(doc(db, 'deletedUsers', id));
+                        showToast('User Restored');
+                        loadDeletedUsers();
+                        loadUsers();
+                        auditService.logAction('RESTORE_USER', id, 'user', { restoredBy: auth.currentUser.email });
+                    }
+                }, 'Restoring User...');
+            }
         }
 
         // Permanent Delete
         const deleteBtn = e.target.closest('.permanent-delete-btn');
         if (deleteBtn) {
-            Swal.fire({
-                title: 'PERMANENTLY DELETE?',
-                text: "This action cannot be undone. All user details (Name, Phone, ID, Pic) will be wiped.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                confirmButtonText: 'Yes, Wipe Data'
-            }).then(res => {
-                if (res.isConfirmed) {
-                    window.safeAsync(async () => {
-                        const id = deleteBtn.dataset.id;
-                        await deleteDoc(doc(db, 'deletedUsers', id));
-                        showToast('User Permanently Deleted');
-                        loadDeletedUsers();
-                        auditService.logAction('PERMANENT_DELETE_USER', id, 'user', { deletedBy: auth.currentUser.email });
-                    }, 'Wiping Data...');
-                }
-            });
+            if (window.confirm('PERMANENTLY DELETE? This action cannot be undone. All user details will be wiped.')) {
+                window.safeAsync(async () => {
+                    const id = deleteBtn.dataset.id;
+                    await deleteDoc(doc(db, 'deletedUsers', id));
+                    showToast('User Permanently Deleted');
+                    loadDeletedUsers();
+                    auditService.logAction('PERMANENT_DELETE_USER', id, 'user', { deletedBy: auth.currentUser.email });
+                }, 'Wiping Data...');
+            }
         }
     });
 
@@ -408,84 +394,70 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Make Admin
         if (btn.classList.contains('make-admin-btn')) {
-            Swal.fire({ title: 'Grant Admin?', showCancelButton: true }).then(res => {
-                if (res.isConfirmed) {
-                    window.safeAsync(async () => {
-                        await updateDoc(doc(db, CONSTANTS.COLLECTIONS.USERS, btn.dataset.id), { role: CONSTANTS.ROLES.ADMIN });
-                        showToast('Role Updated');
-                        loadUsers();
-                        auditService.logAction('GRANT_ADMIN', btn.dataset.id, 'user', { by: auth.currentUser.email });
-                    }, 'Updating Role...');
-                }
-            });
+            if (window.confirm('Grant Admin?')) {
+                window.safeAsync(async () => {
+                    await updateDoc(doc(db, CONSTANTS.COLLECTIONS.USERS, btn.dataset.id), { role: CONSTANTS.ROLES.ADMIN });
+                    showToast('Role Updated');
+                    loadUsers();
+                    auditService.logAction('GRANT_ADMIN', btn.dataset.id, 'user', { by: auth.currentUser.email });
+                }, 'Updating Role...');
+            }
         }
 
         // Remove Admin
         if (btn.classList.contains('remove-admin-btn')) {
-            Swal.fire({ title: 'Revoke Admin?', showCancelButton: true }).then(res => {
-                if (res.isConfirmed) {
-                    window.safeAsync(async () => {
-                        await updateDoc(doc(db, CONSTANTS.COLLECTIONS.USERS, btn.dataset.id), { role: CONSTANTS.ROLES.STUDENT });
-                        showToast('Role Updated');
-                        loadUsers();
-                        auditService.logAction('REVOKE_ADMIN', btn.dataset.id, 'user', { by: auth.currentUser.email });
-                    }, 'Updating Role...');
-                }
-            });
+            if (window.confirm('Revoke Admin?')) {
+                window.safeAsync(async () => {
+                    await updateDoc(doc(db, CONSTANTS.COLLECTIONS.USERS, btn.dataset.id), { role: CONSTANTS.ROLES.STUDENT });
+                    showToast('Role Updated');
+                    loadUsers();
+                    auditService.logAction('REVOKE_ADMIN', btn.dataset.id, 'user', { by: auth.currentUser.email });
+                }, 'Updating Role...');
+            }
         }
 
         // Reset Profile (Delete Details)
         if (btn.classList.contains('reset-user-btn')) {
-            Swal.fire({
-                title: 'Reset Profile?',
-                text: 'This will delete phone, gender, ID, and photo. The user will need to complete their profile again.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, Reset Details'
-            }).then(res => {
-                if (res.isConfirmed) {
-                    window.safeAsync(async () => {
-                        const id = btn.dataset.id;
-                        await updateDoc(doc(db, CONSTANTS.COLLECTIONS.USERS, id), {
-                            phone: null,
-                            gender: null,
-                            studentId: null,
-                            photoURL: null,
-                            dob: null,
-                            parentName: null,
-                            parentPhone: null,
-                            address: null
-                        });
-                        showToast('Profile Details Cleared');
-                        loadUsers();
-                        auditService.logAction('RESET_USER_PROFILE', id, 'user', { by: auth.currentUser.email });
-                    }, 'Resetting Profile...');
-                }
-            });
+            if (window.confirm('Reset Profile? This will delete phone, gender, ID, and photo. The user will need to complete their profile again.')) {
+                window.safeAsync(async () => {
+                    const id = btn.dataset.id;
+                    await updateDoc(doc(db, CONSTANTS.COLLECTIONS.USERS, id), {
+                        phone: null,
+                        gender: null,
+                        studentId: null,
+                        photoURL: null,
+                        dob: null,
+                        parentName: null,
+                        parentPhone: null,
+                        address: null
+                    });
+                    showToast('Profile Details Cleared');
+                    loadUsers();
+                    auditService.logAction('RESET_USER_PROFILE', id, 'user', { by: auth.currentUser.email });
+                }, 'Resetting Profile...');
+            }
         }
 
         // Delete/Archive User
         if (btn.classList.contains('delete-user-btn')) {
-            Swal.fire({ title: 'Archive User?', text: 'Move to Archive?', icon: 'warning', showCancelButton: true }).then(res => {
-                if (res.isConfirmed) {
-                    window.safeAsync(async () => {
-                        const id = btn.dataset.id;
-                        const userSnap = await getDoc(doc(db, CONSTANTS.COLLECTIONS.USERS, id));
-                        if (userSnap.exists()) {
-                            await setDoc(doc(db, 'deletedUsers', id), {
-                                ...userSnap.data(),
-                                deletedAt: serverTimestamp(),
-                                deletedBy: auth.currentUser.email
-                            });
-                            await deleteDoc(doc(db, CONSTANTS.COLLECTIONS.USERS, id));
-                            showToast('User Archived');
-                            loadUsers();
-                            loadDeletedUsers();
-                            auditService.logAction('ARCHIVE_USER', id, 'user', { by: auth.currentUser.email });
-                        }
-                    }, 'Archiving User...');
-                }
-            });
+            if (window.confirm('Archive User?')) {
+                window.safeAsync(async () => {
+                    const id = btn.dataset.id;
+                    const userSnap = await getDoc(doc(db, CONSTANTS.COLLECTIONS.USERS, id));
+                    if (userSnap.exists()) {
+                        await setDoc(doc(db, 'deletedUsers', id), {
+                            ...userSnap.data(),
+                            deletedAt: serverTimestamp(),
+                            deletedBy: auth.currentUser.email
+                        });
+                        await deleteDoc(doc(db, CONSTANTS.COLLECTIONS.USERS, id));
+                        showToast('User Archived');
+                        loadUsers();
+                        loadDeletedUsers();
+                        auditService.logAction('ARCHIVE_USER', id, 'user', { by: auth.currentUser.email });
+                    }
+                }, 'Archiving User...');
+            }
         }
 
         // View Student ID
@@ -772,7 +744,45 @@ document.addEventListener('DOMContentLoaded', async () => {
     let allBookingsData = [];
     let roomMetadata = {};
 
+    // Load room metadata for displaying hostel names
+    const loadRoomMetadata = async () => {
+        try {
+            const roomsSnap = await getDocs(collection(db, CONSTANTS.COLLECTIONS.ROOMS));
+            roomsSnap.forEach(doc => {
+                const data = doc.data();
+                roomMetadata[data.roomNumber] = {
+                    id: doc.id,
+                    hostelName: data.hostelName || 'Unknown Hostel'
+                };
+            });
+            console.log('✅ Room metadata loaded:', roomMetadata);
+        } catch (error) {
+            console.error('Error loading room metadata:', error);
+        }
+    };
+
+    // Load bookings data
+    const loadBookings = async () => {
+        console.log('🔄 Loading bookings...');
+        try {
+            // Load room metadata first if not already loaded
+            if (Object.keys(roomMetadata).length === 0) {
+                await loadRoomMetadata();
+            }
+            // The onSnapshot listener below will handle the actual data loading
+        } catch (error) {
+            console.error('Error loading bookings:', error);
+            if (bookingsTableBody) {
+                bookingsTableBody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-red-500 text-xs">Error loading bookings. Check console.</td></tr>`;
+            }
+        }
+    };
+
+    // Expose globally
+    window.loadBookings = loadBookings;
+
     const renderBookings = () => {
+        console.log('🔄 renderBookings called, data count:', allBookingsData.length);
         if (!bookingsTableBody) return;
         const queryText = (bookingSearch?.value || '').toLowerCase();
         const filtered = allBookingsData.filter(b =>
@@ -799,6 +809,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <br><span class="text-[10px] text-gray-400">${escapeHTML(b.userEmail)}</span>
                     </td>
                     <td class="px-6 py-4 text-sm">Room ${escapeHTML(b.roomNumber)}<br><span class="text-[10px] text-indigo-500">${meta.hostelName}</span></td>
+                    <td class="px-6 py-4 text-xs text-gray-500 hidden sm:table-cell">
+                        ${b.timestamp ? new Date(b.timestamp.seconds * 1000).toLocaleDateString() : 'N/A'}
+                    </td>
                     <td class="px-6 py-4">${statusBadge}</td>
                     <td class="px-6 py-4 text-right">
                         ${b.status === CONSTANTS.STATUS.PENDING ?
@@ -815,6 +828,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     onSnapshot(collection(db, CONSTANTS.COLLECTIONS.BOOKINGS), snap => {
+        console.log('🔔 onSnapshot fired! Bookings updated, doc count:', snap.docs.length);
         allBookingsData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         const pendingCount = allBookingsData.filter(b => b.status === CONSTANTS.STATUS.PENDING).length;
 
@@ -836,29 +850,56 @@ document.addEventListener('DOMContentLoaded', async () => {
     bookingSearch?.addEventListener('input', renderBookings);
 
     window.handleBookingAction = (action, bookingId, roomId, bedId) => {
+        console.log('🔧 handleBookingAction:', { action, bookingId, roomId, bedId });
         if (!auth.currentUser) return showToast('Session expired. Please login.', true);
-        window.safeAsync(async () => {
-            const bRef = doc(db, CONSTANTS.COLLECTIONS.BOOKINGS, bookingId);
-            if (action === 'approve') {
-                await updateDoc(bRef, { status: CONSTANTS.STATUS.APPROVED });
-                showToast('Approved');
-            } else if (action === 'force-vacate') {
-                const res = await Swal.fire({ title: 'Vacate?', showCancelButton: true });
-                if (res.isConfirmed) {
+
+        // Handle vacate with confirmation OUTSIDE async context
+        if (action === 'force-vacate') {
+            if (window.confirm('Vacate This Booking? This will mark the booking as vacated and free up the bed.')) {
+                console.log('🚀 User confirmed! Executing vacate...');
+                // ... logic continues below
+                // User confirmed, now execute the vacate
+                window.safeAsync(async () => {
+                    console.log('📝 Inside safeAsync, starting transaction...');
+                    const bRef = doc(db, CONSTANTS.COLLECTIONS.BOOKINGS, bookingId);
                     const roomRef = doc(db, CONSTANTS.COLLECTIONS.ROOMS, roomId);
                     await runTransaction(db, async (t) => {
                         const rDoc = await t.get(roomRef);
+                        const bDoc = await t.get(bRef);
                         const beds = rDoc.data().beds;
+                        console.log('🛏️ Current beds:', beds);
+                        console.log('🎯 Updating bed:', bedId);
+
                         beds[bedId].status = 'available';
                         beds[bedId].userId = null;
                         t.update(roomRef, { beds });
-                        t.update(bRef, { status: CONSTANTS.STATUS.VACATED });
+
+                        // Update booking status and clear any pending leave request
+                        const updateData = {
+                            status: CONSTANTS.STATUS.VACATED,
+                            leaveRequest: null  // Clear any pending vacate request
+                        };
+                        t.update(bRef, updateData);
+                        console.log('✅ Transaction completed - booking vacated and leaveRequest cleared');
                     });
+                    console.log('✅ Transaction completed successfully');
                     showToast('Vacated');
-                }
+                }, 'Processing Vacate...');
+            } else {
+                console.log('❌ User cancelled');
             }
-        }, 'Processing Action...');
+        } else if (action === 'approve') {
+            // Approve without confirmation
+            window.safeAsync(async () => {
+                const bRef = doc(db, CONSTANTS.COLLECTIONS.BOOKINGS, bookingId);
+                await updateDoc(bRef, { status: CONSTANTS.STATUS.APPROVED });
+                showToast('Approved');
+            }, 'Processing Action...');
+        }
     };
+
+    // Initial load of bookings data
+    loadBookings();
 
     // --- OUTPASSES ---
     const outpassList = document.getElementById('admin-outpass-list');
@@ -1130,17 +1171,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Clear All Broadcasts
         document.getElementById('clear-broadcasts-btn')?.addEventListener('click', () => {
-            Swal.fire({ title: 'Clear History?', text: 'Delete all broadcast records?', showCancelButton: true, confirmButtonColor: '#ef4444' }).then(res => {
-                if (res.isConfirmed) {
-                    window.safeAsync(async () => {
-                        const snap = await getDocs(query(collection(db, CONSTANTS.COLLECTIONS.NOTIFICATIONS), where('recipientId', '==', null)));
-                        const batch = writeBatch(db);
-                        snap.docs.forEach(d => batch.delete(d.ref));
-                        await batch.commit();
-                        showToast('History Cleared');
-                    }, 'Clearing...');
-                }
-            });
+            if (window.confirm('Clear History? This will delete all broadcast records.')) {
+                window.safeAsync(async () => {
+                    const snap = await getDocs(query(collection(db, CONSTANTS.COLLECTIONS.NOTIFICATIONS), where('recipientId', '==', null)));
+                    const batch = writeBatch(db);
+                    snap.docs.forEach(d => batch.delete(d.ref));
+                    await batch.commit();
+                    showToast('History Cleared');
+                }, 'Clearing...');
+            }
         });
     }
 
@@ -1195,17 +1234,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Clear Board
     document.getElementById('delete-all-notices-btn')?.addEventListener('click', () => {
-        Swal.fire({ title: 'Clear Board?', text: 'Delete all notices?', showCancelButton: true, confirmButtonColor: '#ef4444' }).then(res => {
-            if (res.isConfirmed) {
-                window.safeAsync(async () => {
-                    const snap = await getDocs(collection(db, CONSTANTS.COLLECTIONS.NOTICES));
-                    const batch = writeBatch(db);
-                    snap.docs.forEach(d => batch.delete(d.ref));
-                    await batch.commit();
-                    showToast('Board Cleared');
-                }, 'Clearing...');
-            }
-        });
+        if (window.confirm('Clear Board? This will delete all notices.')) {
+            window.safeAsync(async () => {
+                const snap = await getDocs(collection(db, CONSTANTS.COLLECTIONS.NOTICES));
+                const batch = writeBatch(db);
+                snap.docs.forEach(d => batch.delete(d.ref));
+                await batch.commit();
+                showToast('Board Cleared');
+            }, 'Clearing...');
+        }
     });
 
 });

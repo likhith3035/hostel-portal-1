@@ -1,6 +1,7 @@
 /**
  * Centralized Error Handling & User Feedback
  * Shared between Main App and Auth Module
+ * "use client";
  */
 
 export const getReadableError = (error) => {
@@ -30,27 +31,19 @@ export const getReadableError = (error) => {
 };
 
 export const showToast = (message, isError = false) => {
-    // Prefer SweetAlert2 if available
-    if (window.Swal) {
-        const isDark = document.documentElement.classList.contains('dark');
-        window.Swal.fire({
-            toast: true,
-            position: 'bottom-end',
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            icon: isError ? 'error' : 'success',
-            title: message,
-            background: isDark ? '#1C1C1E' : '#FFFFFF',
-            color: isDark ? '#FFFFFF' : '#000000',
-            customClass: {
-                popup: 'rounded-2xl border border-white/20 shadow-2xl'
-            }
+    // Standardize all alerts to use the Premium Animated Toasts
+    if (window.addToast) {
+        window.addToast({
+            message: message,
+            type: isError ? 'error' : 'success',
+            title: isError ? 'Attention Required' : 'Action Success',
+            duration: 4000
         });
     } else {
-        // Fallback to simple DOM toast (like in original auth.js)
+        // Simple DOM fallback if system not yet ready
         const toast = document.createElement('div');
-        toast.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg text-white font-bold shadow-lg z-[9999] ${isError ? 'bg-red-500' : 'bg-green-500'} animate-fade-in-up`;
+        toast.className = `fixed top-4 right-4 px-6 py-3 rounded-xl text-white font-bold shadow-2xl z-[10000] ${isError ? 'bg-red-500' : 'bg-green-500'} animate-fade-in`;
+        toast.style.backdropFilter = 'blur(10px)';
         toast.textContent = message;
         document.body.appendChild(toast);
         setTimeout(() => {
@@ -68,20 +61,6 @@ export const errorHandler = (error, customMsg = null) => {
 
     const userMessage = customMsg || getReadableError(error);
 
-    if (window.Swal) {
-        const isDark = document.documentElement.classList.contains('dark');
-        window.Swal.fire({
-            title: 'Operation Failed',
-            text: userMessage,
-            icon: 'error',
-            confirmButtonColor: '#007AFF',
-            background: isDark ? '#1C1C1E' : '#FFFFFF',
-            color: isDark ? '#fff' : '#000',
-            customClass: {
-                popup: 'rounded-[2rem] border border-white/20'
-            }
-        });
-    } else {
-        showToast(userMessage, true);
-    }
+    // No longer using SweetAlert2 for errors, all go to Animated Toasts for consistency
+    showToast(userMessage, true);
 };

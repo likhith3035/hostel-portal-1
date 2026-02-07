@@ -65,7 +65,7 @@
 
     <script src="https://cdn.tailwindcss.com" data-cmp-ignore="1" class="cmp-ignore"></script>
     <script src="js/vendor/alpine.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
 
     <script>
         tailwind.config = {
@@ -282,7 +282,7 @@
                 <div x-show="activeTab === 'apply'" x-transition:enter="transition ease-out duration-300"
                     x-transition:enter-start="opacity-0 translate-y-4"
                     x-transition:enter-end="opacity-100 translate-y-0">
-                    <div class="glass-panel p-6 md:p-12 rounded-[2.5rem] relative overflow-hidden">
+                    <div class="glass-panel p-6 md:p-12 rounded-[2.5rem] relative">
                         <div class="absolute top-0 right-0 w-64 h-64 bg-iosBlue/5 rounded-full -mr-32 -mt-32 blur-3xl">
                         </div>
 
@@ -293,7 +293,18 @@
                                 campus leave.</p>
                         </div>
 
-                        <form id="outpass-form" class="space-y-8 relative z-10">
+                        <form id="outpass-form" class="space-y-8 relative z-10" x-data="{ 
+                            syncReturn(val) {
+                                try {
+                                    const departure = new Date(val.replace(/-/g, '/'));
+                                    const arrival = new Date(departure.getTime() + 90 * 60000);
+                                    const h = arrival.getHours().toString().padStart(2, '0');
+                                    const m = arrival.getMinutes() < 30 ? '00' : '30';
+                                    const returnTime = `${arrival.getFullYear()}-${(arrival.getMonth() + 1).toString().padStart(2, '0')}-${arrival.getDate().toString().padStart(2, '0')} ${h}:${m}`;
+                                    this.$dispatch('set-return-time', returnTime);
+                                } catch(e) { console.error(e); }
+                            }
+                        }">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div class="premium-input-group group">
                                     <label
@@ -318,27 +329,149 @@
                                             class="fas fa-phone absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-iosBlue transition-colors text-lg"></i>
                                     </div>
                                 </div>
-                                <div class="premium-input-group group">
+                                <div class="premium-input-group group" x-data="animatedCalendar(null, 'single', 30)"
+                                    @date-change="syncReturn($event.detail.value)">
                                     <label
                                         class="premium-label block text-xs font-black uppercase text-gray-400 tracking-widest mb-2 ml-1">Departure</label>
                                     <div class="relative">
-                                        <input type="text" id="fromDate"
+                                        <input type="text" id="fromDate" x-ref="input" @click="toggle()" x-model="value"
                                             class="w-full bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded-2xl py-4 pl-12 pr-4 font-bold text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-4 focus:ring-iosBlue/10 focus:border-iosBlue transition-all cursor-pointer"
-                                            placeholder="Select Date & Time" required>
+                                            placeholder="Select Date & Time" readonly required>
                                         <i
                                             class="far fa-calendar-alt absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-iosBlue transition-colors text-lg"></i>
+
+                                        <!-- Animated Calendar Dropdown -->
+                                        <div x-show="isOpen" @click.away="isOpen = false"
+                                            x-transition:enter="calendar-dropdown"
+                                            class="absolute top-full left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 mt-4 w-[calc(100vw-2rem)] sm:w-[340px] glass-panel rounded-[2rem] shadow-2xl z-[100] border border-white/20 p-5">
+
+                                            <div class="flex items-center justify-between mb-6">
+                                                <button type="button" @click="prevMonth()"
+                                                    class="w-10 h-10 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 flex items-center justify-center transition-colors">
+                                                    <i class="fas fa-chevron-left text-sm"></i>
+                                                </button>
+                                                <div class="text-sm font-black uppercase tracking-widest"
+                                                    x-text="months[viewDate.getMonth()] + ' ' + viewDate.getFullYear()">
+                                                </div>
+                                                <button type="button" @click="nextMonth()"
+                                                    class="w-10 h-10 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 flex items-center justify-center transition-colors">
+                                                    <i class="fas fa-chevron-right text-sm"></i>
+                                                </button>
+                                            </div>
+
+                                            <div class="grid grid-cols-7 gap-1 mb-2">
+                                                <template x-for="day in ['S','M','T','W','T','F','S']">
+                                                    <div class="text-[10px] font-black text-gray-400 text-center py-2"
+                                                        x-text="day"></div>
+                                                </template>
+                                            </div>
+
+                                            <div class="grid grid-cols-7 gap-1">
+                                                <template x-for="day in days" :key="day.day + '-' + day.month">
+                                                    <button type="button" @click="selectDate(day)"
+                                                        class="calendar-day w-full aspect-square rounded-xl text-xs font-bold flex items-center justify-center"
+                                                        :class="{
+                                                            'opacity-20': !day.isCurrentMonth,
+                                                            'today': day.isToday,
+                                                            'selected': isSelected(day),
+                                                            'hover:bg-black/5 dark:hover:bg-white/5': !isSelected(day)
+                                                        }" x-text="day.day">
+                                                    </button>
+                                                </template>
+                                            </div>
+
+                                            <!-- Time Picker Part -->
+                                            <div class="mt-4 pt-4 border-t border-gray-100 dark:border-white/5">
+                                                <div
+                                                    class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 px-1">
+                                                    Select Time</div>
+                                                <div class="flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
+                                                    <template x-for="time in timeSlots">
+                                                        <button type="button" @click="selectTime(time)"
+                                                            class="time-picker-item flex-shrink-0 px-4 py-2 rounded-xl bg-gray-50 dark:bg-white/5 text-[10px] font-black whitespace-nowrap"
+                                                            :class="selectedTime === time ? 'selected' : ''"
+                                                            x-text="time">
+                                                        </button>
+                                                    </template>
+                                                </div>
+                                            </div>
+
+                                            <button type="button" @click="isOpen = false"
+                                                class="w-full mt-4 py-3 rounded-xl bg-iosBlue text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 active:scale-95 transition-all">Done</button>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="premium-input-group group">
+                                <div class="premium-input-group group" x-data="animatedCalendar(null, 'single', 90)"
+                                    @set-return-time.window="value = $event.detail">
                                     <label
                                         class="premium-label block text-xs font-black uppercase text-gray-400 tracking-widest mb-2 ml-1">Return
                                         ETA</label>
                                     <div class="relative">
-                                        <input type="text" id="toDate"
+                                        <input type="text" id="toDate" x-ref="input" @click="toggle()" x-model="value"
                                             class="w-full bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded-2xl py-4 pl-12 pr-4 font-bold text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-4 focus:ring-iosBlue/10 focus:border-iosBlue transition-all cursor-pointer"
-                                            placeholder="Select Date & Time" required>
+                                            placeholder="Select Date & Time" readonly required>
                                         <i
                                             class="far fa-clock absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-iosBlue transition-colors text-lg"></i>
+
+                                        <!-- Animated Calendar Dropdown -->
+                                        <div x-show="isOpen" @click.away="isOpen = false"
+                                            x-transition:enter="calendar-dropdown"
+                                            class="absolute top-full left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 mt-4 w-[calc(100vw-2rem)] sm:w-[340px] glass-panel rounded-[2rem] shadow-2xl z-[100] border border-white/20 p-5">
+
+                                            <div class="flex items-center justify-between mb-6">
+                                                <button type="button" @click="prevMonth()"
+                                                    class="w-10 h-10 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 flex items-center justify-center transition-colors">
+                                                    <i class="fas fa-chevron-left text-sm"></i>
+                                                </button>
+                                                <div class="text-sm font-black uppercase tracking-widest"
+                                                    x-text="months[viewDate.getMonth()] + ' ' + viewDate.getFullYear()">
+                                                </div>
+                                                <button type="button" @click="nextMonth()"
+                                                    class="w-10 h-10 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 flex items-center justify-center transition-colors">
+                                                    <i class="fas fa-chevron-right text-sm"></i>
+                                                </button>
+                                            </div>
+
+                                            <div class="grid grid-cols-7 gap-1 mb-2">
+                                                <template x-for="day in ['S','M','T','W','T','F','S']">
+                                                    <div class="text-[10px] font-black text-gray-400 text-center py-2"
+                                                        x-text="day"></div>
+                                                </template>
+                                            </div>
+
+                                            <div class="grid grid-cols-7 gap-1">
+                                                <template x-for="day in days" :key="day.day + '-' + day.month">
+                                                    <button type="button" @click="selectDate(day)"
+                                                        class="calendar-day w-full aspect-square rounded-xl text-xs font-bold flex items-center justify-center"
+                                                        :class="{
+                                                            'opacity-20': !day.isCurrentMonth,
+                                                            'today': day.isToday,
+                                                            'selected': isSelected(day),
+                                                            'hover:bg-black/5 dark:hover:bg-white/5': !isSelected(day)
+                                                        }" x-text="day.day">
+                                                    </button>
+                                                </template>
+                                            </div>
+
+                                            <!-- Time Picker Part -->
+                                            <div class="mt-4 pt-4 border-t border-gray-100 dark:border-white/5">
+                                                <div
+                                                    class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 px-1">
+                                                    Select Time</div>
+                                                <div class="flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
+                                                    <template x-for="time in timeSlots">
+                                                        <button type="button" @click="selectTime(time)"
+                                                            class="time-picker-item flex-shrink-0 px-4 py-2 rounded-xl bg-gray-50 dark:bg-white/5 text-[10px] font-black whitespace-nowrap"
+                                                            :class="selectedTime === time ? 'selected' : ''"
+                                                            x-text="time">
+                                                        </button>
+                                                    </template>
+                                                </div>
+                                            </div>
+
+                                            <button type="button" @click="isOpen = false"
+                                                class="w-full mt-4 py-3 rounded-xl bg-iosBlue text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 active:scale-95 transition-all">Done</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -382,6 +515,7 @@
     </div>
 
 
+    <script src="js/components/calendar.js"></script>
     <script type="module" src="js/outpass.js?v=cachebust1"></script>
 </body>
 

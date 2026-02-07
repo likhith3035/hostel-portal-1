@@ -444,9 +444,9 @@ button:disabled,
     }
 }
 
-/* Apply to SweetAlert2 Popup */
-div:where(.swal2-container) div:where(.swal2-popup) {
-    animation: springPopup 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+/* Apply to SweetAlert2 Popup - Centered Modals Only */
+div:where(.swal2-container.swal2-center) div:where(.swal2-popup):not(.swal2-toast) {
+    animation: springPopup 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
     transform-origin: center center;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
@@ -549,4 +549,299 @@ div:where(.swal2-container:not(.swal2-center)) {
 .heatmap-card:hover .bg-icon {
     transform: rotate(0deg) scale(1.1);
     opacity: 0.1;
+}
+
+/* --- Premium Animated Calendar --- */
+.calendar-dropdown {
+    animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: top center;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.calendar-day {
+    position: relative;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 32px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.calendar-day::after {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    background: #007AFF;
+    border-radius: 8px;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: -1;
+}
+
+.calendar-day.selected {
+    color: white !important;
+}
+
+.calendar-day.selected::after {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+}
+
+.calendar-day.today {
+    color: #007AFF;
+    font-weight: 800;
+}
+
+.calendar-day.today::before {
+    content: '';
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    background: #007AFF;
+    border-radius: 50%;
+}
+
+.calendar-grid-enter {
+    animation: fadeInScale 0.3s ease-out forwards;
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.time-picker-item {
+    transition: all 0.2s ease;
+}
+
+.time-picker-item.selected {
+    background: #007AFF;
+    color: white;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* --- Premium Animated Toasts --- */
+.toast-container {
+    pointer-events: none;
+    z-index: 10000;
+}
+
+.toast-container>* {
+    pointer-events: auto;
+}
+
+.toast-item {
+    width: 340px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    border-radius: 1.5rem;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    gap: 0.85rem;
+    position: relative;
+    overflow: hidden;
+    animation: toastEnter 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.dark .toast-item {
+    background: rgba(28, 28, 30, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.toast-item.closing {
+    animation: toastExit 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes toastEnter {
+    from {
+        opacity: 0;
+        transform: translateX(120px) scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+@keyframes toastExit {
+    from {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(120px) scale(0.9);
+    }
+}
+
+.toast-icon {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.toast-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.toast-title {
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+    color: #1c1c1e;
+}
+
+.dark .toast-title {
+    color: #ffffff;
+}
+
+.toast-message {
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1.4;
+    opacity: 0.7;
+    color: #1c1c1e;
+}
+
+.dark .toast-message {
+    color: #ffffff;
+}
+
+/* Toast Types */
+.toast-success .toast-icon {
+    background: rgba(52, 199, 89, 0.15);
+    color: #34C759;
+}
+
+.toast-error .toast-icon {
+    background: rgba(255, 59, 48, 0.15);
+    color: #FF3B30;
+}
+
+.toast-warning .toast-icon {
+    background: rgba(255, 149, 0, 0.15);
+    color: #FF9500;
+}
+
+.toast-info .toast-icon {
+    background: rgba(0, 122, 255, 0.15);
+    color: #007AFF;
+}
+
+.toast-default .toast-icon {
+    background: rgba(142, 142, 147, 0.15);
+    color: #8E8E93;
+}
+
+.toast-progress-track {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.dark .toast-progress-track {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.toast-progress-bar {
+    height: 100%;
+    background: #007AFF;
+    transition: width 0.01s linear;
+}
+
+.toast-success .toast-progress-bar {
+    background: #34C759;
+}
+
+.toast-error .toast-progress-bar {
+    background: #FF3B30;
+}
+
+.toast-warning .toast-progress-bar {
+    background: #FF9500;
+}
+
+.toast-info .toast-progress-bar {
+    background: #007AFF;
+}
+
+.toast-close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    opacity: 0.3;
+    transition: all 0.2s;
+}
+
+.toast-close:hover {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.dark .toast-close:hover {
+    background: rgba(255, 255, 255, 0.05);
 }

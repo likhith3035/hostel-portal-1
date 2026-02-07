@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Toast Demo | Premium UI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/vendor/alpine.min.js" defer></script>
+    <script src="js/components/toast.js"></script>
+    <style>
+        body {
+            background: #f4f7f6;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .demo-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px border-white/20;
+            border-radius: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-ios {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-ios:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-ios:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-6 bg-slate-50 dark:bg-slate-900" x-data="{ 
+        init() { 
+            if (typeof registerToastComponent === 'function') registerToastComponent();
+            setTimeout(() => {
+                this.showExample('success');
+            }, 500);
+        },
+        showExample(type) {
+            const messages = {
+                success: { message: 'Action completed successfully!', type: 'success', title: 'Action Success' },
+                error: { message: 'Something went wrong. Please try again.', type: 'error', title: 'Attention Required' },
+                info: { message: 'We have updated our privacy policy.', type: 'info', title: 'New Notification' },
+                warning: { message: 'Your subscription is about to expire.', type: 'warning', title: 'System Alert' },
+                action: { 
+                    message: 'Your profile is incomplete.', 
+                    type: 'info', 
+                    title: 'Action Required',
+                    action: {
+                        label: 'Complete Now',
+                        callback: () => alert('Redirecting to profile...')
+                    }
+                }
+            };
+            if (window.addToast) window.addToast(messages[type]);
+        }
+      }">
+
+    <!-- Premium Toast Container -->
+    <div id="premium-toast-container" class="fixed top-4 right-4 z-[10000] toast-container flex flex-col items-end"
+        x-data="animatedToasts({ position: 'top-right', maxToasts: 5 })">
+        <template x-for="toast in toasts" :key="toast.id">
+            <div x-show="toast.visible" x-transition:enter="transition ease-out duration-300 transform"
+                x-transition:enter-start="translate-x-full opacity-0 scale-90"
+                x-transition:enter-end="translate-x-0 opacity-100 scale-100"
+                x-transition:leave="transition ease-in duration-200 transform"
+                x-transition:leave-start="translate-x-0 opacity-100 scale-100"
+                x-transition:leave-end="translate-x-full opacity-0 scale-90" class="mb-3 pointer-events-auto">
+                <div class="toast-card glass-panel p-4 rounded-[1.5rem] shadow-2xl border border-white/20 min-w-[320px] flex items-center justify-between gap-4 backdrop-blur-xl bg-white/10"
+                    :class="{'border-green-500/30': toast.type === 'success', 'border-red-500/30': toast.type === 'error'}">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg shadow-inner" :class="{
+                               'bg-green-500/20 text-green-500': toast.type === 'success',
+                               'bg-red-500/20 text-red-500': toast.type === 'error',
+                               'bg-blue-500/20 text-blue-500': toast.type === 'info',
+                               'bg-yellow-500/20 text-yellow-500': toast.type === 'warning'
+                             }">
+                            <i class="fas" :class="{
+                                'fa-check-circle': toast.type === 'success',
+                                'fa-exclamation-circle': toast.type === 'error',
+                                'fa-info-circle': toast.type === 'info',
+                                'fa-exclamation-triangle': toast.type === 'warning'
+                            }"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-sm tracking-tight text-gray-800 dark:text-white"
+                                x-text="toast.title"></h4>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 font-medium leading-relaxed max-w-[200px]"
+                                x-text="toast.message"></p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <template x-if="toast.action">
+                            <button @click="toast.action.callback(); remove(toast.id)"
+                                class="px-3 py-1.5 bg-blue-500 text-white text-[10px] font-black uppercase tracking-tighter rounded-lg hover:bg-blue-600 transition-all shadow-lg shadow-blue-500/20">
+                                <span x-text="toast.action.label"></span>
+                            </button>
+                        </template>
+                        <button @click="remove(toast.id)"
+                            class="text-gray-400 hover:text-gray-600 transition-colors p-1">
+                            <i class="fas fa-times text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+
+    <div class="max-w-xl w-full demo-card p-10 text-center animate-fade-in">
+        <div class="mb-8">
+            <div
+                class="w-20 h-20 bg-iosBlue rounded-[1.5rem] flex items-center justify-center text-white text-3xl mx-auto mb-6 shadow-2xl shadow-blue-500/30 rotate-3">
+                <i class="fas fa-magic"></i>
+            </div>
+            <h1 class="text-4xl font-black tracking-tight text-gray-900 dark:text-white mb-2">Animated Toast Demo</h1>
+            <p class="text-gray-500 font-medium">Testing the new Premium UI notification system</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <button @click="showExample('success')"
+                class="btn-ios p-4 bg-green-500/10 border border-green-500/20 rounded-2xl text-green-600 font-bold flex flex-col items-center gap-2">
+                <i class="fas fa-check-circle text-2xl"></i> Success
+            </button>
+            <button @click="showExample('error')"
+                class="btn-ios p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-600 font-bold flex flex-col items-center gap-2">
+                <i class="fas fa-exclamation-circle text-2xl"></i> Error
+            </button>
+            <button @click="showExample('info')"
+                class="btn-ios p-4 bg-blue-500/10 border border-blue-500/20 rounded-2xl text-blue-600 font-bold flex flex-col items-center gap-2">
+                <i class="fas fa-info-circle text-2xl"></i> Info
+            </button>
+            <button @click="showExample('warning')"
+                class="btn-ios p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-2xl text-yellow-600 font-bold flex flex-col items-center gap-2">
+                <i class="fas fa-exclamation-triangle text-2xl"></i> Warning
+            </button>
+            <button @click="showExample('action')"
+                class="btn-ios col-span-2 p-5 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3">
+                <i class="fas fa-bolt"></i> Show Action Toast
+            </button>
+        </div>
+
+        <div class="mt-8 pt-8 border-t border-gray-200/50">
+            <a href="index.html" class="text-sm font-bold text-gray-400 hover:text-iosBlue transition-colors italic">
+                <i class="fas fa-arrow-left mr-2"></i> Return to Portal
+            </a>
+        </div>
+    </div>
+</body>
+
+</html>

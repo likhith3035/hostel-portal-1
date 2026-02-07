@@ -8,11 +8,20 @@ import {
     where,
     orderBy,
     limit,
-    onSnapshot
+    onSnapshot,
+    deleteDoc
 } from './firebase/firebase-firestore.js';
 
 window.toggleTheme = toggleTheme;
 window.toggleSidebar = toggleSidebar;
+
+// Dismiss vacation status (delete booking doc)
+window.dismissVacation = (id) => {
+    deleteDoc(doc(db, CONSTANTS.COLLECTIONS.BOOKINGS, id)).then(() => {
+        // The onSnapshot will automatically update the UI to default state
+        console.log('Vacation dismissed, booking doc deleted');
+    }).catch(err => console.error('Error dismissing vacation:', err));
+};
 
 // --- NOTICE BOARD (Public) ---
 const initNoticeBoard = () => {
@@ -89,15 +98,27 @@ document.addEventListener('DOMContentLoaded', async () => {
                     // Check if doc exists and has data
                     if (docBox.exists()) {
                         const data = docBox.data();
+                        console.log('📊 Dashboard Room Widget Data:', data);
 
                         // Proceed with checking status
                         const isPending = data.status === CONSTANTS.STATUS.PENDING;
                         const isRejected = data.status === CONSTANTS.STATUS.REJECTED;
                         const isVacated = data.status === CONSTANTS.STATUS.VACATED;
 
-                        // If vacated, treat as no booking
+                        // If vacated, show specific vacated message
                         if (isVacated) {
-                            roomWidget.innerHTML = defaultRoomHTML;
+                            console.log('👋 Booking is VACATED. Showing vacated widget.');
+                            roomWidget.innerHTML = `
+                            <div class="flex flex-col items-center justify-center text-center h-full gap-4">
+                                <div class="w-16 h-16 bg-gradient-to-tr from-rose-400 to-rose-600 rounded-full flex items-center justify-center text-3xl text-white shadow-lg shadow-rose-500/30">
+                                    <i class="fas fa-door-open"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-xl text-gray-900 dark:text-white">Room Vacated</h3>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 px-4 leading-relaxed">You have vacated your room. You are now free to book a new one.</p>
+                                </div>
+                                <button onclick="window.dismissVacation('${docBox.id}')" class="px-8 py-3 rounded-full bg-rose-500 text-white font-bold text-sm shadow-xl transition-all spring-click hover:bg-rose-600">Browse Rooms</button>
+                            </div>`;
                             return;
                         }
 

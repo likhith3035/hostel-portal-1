@@ -1,3 +1,4 @@
+/** "use client"; **/
 import { checkUserSession, handleLogout, db, markNotificationsAsRead, toggleTheme, toggleSidebar, showToast, triggerLoginModal, CONSTANTS } from '../main.js?v=3';
 import {
     collection,
@@ -181,23 +182,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!targetElement) return;
             const complaintId = targetElement.dataset.id;
             if (targetElement.classList.contains('delete-btn')) {
-                Swal.fire({
-                    title: 'Delete?',
-                    text: "Undoing isn't possible.",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Delete',
-                    confirmButtonColor: '#ef4444',
-                    background: document.documentElement.classList.contains('dark') ? '#1e293b' : '#fff',
-                    color: document.documentElement.classList.contains('dark') ? '#fff' : '#333'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.safeAsync(async () => {
-                            await deleteDoc(doc(db, CONSTANTS.COLLECTIONS.COMPLAINTS, complaintId));
-                            showToast('Deleted');
-                        }, 'Deleting Complaint...');
-                    }
-                });
+                if (window.confirm('Delete this complaint? This cannot be undone.')) {
+                    window.safeAsync(async () => {
+                        await deleteDoc(doc(db, CONSTANTS.COLLECTIONS.COMPLAINTS, complaintId));
+                        showToast('Deleted');
+                    }, 'Deleting Complaint...');
+                }
             }
             if (targetElement.classList.contains('edit-btn')) {
                 window.safeAsync(async () => {

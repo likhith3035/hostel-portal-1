@@ -1,5 +1,7 @@
+/** "use client"; **/
 import { db } from '../firebase-config.js';
 import { collection, query, where, getDocs, doc, getDoc } from './firebase/firebase-firestore.js';
+import { showToast } from '../main.js?v=3';
 
 let html5QrCode;
 let currentMode = 'qr';
@@ -69,7 +71,7 @@ window.verifyManual = async () => {
     const last4 = input.value.trim();
 
     if (last4.length !== 4 || !/^\d{4}$/.test(last4)) {
-        Swal.fire('Invalid Input', 'Please enter exactly 4 digits', 'error');
+        showToast('Please enter exactly 4 digits', true);
         return;
     }
 
@@ -145,12 +147,7 @@ window.resetChecker = () => {
 
 // Show error
 function showError(message) {
-    Swal.fire({
-        icon: 'error',
-        title: 'Verification Failed',
-        text: message,
-        confirmButtonColor: '#007AFF'
-    });
+    showToast(message, true);
 }
 
 // Initialize
