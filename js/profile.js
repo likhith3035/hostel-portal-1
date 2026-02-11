@@ -107,14 +107,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     const rolePreview = document.getElementById('profile-role');
 
     const updateProfileUI = (userData) => {
-        const name = userData?.displayName || userData?.email?.split('@')[0] || 'Guest';
+        const name = userData?.firestoreData?.displayName || userData?.displayName || userData?.email?.split('@')[0] || 'Guest';
+        const photo = userData?.firestoreData?.photoURL || userData?.photoURL || 'https://placehold.co/100';
 
         if (emailInput) emailInput.value = userData?.email || '';
-        if (displayNameInput) displayNameInput.value = userData?.displayName || '';
-        if (photoURLInput) photoURLInput.value = userData?.photoURL || '';
+        if (displayNameInput) displayNameInput.value = userData?.firestoreData?.displayName || userData?.displayName || '';
+        if (photoURLInput) photoURLInput.value = userData?.firestoreData?.photoURL || userData?.photoURL || '';
         if (namePreview) namePreview.textContent = name;
         if (emailPreview) emailPreview.textContent = userData?.email || 'Not logged in';
-        if (rolePreview) rolePreview.textContent = 'Guest';
+        if (rolePreview) rolePreview.textContent = userData?.firestoreData?.role || 'Student';
+
+        // Update header elements (mobile + desktop)
+        if (nameDropdown) nameDropdown.textContent = name;
+        if (userAvatar) userAvatar.src = photo;
+        const nameDropdownDesktop = document.getElementById('user-name-dropdown-desktop');
+        const userAvatarDesktop = document.getElementById('user-avatar-desktop');
+        if (nameDropdownDesktop) nameDropdownDesktop.textContent = name;
+        if (userAvatarDesktop) userAvatarDesktop.src = photo;
+        if (avatarPreview) avatarPreview.src = photo;
 
         // --- Digital ID Update ---
         const idIncomplete = document.getElementById('id-incomplete-state');

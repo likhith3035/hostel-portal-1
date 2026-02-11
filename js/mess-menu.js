@@ -79,60 +79,56 @@ document.addEventListener('DOMContentLoaded', async () => {
                 grid.innerHTML = '';
                 const dayData = allMenus[selectedDay] || {};
 
-                Object.entries(mealConfig).forEach(([key, config]) => {
+                Object.entries(mealConfig).forEach(([key, config], index) => {
                     const mealData = dayData[key] || { item: 'Not Scheduled', isSpecial: false };
                     const ratingKey = `${selectedDay}-${key}`;
                     const myRating = userRatings[ratingKey];
 
-                    // Premium Meal Card Design (Compact)
+                    // Glass Card Design
                     grid.insertAdjacentHTML('beforeend', `
-                        <div class="glass-panel p-5 rounded-[2rem] relative overflow-hidden transition-all duration-300 hover:scale-[1.02] border border-white/40 dark:border-white/10 shadow-sm hover:shadow-glow group flex flex-col justify-between min-h-[180px]">
+                        <div class="glass-panel bg-white/40 dark:bg-black/20 rounded-[2rem] p-6 border border-white/20 shadow-sm hover:shadow-glow hover:scale-[1.02] transition-all duration-300 flex flex-col h-full animate-fade-in-up backdrop-blur-md" style="animation-delay: ${index * 50}ms">
                             
-                            <!-- Dynamic Background -->
-                            <div class="absolute -right-8 -top-8 w-32 h-32 bg-${config.color}-500/10 rounded-full blur-[50px] group-hover:bg-${config.color}-500/20 transition-all duration-700"></div>
-
-                            <div class="relative z-10 w-full">
-                                
-                                <div class="flex items-start justify-between mb-4">
-                                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-${config.color}-50 to-${config.color}-100 dark:from-${config.color}-900/30 dark:to-${config.color}-800/10 flex items-center justify-center text-${config.color}-500 text-2xl shadow-inner border border-white/50 dark:border-white/10 group-hover:rotate-6 transition-transform duration-300">
-                                        <i class="fas ${config.icon} drop-shadow-sm"></i>
-                                    </div>
-                                    ${mealData.isSpecial ? `
-                                        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-gradient-to-r from-amber-200 to-orange-400 text-black text-[8px] font-black uppercase tracking-widest shadow-lg shadow-amber-500/20 animate-pulse">
-                                            <i class="fas fa-star text-[7px]"></i> Special
-                                        </span>
-                                    ` : ''}
+                            <!-- Header -->
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="w-10 h-10 rounded-2xl bg-white/50 dark:bg-white/5 text-${config.color}-600 dark:text-${config.color}-400 flex items-center justify-center border border-white/20 shadow-sm backdrop-blur-sm">
+                                    <i class="fas ${config.icon} text-lg"></i>
                                 </div>
-
-                                <div class="mb-4">
-                                    <h3 class="font-extrabold text-${config.color}-600 dark:text-${config.color}-400 uppercase tracking-widest text-[9px] mb-1 pl-0.5">${config.label}</h3>
-                                    <p class="text-xl md:text-2xl font-black text-gray-900 dark:text-white leading-tight mb-2 break-words tracking-tight line-clamp-2">${escapeHTML(mealData.item)}</p>
-                                    
-                                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5">
-                                        <i class="far fa-clock text-[10px] text-gray-400"></i>
-                                        <p class="text-[10px] font-bold text-gray-500 dark:text-gray-400 tabular-nums tracking-wide">${config.time}</p>
-                                    </div>
-                                </div>
+                                ${mealData.isSpecial ? `
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-100/50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-[10px] font-bold uppercase tracking-wider border border-amber-200/50 dark:border-amber-500/20 backdrop-blur-sm">
+                                        <i class="fas fa-star text-[8px]"></i> Special
+                                    </span>
+                                ` : ''}
                             </div>
 
-                            <!-- Action Bar -->
-                            ${user ? `
-                            <div class="mt-auto pt-4 border-t border-gray-100 dark:border-white/5 grid grid-cols-2 gap-2 relative z-10">
-                                <button onclick="rateMeal('${selectedDay}', '${key}', 'like', this)" 
-                                     class="like-anim py-2 rounded-xl bg-white dark:bg-black/20 hover:bg-red-50 dark:hover:bg-red-900/10 border border-gray-100 dark:border-white/10 hover:border-red-200 dark:hover:border-red-500/20 transition-all flex items-center justify-center gap-1.5 group/btn active:scale-95 ${myRating === 'like' ? 'like-active bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-500/20' : ''}">
-                                    <i class="${myRating === 'like' ? 'fas' : 'far'} fa-heart text-sm group-hover/btn:text-red-500 transition-colors ${myRating === 'like' ? 'text-red-500' : 'text-gray-400'}"></i>
-                                    <span class="text-[10px] font-bold ${myRating === 'like' ? 'text-red-500' : 'text-gray-500'}">Like</span>
-                                </button>
-                                <button onclick="rateMeal('${selectedDay}', '${key}', 'dislike', this)" 
-                                     class="like-anim py-2 rounded-xl bg-white dark:bg-black/20 hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-100 dark:border-white/10 hover:border-gray-200 dark:hover:border-white/20 transition-all flex items-center justify-center gap-1.5 group/btn active:scale-95 ${myRating === 'dislike' ? 'bg-gray-100 dark:bg-white/10' : ''}">
-                                    <i class="${myRating === 'dislike' ? 'fas' : 'far'} fa-thumbs-down text-sm group-hover/btn:text-gray-600 dark:group-hover/btn:text-white transition-colors ${myRating === 'dislike' ? 'text-gray-600 dark:text-white' : 'text-gray-400'}"></i>
-                                    <span class="text-[10px] font-bold ${myRating === 'dislike' ? 'text-gray-600 dark:text-white' : 'text-gray-500'}">Pass</span>
-                                </button>
-                            </div>` :
-                            `<div class="mt-auto pt-4 border-t border-gray-100 dark:border-white/5">
-                                <p class="text-center text-[9px] font-bold text-gray-400 uppercase tracking-widest opacity-50">Login to Rate</p>
-                            </div>`
+                            <!-- Content -->
+                            <div class="flex-1 mb-6">
+                                <h3 class="text-[10px] font-bold text-gray-500/80 dark:text-gray-400 uppercase tracking-widest mb-1">${config.label}</h3>
+                                <p class="text-lg font-bold text-gray-900 dark:text-white leading-tight line-clamp-3">${escapeHTML(mealData.item)}</p>
+                            </div>
+                            
+                            <!-- Footer -->
+                            <div class="mt-auto pt-4 border-t border-gray-200/50 dark:border-white/5 flex flex-col gap-3">
+                                <div class="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400">
+                                    <i class="far fa-clock"></i> ${config.time}
+                                </div>
+
+                                <!-- Actions -->
+                                ${user ? `
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button onclick="rateMeal('${selectedDay}', '${key}', 'like', this)" 
+                                         class="py-2.5 rounded-xl border border-white/20 flex items-center justify-center gap-1.5 ${myRating === 'like' ? 'bg-green-500 text-white shadow-lg shadow-green-500/30 border-green-500' : 'bg-white/50 dark:bg-white/5 text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-white/10'} transition-all active:scale-95 backdrop-blur-sm group">
+                                        <i class="${myRating === 'like' ? 'fas' : 'far'} fa-heart text-xs group-hover:scale-110 transition-transform"></i>
+                                        <span class="text-[10px] font-bold uppercase">Like</span>
+                                    </button>
+                                    <button onclick="rateMeal('${selectedDay}', '${key}', 'dislike', this)" 
+                                         class="py-2.5 rounded-xl border border-white/20 flex items-center justify-center gap-1.5 ${myRating === 'dislike' ? 'bg-zinc-800 text-white shadow-lg border-zinc-800' : 'bg-white/50 dark:bg-white/5 text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-white/10'} transition-all active:scale-95 backdrop-blur-sm group">
+                                        <i class="${myRating === 'dislike' ? 'fas' : 'far'} fa-thumbs-down text-xs group-hover:scale-110 transition-transform"></i>
+                                        <span class="text-[10px] font-bold uppercase">Pass</span>
+                                    </button>
+                                </div>` :
+                            `<div class="p-2 rounded-xl bg-white/30 dark:bg-white/5 border border-white/10 text-[10px] text-center font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider backdrop-blur-sm">Login to Rate</div>`
                         }
+                            </div>
                         </div>`);
                 });
             };
@@ -141,18 +137,49 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (daySelector) {
                 daySelector.innerHTML = '';
                 const todayIndex = days.indexOf(todayLower);
+                // Reorder days starting from today
                 const orderedDays = [...days.slice(todayIndex), ...days.slice(0, todayIndex)];
 
                 orderedDays.forEach((day, index) => {
                     const date = new Date();
                     date.setDate(date.getDate() + index);
+
                     const btn = document.createElement('button');
                     const isActive = day === todayLower;
-                    btn.className = `day-tab flex-shrink-0 flex flex-col items-center justify-center w-[60px] h-[60px] rounded-2xl border transition-all duration-200 ${isActive ? 'bg-iosBlue text-white shadow-lg border-transparent' : 'bg-white dark:bg-white/5 border-transparent text-gray-500'}`;
-                    btn.innerHTML = `<span class="text-[10px] font-bold uppercase tracking-widest opacity-80">${day.substring(0, 3)}</span><span class="text-xl font-bold">${date.getDate()}</span>`;
+
+                    const baseClasses = "flex-shrink-0 relative group w-14 h-20 rounded-2xl flex flex-col items-center justify-center transition-all duration-300 snap-center outline-none select-none border";
+                    const activeClasses = "bg-iosBlue text-white shadow-lg shadow-blue-500/30 scale-105 border-blue-400 z-10";
+                    const inactiveClasses = "glass-panel bg-white/40 dark:bg-black/20 hover:bg-white/60 dark:hover:bg-white/10 text-gray-500 dark:text-gray-400 border-white/10 hover:border-white/20 hover:scale-[1.02]";
+
+                    btn.className = `${baseClasses} ${isActive ? activeClasses : inactiveClasses}`;
+
+                    btn.innerHTML = `
+                        <span class="text-[9px] font-bold uppercase tracking-widest mb-0.5 ${isActive ? 'opacity-90' : 'opacity-60'} group-hover:opacity-100 transition-opacity">${day.substring(0, 3)}</span>
+                        <span class="text-xl font-bold font-sans tracking-tight">${date.getDate()}</span>
+                        ${isActive ? '<div class="absolute bottom-2 w-1 h-1 bg-white rounded-full opacity-50"></div>' : ''}
+                    `;
+
                     btn.onclick = () => {
-                        daySelector.querySelectorAll('.day-tab').forEach(b => b.classList.remove('bg-iosBlue', 'text-white'));
-                        btn.classList.add('bg-iosBlue', 'text-white');
+                        // Reset all
+                        const buttons = daySelector.querySelectorAll('button');
+                        buttons.forEach(b => {
+                            b.className = `${baseClasses} ${inactiveClasses}`;
+                            // Remove dot
+                            const dot = b.querySelector('.absolute.bottom-2');
+                            if (dot) dot.remove();
+                            // Reset opacity
+                            b.querySelector('span:first-child').className = "text-[9px] font-bold uppercase tracking-widest mb-0.5 opacity-60 group-hover:opacity-100 transition-opacity";
+                        });
+
+                        // Set active
+                        btn.className = `${baseClasses} ${activeClasses}`;
+                        btn.insertAdjacentHTML('beforeend', '<div class="absolute bottom-2 w-1 h-1 bg-white rounded-full opacity-50"></div>');
+                        btn.querySelector('span:first-child').className = "text-[9px] font-bold uppercase tracking-widest mb-0.5 opacity-90 group-hover:opacity-100 transition-opacity";
+
+                        // Scroll into view nicely
+                        btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+
+                        // Render
                         renderMenuGrid(day);
                     };
                     daySelector.appendChild(btn);
@@ -186,22 +213,27 @@ document.addEventListener('DOMContentLoaded', async () => {
             const likeBtn = container.children[0];
             const dislikeBtn = container.children[1];
 
-            // Reset both
-            likeBtn.classList.remove('like-active', 'bg-red-50/50', 'border-red-100', 'text-red-500');
-            likeBtn.querySelector('i').className = 'far fa-heart text-lg group-hover/btn:text-red-500 transition-colors';
-            likeBtn.querySelector('span').classList.remove('text-red-500');
+            // Tailwind Class Sets
+            const baseClasses = 'py-2.5 rounded-xl border border-white/20 flex items-center justify-center gap-1.5 bg-white/50 dark:bg-white/5 text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-white/10 transition-all active:scale-95 backdrop-blur-sm group';
 
-            dislikeBtn.classList.remove('text-gray-600', 'bg-gray-200', 'dark:bg-white/20');
-            dislikeBtn.querySelector('i').className = 'far fa-thumbs-down text-lg group-hover/btn:text-gray-600 transition-colors';
+            const likeActiveClasses = 'py-2.5 rounded-xl border border-green-500 flex items-center justify-center gap-1.5 bg-green-500 text-white shadow-lg shadow-green-500/30 transition-all active:scale-95 backdrop-blur-sm group';
 
-            // Apply active state
+            const dislikeActiveClasses = 'py-2.5 rounded-xl border border-zinc-800 flex items-center justify-center gap-1.5 bg-zinc-800 text-white shadow-lg border-zinc-800 transition-all active:scale-95 backdrop-blur-sm group';
+
+            // Reset
+            likeBtn.className = baseClasses;
+            likeBtn.querySelector('i').className = 'far fa-heart text-xs group-hover:scale-110 transition-transform';
+
+            dislikeBtn.className = baseClasses;
+            dislikeBtn.querySelector('i').className = 'far fa-thumbs-down text-xs group-hover:scale-110 transition-transform';
+
+            // Apply Active
             if (rating === 'like') {
-                likeBtn.classList.add('like-active', 'bg-red-50/50', 'border-red-100', 'text-red-500');
-                likeBtn.querySelector('i').className = 'fas fa-heart text-lg text-red-500';
-                likeBtn.querySelector('span').classList.add('text-red-500');
+                likeBtn.className = likeActiveClasses;
+                likeBtn.querySelector('i').className = 'fas fa-heart text-xs group-hover:scale-110 transition-transform';
             } else {
-                dislikeBtn.classList.add('text-gray-600', 'bg-gray-200', 'dark:bg-white/20');
-                dislikeBtn.querySelector('i').className = 'fas fa-thumbs-down text-lg';
+                dislikeBtn.className = dislikeActiveClasses;
+                dislikeBtn.querySelector('i').className = 'fas fa-thumbs-down text-xs group-hover:scale-110 transition-transform';
             }
         }, 'Saving feedback...');
     };

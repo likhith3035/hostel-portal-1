@@ -16,10 +16,11 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-    
+
 
     <script>
         tailwind.config = {
+            safelist: ['bg-iosBlue'],
             darkMode: 'class',
             theme: {
                 fontFamily: {
@@ -110,9 +111,7 @@
                 <a href="about.html"
                     class="nav-item flex items-center px-5 py-4 rounded-[1.2rem] text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all spring-click"><i
                         class="fas fa-info-circle w-6"></i> <span>About</span></a>
-                <a href="developer.html"
-                    class="nav-item flex items-center px-5 py-4 rounded-[1.2rem] text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all spring-click"><i
-                        class="fas fa-code w-6"></i> <span>Developer</span></a>
+
             </nav>
 
             <div class="p-5 mt-auto">
@@ -142,11 +141,15 @@
                         class="lg:hidden w-10 h-10 rounded-full glass-panel flex items-center justify-center text-gray-500 hover:text-iosBlue transition-colors spring-click">
                         <i class="fas fa-bars text-base"></i>
                     </button>
-                    <div
-                        class="glass-panel px-3 py-1.5 rounded-full lg:bg-transparent lg:backdrop-filter-none lg:border-none lg:shadow-none flex items-center gap-2 lg:block">
-                        <img src="https://upload.wikimedia.org/wikipedia/en/3/3d/NBKRIST_logo.png"
-                            class="w-6 h-6 object-contain lg:hidden">
-                        <div class="hidden lg:block">
+                    <div class="flex items-center gap-2">
+                        <div class="glass-panel px-3 py-1.5 rounded-full flex items-center gap-2 flex-shrink-0">
+                            <img src="https://upload.wikimedia.org/wikipedia/en/3/3d/NBKRIST_logo.png"
+                                class="w-6 h-6 md:w-7 md:h-7 object-contain">
+                            <span
+                                class="font-bold text-xs md:text-base tracking-tight text-gray-900 dark:text-white whitespace-nowrap">NBKRIST</span>
+                        </div>
+                        <div
+                            class="hidden lg:block ml-2 px-6 py-2 rounded-[2rem] glass-panel bg-white/40 dark:bg-black/30 backdrop-blur-xl border border-white/20 shadow-sm">
                             <h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Mess Menu</h2>
                             <div class="flex items-center gap-2">
                                 <p class="text-sm text-gray-500 dark:text-gray-400 font-medium" id="current-date">
@@ -156,7 +159,6 @@
                                 <p class="text-[10px] font-bold text-iosBlue uppercase" id="am-pm"></p>
                             </div>
                         </div>
-                        <span class="font-bold text-sm lg:hidden">NBKRIST</span>
                     </div>
                 </div>
 
@@ -213,10 +215,7 @@
                             </div>
                             <div class="space-y-1" id="profile-dropdown-list"><a href="profile.html"
                                     class="flex items-center px-3 py-2 text-xs font-semibold rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"><i
-                                        class="fas fa-user-circle w-4 mr-2 text-gray-400"></i> My Profile</a><a
-                                    href="developer.html"
-                                    class="flex items-center admin-link px-3 py-2 text-xs font-semibold rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors hidden"><i
-                                        class="fas fa-code w-4 mr-2 text-gray-400"></i> Developer</a></div>
+                                        class="fas fa-user-circle w-4 mr-2 text-gray-400"></i> My Profile</a></div>
                             <div class="mt-1 pt-1 border-t border-gray-100 dark:border-white/10"><button
                                     id="logout-header"
                                     class="w-full flex items-center px-3 py-2 text-xs font-bold text-red-500 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors text-left"><i
@@ -229,92 +228,51 @@
             <div class="max-w-6xl mx-auto pb-10 animate-fade-in">
 
                 <!-- Hero: Live Status (Compact) -->
+                <!-- Hero: Live Status (Premium) -->
+                <!-- Hero: Live Status (Ultra Premium) -->
+                <!-- Hero: Live Status (Simple) -->
                 <div
-                    class="glass-panel p-6 md:p-8 rounded-[2rem] relative overflow-hidden mb-6 border border-white/40 dark:border-white/10 group">
-                    <!-- Dynamic Background -->
+                    class="glass-panel bg-white/60 dark:bg-black/30 rounded-3xl p-8 mb-8 border border-white/20 shadow-glass relative overflow-hidden backdrop-blur-xl transition-all hover:scale-[1.01] duration-500">
                     <div
-                        class="absolute top-0 right-0 w-[400px] h-[400px] bg-gradient-to-b from-blue-500/10 to-transparent rounded-full blur-3xl -mr-32 -mt-32 animate-pulse">
-                    </div>
-                    <div
-                        class="absolute bottom-0 left-0 w-[300px] h-[300px] bg-gradient-to-t from-cyan-500/10 to-transparent rounded-full blur-3xl -ml-20 -mb-20">
+                        class="absolute top-0 right-0 p-8 opacity-5 pointer-events-none transform translate-x-1/4 -translate-y-1/4">
+                        <i class="fas fa-utensils text-[12rem] text-gray-900 dark:text-white"></i>
                     </div>
 
-                    <div class="relative z-10 flex flex-row items-center gap-6">
-                        <!-- Icon/Visual -->
-                        <div class="relative group/icon shrink-0 hidden md:block">
-                            <div
-                                class="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-[1.5rem] blur opacity-30 group-hover/icon:opacity-50 transition-opacity duration-500">
-                            </div>
-                            <div
-                                class="w-24 h-24 rounded-[1.5rem] bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-white shadow-xl relative z-10 hover:scale-105 transition-transform duration-500 border border-white/20">
-                                <i class="fas fa-utensils text-3xl drop-shadow-md"></i>
+                    <div class="relative z-10">
+                        <div class="flex flex-wrap items-center gap-4 mb-6">
+                            <span
+                                class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-[11px] font-bold uppercase tracking-wider">
+                                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                                Live Now
+                            </span>
+
+                            <div class="w-px h-4 bg-gray-200 dark:bg-white/10 hidden sm:block"></div>
+
+                            <span class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest"
+                                id="hero-meal-type">--</span>
+
+                            <div class="ml-auto text-right">
+                                <p class="text-xl font-bold text-gray-900 dark:text-white tabular-nums" id="clock-time">
+                                    00:00</p>
+                                <p class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest"
+                                    id="am-pm">--</p>
                             </div>
                         </div>
 
-                        <!-- Content -->
-                        <div class="flex-1 min-w-0 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                            <div class="text-left">
-                                <div class="flex items-center gap-3 mb-2">
-                                    <div
-                                        class="inline-block px-2.5 py-1 rounded-md bg-blue-500/10 text-blue-500 text-[9px] font-black uppercase tracking-widest border border-blue-500/10">
-                                        Current Meal
-                                    </div>
-                                    <div
-                                        class="flex items-center gap-1.5 px-2 py-0.5 bg-green-500/10 text-green-600 rounded-full border border-green-500/20">
-                                        <span class="relative flex h-1.5 w-1.5">
-                                            <span
-                                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                                            <span
-                                                class="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500"></span>
-                                        </span>
-                                        <span class="text-[9px] font-bold uppercase tracking-wide">Live</span>
-                                    </div>
-                                </div>
+                        <h1 class="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6 tracking-tight leading-tight max-w-3xl"
+                            id="hero-meal-name">
+                            Loading...
+                        </h1>
 
-                                <h1 class="text-3xl md:text-4xl font-black text-gray-900 dark:text-white mb-1 tracking-tight truncate max-w-md"
-                                    id="hero-meal-name">
-                                    Loading...
-                                </h1>
-                                <p class="text-sm text-gray-500 dark:text-gray-400 font-medium truncate"
-                                    id="hero-meal-desc">
-                                    Fetching latest updates...
-                                </p>
-                            </div>
-
-                            <div class="flex gap-3">
-                                <div
-                                    class="px-4 py-2 rounded-xl bg-white/50 dark:bg-white/5 border border-white/40 dark:border-white/10 backdrop-blur-md flex items-center gap-2 shadow-sm min-w-[100px]">
-                                    <div
-                                        class="w-6 h-6 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center text-[10px]">
-                                        <i class="fas fa-carrot"></i>
-                                    </div>
-                                    <div class="flex flex-col text-left">
-                                        <span
-                                            class="text-[8px] font-bold uppercase text-gray-400 tracking-wider">Type</span>
-                                        <span class="text-xs font-bold text-gray-800 dark:text-white"
-                                            id="hero-meal-type">--</span>
-                                    </div>
-                                </div>
-
-                                <div
-                                    class="px-4 py-2 rounded-xl bg-white/50 dark:bg-white/5 border border-white/40 dark:border-white/10 backdrop-blur-md flex items-center gap-2 shadow-sm min-w-[100px]">
-                                    <div
-                                        class="w-6 h-6 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center text-[10px]">
-                                        <i class="fas fa-clock"></i>
-                                    </div>
-                                    <div class="flex flex-col text-left">
-                                        <span
-                                            class="text-[8px] font-bold uppercase text-gray-400 tracking-wider">Time</span>
-                                        <span class="text-xs font-bold text-gray-800 dark:text-white tabular-nums"
-                                            id="hero-meal-time">--</span>
-                                    </div>
-                                </div>
-                            </div>
+                        <div
+                            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 text-gray-600 dark:text-gray-300 font-medium text-sm">
+                            <i class="far fa-clock text-gray-400"></i>
+                            <span id="hero-meal-time">--</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="flex gap-2 overflow-x-auto pb-4 mb-4 scrollbar-hide snap-x" id="day-selector">
+                <div class="flex gap-3 overflow-x-auto pb-6 mb-2 scrollbar-hide snap-x px-1" id="day-selector">
                 </div>
 
                 <div id="menu-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">

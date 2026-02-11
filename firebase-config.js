@@ -3,7 +3,7 @@
 
 import { initializeApp } from './js/firebase/firebase-app.js';
 import { getAuth } from './js/firebase/firebase-auth.js';
-import { getFirestore } from './js/firebase/firebase-firestore.js';
+import { getFirestore, collection, doc, getDoc, getDocs, addDoc, updateDoc, setDoc, deleteDoc, query, where, orderBy, limit, onSnapshot, serverTimestamp } from './js/firebase/firebase-firestore.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyB5CQEpb8nd3Ad-ZwJdYb1RCPEAnGpL-zA",
@@ -19,10 +19,13 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 // console.log('FirebaseConfig: App initialized', app);
 
-// Initialize and export Firebase services
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+// Initialize Firebase services
+const auth = getAuth(app);
+const db = getFirestore(app);
 // console.log('FirebaseConfig: DB initialized', db);
+
+// Export Firebase app and services
+export { app, auth, db };
 
 // Re-export Firestore functions to ensure Singletons (avoid dual-module issues)
 export {

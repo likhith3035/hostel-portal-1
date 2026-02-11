@@ -241,6 +241,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                                     </div>
                                 </div>
 
+                                <!-- QR Code Section -->
+                                <div class="flex flex-col items-center justify-center mb-6 p-4 bg-white border-2 border-dashed border-gray-200 rounded-xl">
+                                    <div id="qrcode-${doc.id}" class="qrcode-container mb-2"></div>
+                                    <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Scan at Gate</div>
+                                </div>
+
                                 <div class="border-t-2 border-dashed border-gray-100 pt-6 text-center">
                                     <div class="flex justify-center items-center gap-3 mb-4 opacity-50">
                                         <i class="fas fa-fingerprint text-3xl"></i>
@@ -249,6 +255,35 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 </div>
                             </div>
                         </div>`;
+
+                    // Generate QR Code after a slight delay to ensure DOM is ready
+                    // Generate QR Code with safety checks
+                    setTimeout(() => {
+                        const qrContainer = document.getElementById(`qrcode-${doc.id}`);
+                        if (qrContainer && !qrContainer.innerHTML) {
+                            if (typeof QRCode === 'undefined') {
+                                console.error('QRCode library not loaded');
+                                qrContainer.innerHTML = '<p class="text-[10px] text-red-500 font-mono">QR Lib Error</p>';
+                                return;
+                            }
+
+                            try {
+                                const qrData = `${window.location.origin}/gate-kiosk.html?id=${encodeURIComponent(d.userEmail)}`;
+                                new QRCode(qrContainer, {
+                                    text: qrData,
+                                    width: 120,
+                                    height: 120,
+                                    colorDark: "#000000",
+                                    colorLight: "#ffffff",
+                                    correctLevel: QRCode.CorrectLevel.M
+                                });
+                                qrContainer.removeAttribute('title'); // Remove tooltip
+                            } catch (e) {
+                                console.error('QR Gen Error:', e);
+                                qrContainer.innerHTML = '<p class="text-[10px] text-red-500">Error</p>';
+                            }
+                        }
+                    }, 300);
                 } else {
                     const isRej = d.status === CONSTANTS.STATUS.REJECTED;
                     const color = isRej ? 'red' : 'yellow';
@@ -332,15 +367,29 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (btn) btn.style.display = 'none';
 
             if (window.html2canvas) {
+                const btn = element.querySelector('.download-btn');
+                const originalText = btn ? btn.innerHTML : '';
+                if (btn) btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
+
+                // Slight delay to ensure text render
+                await new Promise(r => setTimeout(r, 100));
+
                 window.html2canvas(element, {
                     backgroundColor: document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff',
-                    scale: 2
+                    scale: 3,
+                    useCORS: true,
+                    logging: false,
+                    allowTaint: true
                 }).then(canvas => {
                     const link = document.createElement('a');
                     link.download = `GatePass-${id.substr(0, 5)}.png`;
-                    link.href = canvas.toDataURL();
+                    link.href = canvas.toDataURL('image/png');
                     link.click();
-                    if (btn) btn.style.display = 'flex';
+                    if (btn) btn.innerHTML = originalText;
+                }).catch(err => {
+                    console.error('Download error:', err);
+                    showToast('Download failed', true);
+                    if (btn) btn.innerHTML = originalText;
                 });
             }
         }

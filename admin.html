@@ -24,16 +24,17 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
     <!-- AUTH GUARD: Must be first -->
     <script type="module" src="js/security/auth-guard.js"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
     <script>
@@ -78,6 +79,29 @@
         /* Modern iOS Overrides */
         .glass-panel {
             backdrop-filter: blur(25px) saturate(180%) !important;
+        }
+
+        /* Sidebar Active Tab */
+        .nav-btn.active {
+            background: linear-gradient(135deg, #6366f1, #818cf8);
+            color: #fff !important;
+            box-shadow: 0 4px 15px -3px rgba(99, 102, 241, 0.4);
+            border-left: 3px solid #4f46e5;
+        }
+
+        .nav-btn.active i {
+            color: #fff !important;
+        }
+
+        .dark .nav-btn.active {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(129, 140, 248, 0.2));
+            color: #c7d2fe !important;
+            box-shadow: 0 4px 15px -3px rgba(99, 102, 241, 0.2);
+            border-left: 3px solid #818cf8;
+        }
+
+        .dark .nav-btn.active i {
+            color: #c7d2fe !important;
         }
     </style>
 </head>
@@ -144,6 +168,10 @@
                     :class="currentTab === 'stats' ? 'active' : 'hover:bg-black/5 dark:hover:bg-white/5'"
                     class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-semibold text-sm group text-gray-500 dark:text-gray-400"><i
                         class="fas fa-chart-line w-5 text-center"></i> <span>Overview</span></button>
+                <button @click="currentTab = 'analytics'; sidebarOpen = false"
+                    :class="currentTab === 'analytics' ? 'active' : 'hover:bg-black/5 dark:hover:bg-white/5'"
+                    class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-semibold text-sm group text-gray-500 dark:text-gray-400"><i
+                        class="fas fa-chart-pie w-5 text-center"></i> <span>Analytics</span></button>
                 <button @click="currentTab = 'users'; sidebarOpen = false"
                     :class="currentTab === 'users' ? 'active' : 'hover:bg-black/5 dark:hover:bg-white/5'"
                     class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-semibold text-sm group text-gray-500 dark:text-gray-400"><i
@@ -168,13 +196,21 @@
                     :class="currentTab === 'content' ? 'active' : 'hover:bg-black/5 dark:hover:bg-white/5'"
                     class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-semibold text-sm group text-gray-500 dark:text-gray-400"><i
                         class="fas fa-broadcast-tower w-5 text-center"></i> <span>Broadcast</span></button>
+
+                <div class="my-4 border-t border-gray-200 dark:border-white/5"></div>
+
+                <a href="gate-kiosk.html" target="_blank"
+                    class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-semibold text-sm group text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors">
+                    <i class="fas fa-shield-alt w-5 text-center"></i>
+                    <span>Gate Check</span>
+                    <i class="fas fa-external-link-alt text-[10px] ml-auto opacity-50"></i>
+                </a>
             </nav>
 
             <div class="p-4 mt-auto border-t border-gray-100 dark:border-white/5 space-y-2">
 
-                <a href="developer.html"
-                    class="flex items-center gap-3 px-4 py-3 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-500 hover:bg-indigo-500 hover:text-white transition-all text-sm font-bold justify-center md:justify-start"><i
-                        class="fas fa-code"></i> <span>Developer Page</span></a>
+
+
 
                 <div class="flex justify-center space-x-6 py-2 opacity-70">
                     <a href="https://github.com/likhith3035" target="_blank"
@@ -243,8 +279,8 @@
                                     Total Students</p>
                             </div>
                         </div>
-                        <div
-                            class="glass-panel p-6 rounded-[2rem] relative overflow-hidden transition-transform duration-300 hover:scale-[1.02] group">
+                        <div @click="currentTab = 'bookings'"
+                            class="glass-panel p-6 rounded-[2rem] relative overflow-hidden transition-transform duration-300 hover:scale-[1.02] group cursor-pointer">
                             <div
                                 class="absolute top-0 right-0 w-24 h-24 bg-amber-500/10 rounded-bl-[4rem] -mr-4 -mt-4 transition-all group-hover:bg-amber-500/20">
                             </div>
@@ -258,11 +294,14 @@
                                     <span class="skeleton inline-block w-16 h-8 rounded-md"></span>
                                 </h3>
                                 <p class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
-                                    Pending</p>
+                                    Pending
+                                    <i
+                                        class="fas fa-arrow-right text-[8px] ml-1 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                </p>
                             </div>
                         </div>
-                        <div
-                            class="glass-panel p-6 rounded-[2rem] relative overflow-hidden transition-transform duration-300 hover:scale-[1.02] group">
+                        <div @click="currentTab = 'complaints'"
+                            class="glass-panel p-6 rounded-[2rem] relative overflow-hidden transition-transform duration-300 hover:scale-[1.02] group cursor-pointer">
                             <div
                                 class="absolute top-0 right-0 w-24 h-24 bg-red-500/10 rounded-bl-[4rem] -mr-4 -mt-4 transition-all group-hover:bg-red-500/20">
                             </div>
@@ -276,19 +315,210 @@
                                     <span class="skeleton inline-block w-16 h-8 rounded-md"></span>
                                 </h3>
                                 <p class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
-                                    Issues</p>
+                                    Issues
+                                    <i
+                                        class="fas fa-arrow-right text-[8px] ml-1 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                </p>
                             </div>
                         </div>
-                        <!-- Added 4th card for symmetry or future use, keeping it transparent/placeholder if data not avail or duplicate -->
+                        <!-- Active Bookings Card -->
                         <div
-                            class="glass-panel p-6 rounded-[2rem] relative overflow-hidden transition-transform duration-300 hover:scale-[1.02] group border-dashed border-2 border-gray-300/50 dark:border-white/10 flex items-center justify-center opacity-70">
-                            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest text-center">
-                                System Status<br><span class="text-green-500 text-lg">Online</span></p>
+                            class="glass-panel p-6 rounded-[2rem] relative overflow-hidden transition-transform duration-300 hover:scale-[1.02] group">
+                            <div
+                                class="absolute top-0 right-0 w-24 h-24 bg-green-500/10 rounded-bl-[4rem] -mr-4 -mt-4 transition-all group-hover:bg-green-500/20">
+                            </div>
+                            <div class="flex flex-col relative z-10">
+                                <div
+                                    class="w-12 h-12 rounded-2xl bg-green-50 dark:bg-green-500/20 text-green-600 flex items-center justify-center mb-4 shadow-sm border border-green-100 dark:border-green-500/30">
+                                    <i class="fas fa-bed text-xl"></i>
+                                </div>
+                                <h3 id="stat-active-bookings"
+                                    class="text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-1">
+                                    <span class="skeleton inline-block w-16 h-8 rounded-md"></span>
+                                </h3>
+                                <p class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
+                                    Rooms Booked</p>
+                            </div>
                         </div>
                     </div>
+
+                    <!-- Charts Grid: Occupancy + Complaints -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Room Occupancy Doughnut -->
+                        <div class="glass-panel p-6 rounded-[2rem]">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-bold text-lg">Room Occupancy</h3>
+                                <span
+                                    class="text-[10px] font-bold text-green-500 uppercase tracking-widest bg-green-50 dark:bg-green-500/10 px-2 py-1 rounded-lg">Real-time</span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-3 mb-4">
+                                <div class="text-center p-3 bg-gray-50 dark:bg-white/5 rounded-xl">
+                                    <p class="text-2xl font-black text-gray-800 dark:text-white" id="stat-total-rooms">0
+                                    </p>
+                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Total</p>
+                                </div>
+                                <div class="text-center p-3 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl">
+                                    <p class="text-2xl font-black text-indigo-600 dark:text-indigo-400"
+                                        id="stat-booked-rooms">0
+                                    </p>
+                                    <p class="text-[10px] font-bold text-indigo-400 uppercase tracking-wider">Booked</p>
+                                </div>
+                                <div class="text-center p-3 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl">
+                                    <p class="text-2xl font-black text-emerald-600 dark:text-emerald-400"
+                                        id="stat-available-rooms">0</p>
+                                    <p class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Available
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="h-[220px] w-full flex items-center justify-center">
+                                <canvas id="occupancyChartOverview"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Complaints Volume Bar -->
+                        <div class="glass-panel p-6 rounded-[2rem]">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-bold text-lg">Complaints Volume</h3>
+                                <span
+                                    class="text-[10px] font-bold text-gray-500 uppercase tracking-widest bg-gray-50 dark:bg-white/5 px-2 py-1 rounded-lg">Last
+                                    6 Months</span>
+                            </div>
+                            <div class="h-[280px] w-full">
+                                <canvas id="complaintsChartOverview"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Weekly Activity Line -->
                     <div class="glass-panel p-6 rounded-[2rem]">
                         <h3 class="font-bold text-lg mb-4">Weekly Activity</h3>
                         <div class="h-56 w-full"><canvas id="adminChart"></canvas></div>
+                    </div>
+                </div>
+                <!-- Analytics Section -->
+                <div x-show="currentTab === 'analytics'" class="space-y-8 animate-fade-in" style="display: none;">
+                    <div class="flex justify-between items-center mb-8">
+                        <div>
+                            <h2 class="text-4xl font-black text-slate-800 dark:text-white tracking-tight mb-2">Platform
+                                Insights</h2>
+                            <p class="text-slate-500 dark:text-gray-400">Real-time data visualization and trends</p>
+                        </div>
+                        <button onclick="window.refreshAnalytics()"
+                            class="w-12 h-12 rounded-2xl bg-gray-800 hover:bg-gray-700 text-white flex items-center justify-center transition-all shadow-lg hover:rotate-180 duration-500">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+
+                    <!-- Stats Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Total Students -->
+                        <div
+                            class="glass-panel p-6 rounded-[2rem] border border-white/5 relative overflow-hidden group hover:scale-[1.02] transition-transform bg-white/50 dark:bg-black/20">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                            </div>
+                            <div class="flex justify-between items-start relative z-10">
+                                <div>
+                                    <p
+                                        class="text-slate-500 dark:text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">
+                                        Total
+                                        Students</p>
+                                    <h3 class="text-3xl font-black text-slate-800 dark:text-white"
+                                        id="stat-total-students">--</h3>
+                                </div>
+                                <div
+                                    class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center text-blue-400">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pending Issues -->
+                        <div
+                            class="glass-panel p-6 rounded-[2rem] border border-white/5 relative overflow-hidden group hover:scale-[1.02] transition-transform bg-white/50 dark:bg-black/20">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                            </div>
+                            <div class="flex justify-between items-start relative z-10">
+                                <div>
+                                    <p
+                                        class="text-slate-500 dark:text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">
+                                        Pending
+                                        Issues</p>
+                                    <h3 class="text-3xl font-black text-slate-800 dark:text-white"
+                                        id="stat-pending-issues">--</h3>
+                                </div>
+                                <div
+                                    class="w-12 h-12 bg-orange-500/20 rounded-xl flex items-center justify-center text-orange-400">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Active Outpasses -->
+                        <div
+                            class="glass-panel p-6 rounded-[2rem] border border-white/5 relative overflow-hidden group hover:scale-[1.02] transition-transform bg-white/50 dark:bg-black/20">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                            </div>
+                            <div class="flex justify-between items-start relative z-10">
+                                <div>
+                                    <p
+                                        class="text-slate-500 dark:text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">
+                                        Active
+                                        Outpasses</p>
+                                    <h3 class="text-3xl font-black text-slate-800 dark:text-white"
+                                        id="stat-active-outpasses">--
+                                    </h3>
+                                </div>
+                                <div
+                                    class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center text-green-400">
+                                    <i class="fas fa-walking"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Grid -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Complaints Trend -->
+                        <div
+                            class="glass-panel p-8 rounded-[2.5rem] border border-white/5 bg-white/50 dark:bg-black/20">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-xl font-bold text-slate-800 dark:text-white">Complaints Volume</h3>
+                                <span
+                                    class="text-xs font-bold text-gray-500 uppercase tracking-widest bg-white/5 px-3 py-1 rounded-lg">Last
+                                    6 Months</span>
+                            </div>
+                            <div class="h-[300px] w-full">
+                                <canvas id="complaintsChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Room Occupancy -->
+                        <div
+                            class="glass-panel p-8 rounded-[2.5rem] border border-white/5 bg-white/50 dark:bg-black/20">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-xl font-bold text-slate-800 dark:text-white">Room Occupancy</h3>
+                                <span
+                                    class="text-xs font-bold text-gray-500 uppercase tracking-widest bg-white/5 px-3 py-1 rounded-lg">Real-time</span>
+                            </div>
+
+                            <!-- Booked Rooms Stat -->
+                            <div class="flex justify-center mb-6">
+                                <div
+                                    class="text-center p-6 bg-green-50 dark:bg-green-500/10 rounded-2xl border border-green-100 dark:border-green-500/20 min-w-[150px]">
+                                    <p class="text-4xl font-black text-green-600 dark:text-green-400"
+                                        id="stat-booked-rooms">0</p>
+                                    <p class="text-xs font-bold uppercase text-green-400 tracking-wider mt-2">Rooms
+                                        Booked</p>
+                                </div>
+                            </div>
+
+                            <div class="h-[220px] w-full flex items-center justify-center">
+                                <canvas id="occupancyChart"></canvas>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -591,9 +821,14 @@
                                 </div>
                             </div>
                             <div class="flex flex-col h-[60vh]">
-                                <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">
-                                    Recent
-                                    History</h4>
+                                <div class="flex justify-between items-center mb-4">
+                                    <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest">
+                                        Recent History</h4>
+                                    <button onclick="window.clearOutpassHistory()"
+                                        class="text-[10px] font-bold bg-red-50 text-red-500 px-3 py-1 rounded-full hover:bg-red-100 transition-colors">
+                                        Clear History
+                                    </button>
+                                </div>
                                 <div id="admin-outpass-history"
                                     class="space-y-3 overflow-y-auto flex-1 custom-scrollbar pr-1">
                                     <p class="text-center text-gray-400 py-10">Loading history...</p>

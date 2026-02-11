@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gate Check | NBKRIST Hostel</title>
+    <meta name="description" content="Security Check-in/Check-out System">
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link rel="stylesheet" href="css/style.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <script>
+        // Force unregister service worker for Kiosk to ensure fresh code
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function (registrations) {
+                for (let registration of registrations) {
+                    registration.unregister();
+                }
+            });
+        }
+    </script>
+</head>
+
+<body class="bg-slate-900 dark:bg-black text-white min-h-screen font-sans selection:bg-brand-500/30">
+
+    <!-- Loading Screen -->
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="fixed inset-0 bg-slate-900 z-50 flex flex-col items-center justify-center">
+        <div class="relative w-24 h-24 mb-6">
+            <div class="absolute inset-0 border-4 border-slate-700/50 rounded-full"></div>
+            <div class="absolute inset-0 border-4 border-t-brand-500 rounded-full animate-spin"></div>
+            <i
+                class="fas fa-shield-alt text-3xl text-brand-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></i>
+        </div>
+        <h2 class="text-2xl font-bold tracking-tight">Gate Check System</h2>
+        <p class="text-slate-500 mt-2 font-mono text-sm">Initializing...</p>
+    </div>
+
+    <!-- Main Interface -->
+    <div id="app" class="max-w-7xl mx-auto p-6 opacity-0">
+
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-10 py-4 border-b border-white/10">
+            <div class="flex items-center gap-4">
+                <div
+                    class="w-12 h-12 bg-brand-600 rounded-xl flex items-center justify-center shadow-lg shadow-brand-500/20">
+                    <i class="fas fa-shield-alt text-xl text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-black tracking-tight">NBKRIST <span class="text-brand-500">Check</span>
+                    </h1>
+                    <p class="text-slate-400 text-xs font-mono uppercase tracking-widest">Security Terminal 01</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-right hidden md:block">
+                    <p class="font-bold text-sm" id="guard-name">--</p>
+                    <p class="text-xs text-slate-500" id="current-time">--:-- --</p>
+                </div>
+                <!-- Auth is handled by main.js but we might need explicit logout here if using shared auth -->
+                <button id="logout-btn"
+                    class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors">
+                    Logout
+                </button>
+            </div>
+        </header>
+
+        <!-- Search Mode -->
+        <div id="search-view" class="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-fade-in relative z-10"
+            x-data="{ mode: 'scan' }">
+
+            <!-- Mobile/Main Panel -->
+            <div class="lg:col-span-2 space-y-6">
+
+                <!-- Toggle Switch -->
+                <div class="bg-slate-800 p-1 rounded-xl inline-flex w-full ring-1 ring-white/10">
+                    <!-- mode: scan | manual -->
+                    <button @click="mode = 'scan'; startScanner()"
+                        :class="{'bg-brand-600 text-white shadow-lg': mode === 'scan', 'text-slate-400 hover:text-white': mode !== 'scan'}"
+                        class="flex-1 py-3 rounded-lg font-bold transition-all duration-300 flex items-center justify-center gap-2">
+                        <i class="fas fa-qrcode"></i> Scan QR
+                    </button>
+                    <button @click="mode = 'manual'; stopScanner()"
+                        :class="{'bg-brand-600 text-white shadow-lg': mode === 'manual', 'text-slate-400 hover:text-white': mode !== 'manual'}"
+                        class="flex-1 py-3 rounded-lg font-bold transition-all duration-300 flex items-center justify-center gap-2">
+                        <i class="fas fa-keyboard"></i> Manual Entry
+                    </button>
+
+                    <!-- Hidden input to track mode for JS -->
+                    <input type="hidden" id="input-mode" x-model="mode">
+                </div>
+
+                <!-- Scanner View -->
+                <div x-show="mode === 'scan'"
+                    class="bg-black rounded-3xl overflow-hidden border-2 border-brand-500/30 shadow-2xl relative aspect-square md:aspect-video flex items-center justify-center">
+                    <div id="reader" class="w-full h-full object-cover"></div>
+                    <div id="scanner-placeholder" class="text-slate-500 flex flex-col items-center animate-pulse">
+                        <i class="fas fa-camera text-4xl mb-4"></i>
+                        <p>Camera Initializing...</p>
+                    </div>
+                </div>
+
+                <!-- Manual View -->
+                <div x-show="mode === 'manual'"
+                    class="bg-slate-800 rounded-3xl p-8 border border-white/10 shadow-2xl relative min-h-[400px] flex flex-col justify-center">
+                    <div class="space-y-6">
+                        <div class="text-center">
+                            <h3 class="text-2xl font-bold text-white">Student Search</h3>
+                            <p class="text-slate-400">Enter Student ID, Email, or <span
+                                    class="text-brand-400 font-bold">Last 4 Digits</span></p>
+                        </div>
+
+                        <form id="search-form" class="relative">
+                            <input type="text" id="student-search"
+                                class="w-full bg-slate-900/50 border-2 border-slate-700 focus:border-brand-500 rounded-2xl px-6 py-6 text-2xl text-center text-white font-mono tracking-widest placeholder-slate-600 focus:outline-none transition-colors"
+                                placeholder="XXXX" autocomplete="off">
+
+                            <button type="submit" id="search-btn"
+                                class="mt-6 w-full bg-brand-600 hover:bg-brand-500 text-white text-xl font-bold py-4 rounded-xl shadow-lg transform active:scale-95 transition-all">
+                                SEARCH RECORDS
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-slate-800/50 p-6 rounded-2xl border border-white/5 backdrop-blur-sm">
+                        <p class="text-slate-500 text-xs font-bold uppercase mb-1">Students Out</p>
+                        <p class="text-3xl font-black text-white" id="stat-out">--</p>
+                    </div>
+                    <div class="bg-slate-800/50 p-6 rounded-2xl border border-white/5 backdrop-blur-sm">
+                        <p class="text-slate-500 text-xs font-bold uppercase mb-1">Expected Today</p>
+                        <p class="text-3xl font-black text-white" id="stat-expected">--</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar / History -->
+            <div
+                class="lg:col-span-1 bg-slate-800 rounded-3xl p-6 border border-white/10 flex flex-col h-full max-h-[800px]">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="font-bold text-white flex items-center gap-2">
+                        <i class="fas fa-history text-brand-500"></i> Recent Activity
+                    </h3>
+                    <span class="bg-brand-900/50 text-brand-300 text-xs px-2 py-1 rounded-md">Live</span>
+                </div>
+
+                <div id="recent-logs" class="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
+                    <!-- Logs injected here -->
+                    <div class="text-center text-slate-500 py-10 italic">
+                        No activity yet today.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Audio Effects handled by Web Audio API in JS -->
+
+        <!-- Result Mode (Hidden by default) -->
+        <div id="result-view" style="display:none" class="max-w-4xl mx-auto">
+            <button id="back-btn"
+                class="mb-6 text-slate-400 hover:text-white flex items-center gap-2 transition-colors font-medium">
+                <i class="fas fa-arrow-left"></i> Back to Scan
+            </button>
+
+            <!-- Status Card -->
+            <div class="bg-slate-800 rounded-3xl overflow-hidden border border-white/10 shadow-2xl relative">
+                <!-- Dynamic Status Header -->
+                <div id="status-header" class="p-6 bg-slate-700 transition-colors duration-300">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-2xl font-black text-white flex items-center gap-3">
+                            <i id="status-icon" class="fas fa-circle-notch fa-spin"></i>
+                            <span id="status-text">Searching...</span>
+                        </h2>
+                        <span id="pass-type-badge"
+                            class="hidden px-3 py-1 rounded-full text-xs font-bold bg-white/20 text-white uppercase tracking-wider">Outpass</span>
+                    </div>
+                </div>
+
+                <div class="p-8 grid md:grid-cols-2 gap-8 items-start">
+                    <!-- Student Info -->
+                    <div class="flex items-start gap-6">
+                        <img id="student-photo" src=""
+                            class="w-32 h-32 rounded-2xl object-cover bg-slate-900 border-4 border-slate-700 shadow-xl">
+                        <div>
+                            <h3 class="text-2xl font-bold text-white mb-1" id="student-name">--</h3>
+                            <p class="text-brand-400 font-mono text-lg mb-2 flex items-center gap-2">
+                                <span id="student-id">--</span>
+                                <i class="fas fa-copy text-slate-600 text-xs cursor-pointer hover:text-white"
+                                    title="Copy ID"></i>
+                            </p>
+                            <div class="space-y-1 mt-3">
+                                <p class="text-slate-400 text-sm flex items-center gap-2">
+                                    <i class="fas fa-phone text-xs w-4 text-center"></i> <span
+                                        id="student-phone">--</span>
+                                </p>
+                                <p class="text-slate-400 text-sm flex items-center gap-2">
+                                    <i class="fas fa-bed text-xs w-4 text-center"></i> <span id="student-room">--</span>
+                                </p>
+                                <p class="text-slate-400 text-sm flex items-center gap-2">
+                                    <i class="fas fa-user-friends text-xs w-4 text-center"></i> <span
+                                        id="parent-phone">--</span> (Parent)
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Area -->
+                    <div class="bg-slate-900/50 rounded-2xl p-6 border border-white/5 text-center flex flex-col items-center justify-center min-h-[200px]"
+                        id="action-area">
+                        <p class="text-slate-400 mb-4 italic">Scan Status...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Firebase & Logic -->
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="js/gate-kiosk.js?v=fix_view_v2"></script>
+
+    <style>
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .animate-fade-in-up {
+            animation: fadeInUp 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</body>
+
+</html>

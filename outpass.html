@@ -61,11 +61,12 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
     <script src="https://cdn.tailwindcss.com" data-cmp-ignore="1" class="cmp-ignore"></script>
     <script src="js/vendor/alpine.min.js" defer></script>
-    
+
 
     <script>
         tailwind.config = {
@@ -158,9 +159,7 @@
                 <a href="about.html"
                     class="nav-item flex items-center px-5 py-4 rounded-[1.2rem] text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all spring-click"><i
                         class="fas fa-info-circle w-6"></i> <span>About</span></a>
-                <a href="developer.html"
-                    class="nav-item flex items-center px-5 py-4 rounded-[1.2rem] text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all spring-click"><i
-                        class="fas fa-code w-6"></i> <span>Developer</span></a>
+
             </nav>
 
             <div class="p-5 mt-auto">
@@ -194,7 +193,8 @@
                             <span
                                 class="font-bold text-xs md:text-base tracking-tight text-gray-900 dark:text-white whitespace-nowrap">NBKRIST</span>
                         </div>
-                        <div class="hidden lg:block ml-2">
+                        <div
+                            class="hidden lg:block ml-2 px-6 py-2 rounded-[2rem] glass-panel bg-white/40 dark:bg-black/30 backdrop-blur-xl border border-white/20 shadow-sm">
                             <h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Outpass Request
                             </h2>
                             <div class="flex items-center gap-2">
@@ -258,10 +258,7 @@
                             </div>
                             <div class="space-y-1" id="profile-dropdown-list"><a href="profile.html"
                                     class="flex items-center px-3 py-2 text-xs font-semibold rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"><i
-                                        class="fas fa-user-circle w-4 mr-2 text-gray-400"></i> My Profile</a><a
-                                    href="developer.html"
-                                    class="flex items-center admin-link px-3 py-2 text-xs font-semibold rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors hidden"><i
-                                        class="fas fa-code w-4 mr-2 text-gray-400"></i> Developer</a></div>
+                                        class="fas fa-user-circle w-4 mr-2 text-gray-400"></i> My Profile</a></div>
                             <div class="mt-1 pt-1 border-t border-gray-100 dark:border-white/10"><button
                                     id="logout-header"
                                     class="w-full flex items-center px-3 py-2 text-xs font-bold text-red-500 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors text-left"><i
@@ -516,7 +513,7 @@
 
 
     <script src="js/components/calendar.js"></script>
-    <script type="module" src="js/outpass.js?v=cachebust1"></script>
+    <script type="module" src="js/outpass.js?v=qr_fix_v1"></script>
 </body>
 
 </html>

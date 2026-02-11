@@ -1,7 +1,19 @@
 /** "use client"; **/
 import { db } from '../firebase-config.js';
 import { collection, query, where, getDocs, doc, getDoc } from './firebase/firebase-firestore.js';
-import { showToast } from '../main.js?v=3';
+// Fallback ShowToast
+const showToast = window.showToast || ((msg, isError) => {
+    // Simple fallback toast if main.js is not loaded
+    const div = document.createElement('div');
+    div.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-xl shadow-2xl font-bold text-white transform transition-all duration-500 animate-slide-in-right ${isError ? 'bg-red-500' : 'bg-green-500'}`;
+    div.textContent = msg;
+    document.body.appendChild(div);
+    setTimeout(() => {
+        div.style.opacity = '0';
+        div.style.transform = 'translateY(-20px)';
+        setTimeout(() => div.remove(), 500);
+    }, 3000);
+});
 
 let html5QrCode;
 let currentMode = 'qr';

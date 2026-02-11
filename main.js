@@ -782,7 +782,7 @@ const setupCommonUI = (user, role, userData) => {
     // Capitalize first letter
     const name = safeName.charAt(0).toUpperCase() + safeName.slice(1);
 
-    const nameElements = ['user-name-display', 'user-name-dropdown', 'welcome-name'];
+    const nameElements = ['user-name-display', 'user-name-dropdown', 'user-name-dropdown-desktop', 'welcome-name'];
     nameElements.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.innerText = name;
@@ -790,7 +790,7 @@ const setupCommonUI = (user, role, userData) => {
 
     // 2. Populate Avatar
     const avatarUrl = userData?.photoURL || user.photoURL || `https://placehold.co/100x100/E2E8F0/4A5568?text=${name.charAt(0).toUpperCase()}`;
-    const avatarElements = ['user-avatar', 'profile-avatar-preview'];
+    const avatarElements = ['user-avatar', 'user-avatar-desktop', 'profile-avatar-preview'];
     avatarElements.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.src = avatarUrl;

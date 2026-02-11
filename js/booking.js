@@ -83,107 +83,76 @@ document.addEventListener('DOMContentLoaded', async () => {
             const availableBeds = Object.values(data.beds).filter(b => b.status === 'available').length;
             const totalBeds = Object.keys(data.beds).length;
             const isFull = availableBeds === 0;
+            const delay = index * 80;
 
-            // Staggered animation delay
-            const delay = index * 100;
-
-            // Generate visuals for beds (New Pill Design)
+            // Bed buttons - clean pill design
             const bedVisuals = Object.entries(data.beds).map(([id, bed]) => {
                 const isAvail = bed.status === 'available';
                 return `
                 <button 
-                    class="group relative flex-1 min-w-[30%] sm:min-w-[auto] h-12 rounded-xl flex items-center justify-between px-4 transition-all duration-300 spring-click book-btn overflow-hidden
+                    class="book-btn px-4 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 flex items-center gap-2
                     ${isAvail
-                        ? 'bg-white/50 dark:bg-white/5 hover:bg-iosBlue hover:text-white text-gray-700 dark:text-gray-300 border border-white/40 dark:border-white/10 hover:border-iosBlue hover:shadow-lg hover:shadow-blue-500/30'
-                        : 'bg-gray-100/50 dark:bg-white/5 text-gray-300/50 border border-transparent cursor-not-allowed opacity-60'}"
+                        ? 'bg-iosBlue/10 text-iosBlue hover:bg-iosBlue hover:text-white hover:scale-105 hover:shadow-lg hover:shadow-blue-500/25'
+                        : 'bg-gray-100 dark:bg-white/5 text-gray-300 dark:text-gray-600 cursor-not-allowed'}"
                     data-room="${room.id}"
                     data-bed="${id}"
                     ${!isAvail ? 'disabled' : ''}
-                    title="${isAvail ? 'Book Bed ' + id.toUpperCase() : 'Occupied'}"
                 >
-                    <div class="flex items-center gap-2 relative z-10">
-                        <i class="fas fa-bed text-xs ${isAvail ? 'group-hover:text-white' : ''}"></i>
-                        <span class="font-bold text-sm tracking-wide ${isAvail ? 'group-hover:text-white' : ''}">${id.toUpperCase()}</span>
-                    </div>
-                    ${isAvail
-                        ? `<div class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)] group-hover:bg-white group-hover:shadow-[0_0_8px_rgba(255,255,255,0.8)] transition-all"></div>`
-                        : `<div class="w-2 h-2 rounded-full bg-red-500/50"></div>`
-                    }
-                    
-                    ${isAvail ? `<div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:animate-shimmer"></div>` : ''}
+                    <i class="fas fa-bed text-xs"></i>
+                    <span>${id.toUpperCase()}</span>
+                    ${isAvail ? '<span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>' : ''}
                 </button>
                 `;
             }).join('');
 
-            // Card Gradient based on availability
-            const cardGradient = isFull
-                ? 'from-gray-50 to-gray-100 dark:from-white/5 dark:to-white/5'
-                : 'from-white to-blue-50/30 dark:from-white/5 dark:to-blue-500/5';
-
-            const borderClass = isFull
-                ? 'border-gray-200 dark:border-white/5'
-                : 'border-white/40 dark:border-white/10 hover:border-iosBlue/50 dark:hover:border-iosBlue/50';
-
             return `
-                <div class="glass-panel p-0 rounded-[2.5rem] flex flex-col group hover:-translate-y-2 transition-all duration-500 relative border ${borderClass} hover:shadow-2xl hover:shadow-blue-500/10 overflow-hidden isolate" style="animation: fadeIn 0.6s ease-out ${delay}ms backwards;">
+                <div class="bg-white dark:bg-white/5 rounded-3xl p-6 border border-gray-100 dark:border-white/10 hover:shadow-xl hover:shadow-gray-200/50 dark:hover:shadow-black/20 hover:-translate-y-1 transition-all duration-300 flex flex-col" style="animation: fadeIn 0.5s ease-out ${delay}ms backwards;">
                     
-                    <!-- Background Effects -->
-                    <div class="absolute inset-0 bg-gradient-to-br ${cardGradient} opacity-50 transition-all duration-500 group-hover:opacity-100"></div>
-                    <div class="absolute -right-20 -top-20 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px] group-hover:bg-blue-500/20 transition-all duration-700"></div>
-                    
-                    <!-- Header Section -->
-                    <div class="p-6 pb-4 relative z-10 border-b border-gray-100/50 dark:border-white/5">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <div class="flex items-center gap-2 mb-3">
-                                    <span class="px-3 py-1 rounded-full bg-white/60 dark:bg-white/10 backdrop-blur-md text-[10px] font-black text-gray-500 dark:text-gray-300 uppercase tracking-widest border border-white/20 shadow-sm">
-                                        ${data.gender} Wing
-                                    </span>
-                                    ${!isFull ?
-                    `<span class="px-3 py-1 rounded-full bg-green-500/10 text-[10px] font-black text-green-600 dark:text-green-400 uppercase tracking-widest border border-green-500/10 animate-pulse">Available</span>`
-                    :
-                    `<span class="px-3 py-1 rounded-full bg-red-500/10 text-[10px] font-black text-red-500 uppercase tracking-widest border border-red-500/10">Full</span>`
-                }
-                                </div>
-                                <h3 class="text-5xl font-black text-gray-900 dark:text-white tracking-tighter leading-none group-hover:scale-105 transition-transform origin-left duration-300">
-                                    ${data.roomNumber}
-                                </h3>
+                    <!-- Header -->
+                    <div class="flex justify-between items-start mb-5">
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="px-2.5 py-1 rounded-lg bg-gray-100 dark:bg-white/10 text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    ${data.gender}
+                                </span>
+                                <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider
+                                    ${isFull
+                    ? 'bg-red-50 dark:bg-red-500/10 text-red-500'
+                    : 'bg-green-50 dark:bg-green-500/10 text-green-600 dark:text-green-400'}">
+                                    ${isFull ? 'Full' : availableBeds + ' Available'}
+                                </span>
                             </div>
-                            
-                            <div class="w-16 h-16 rounded-2xl bg-white/50 dark:bg-white/5 flex items-center justify-center text-gray-400 group-hover:text-iosBlue group-hover:bg-blue-500/10 transition-all duration-500 shadow-inner border border-white/20 group-hover:rotate-12">
-                                <i class="fas fa-door-open text-2xl"></i>
-                            </div>
+                            <h3 class="text-4xl font-black text-gray-900 dark:text-white tracking-tight">
+                                ${data.roomNumber}
+                            </h3>
+                        </div>
+                        
+                        <div class="w-12 h-12 rounded-2xl bg-gray-50 dark:bg-white/5 flex items-center justify-center text-gray-400">
+                            <i class="fas fa-door-open text-lg"></i>
                         </div>
                     </div>
 
-                    <!-- Progress Section -->
-                    <div class="px-6 py-4 relative z-10">
-                        <div class="flex justify-between items-end mb-2">
-                             <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Occupancy</span>
-                             <span class="text-xs font-bold ${isFull ? 'text-red-500' : 'text-iosBlue'} tabular-nums relative">
-                                <span class="text-lg">${availableBeds}</span><span class="text-gray-300 dark:text-gray-600 text-[10px] mx-1">/</span><span class="text-gray-500">${totalBeds} BEDS</span>
-                             </span>
+                    <!-- Occupancy Bar -->
+                    <div class="mb-5">
+                        <div class="flex justify-between text-xs mb-2">
+                            <span class="text-gray-400 font-medium">Occupancy</span>
+                            <span class="font-bold ${isFull ? 'text-red-500' : 'text-gray-600 dark:text-gray-300'}">
+                                ${totalBeds - availableBeds}/${totalBeds}
+                            </span>
                         </div>
-                        <div class="h-2.5 bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden shadow-inner border border-gray-100/50 dark:border-white/5">
-                            <div class="h-full ${isFull ? 'bg-red-500' : 'bg-gradient-to-r from-iosBlue to-blue-400'} rounded-full transition-all duration-1000 ease-out relative" style="width: ${((totalBeds - availableBeds) / totalBeds) * 100}%">
-                                ${!isFull ? '<div class="absolute inset-0 bg-white/30 animate-shimmer"></div>' : ''}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Bed Selection Section -->
-                    <div class="p-6 pt-2 mt-auto relative z-10">
-                        <div class="bg-gray-50/50 dark:bg-black/20 rounded-3xl p-4 border border-gray-100 dark:border-white/5 backdrop-blur-sm group-hover:bg-blue-50/30 dark:group-hover:bg-white/10 transition-colors duration-300">
-                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 text-center flex items-center justify-center gap-2">
-                                <span>Select a Bed</span>
-                                <span class="w-full h-px bg-gray-200 dark:bg-white/10"></span>
-                            </p>
-                            <div class="flex flex-wrap justify-center gap-3">
-                                ${bedVisuals}
-                            </div>
+                        <div class="h-2 bg-gray-100 dark:bg-white/10 rounded-full overflow-hidden">
+                            <div class="h-full rounded-full transition-all duration-500 ${isFull ? 'bg-red-500' : 'bg-iosBlue'}" 
+                                 style="width: ${((totalBeds - availableBeds) / totalBeds) * 100}%"></div>
                         </div>
                     </div>
 
+                    <!-- Bed Selection -->
+                    <div class="mt-auto pt-4 border-t border-gray-100 dark:border-white/5">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-3">Select Bed</p>
+                        <div class="flex flex-wrap gap-2">
+                            ${bedVisuals}
+                        </div>
+                    </div>
                 </div>
             `;
         }).join('');

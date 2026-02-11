@@ -152,19 +152,31 @@ service cloud.firestore {
        NOTIFICATIONS - SIMPLIFIED FOR REAL-TIME LISTENERS
     ====================== */
 
+    /* =====================
+       NOTIFICATIONS - SIMPLIFIED FOR REAL-TIME LISTENERS
+    ====================== */
+
     match /notifications/{notifId} {
       // Allow all signed-in users to read notifications
-      // Real-time listeners require simpler rules
       allow read: if isSignedIn();
 
       // Anyone signed in can create notifications
       allow create: if isSignedIn();
 
-      // Users can update notifications
-      allow update: if isSignedIn();
+      // Users can update notifications ONLY if they are marking them as read (adding their UID to readBy)
+      // OR if they are an admin updating content
+      allow update: if isAdmin() || (
+        isSignedIn() && (
+           // Case 1: Updating readBy/deletedBy arrays (recipient action)
+           resource.data.recipientId == request.auth.uid || 
+           (resource.data.recipientId == null && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['readBy', 'deletedBy']))
+        )
+      );
 
       // Admins can delete all, users can delete their own
-      allow delete: if isAdmin() || isSignedIn();
+      allow delete: if isAdmin() || (
+        isSignedIn() && resource.data.recipientId == request.auth.uid
+      );
     }
 
     /* =====================
@@ -184,7 +196,14 @@ service cloud.firestore {
 
     match /metadata/{docId} {
       allow read: if true;
-      allow write: if isSignedIn();
+      // Allow write ONLY if incrementing the 'current' field by exactly 1
+      // This prevents resetting the counter or malicious jumps
+      allow write: if isSignedIn() && 
+                   docId == 'studentIdCounter' &&
+                   (
+                     (resource == null && request.resource.data.current == 1) ||
+                     (resource != null && request.resource.data.current == resource.data.current + 1)
+                   );
     }
 
     /* =====================

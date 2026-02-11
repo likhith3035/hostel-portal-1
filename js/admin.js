@@ -17,7 +17,8 @@ import {
     runTransaction,
     writeBatch,
     serverTimestamp,
-    limit
+    limit,
+    getCountFromServer
 } from './firebase/firebase-firestore.js';
 
 // --- SECURITY & LOGGING ---
@@ -62,11 +63,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (loadingScreen && adminInterface) {
         loadingScreen.classList.add('opacity-0');
         setTimeout(() => {
+            initAnalytics(); // Initialize Charts
             loadingScreen.classList.add('hidden');
             // Trigger entry animation
             adminInterface.classList.remove('opacity-0', 'scale-95');
         }, 600);
     }
+
+    // --- REUSABLE CONFIRMATION DIALOG ---
+    const showConfirm = (title, text, confirmText = 'Confirm', isDanger = true) => {
+        return Swal.fire({
+            title: title,
+            text: text,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: confirmText,
+            cancelButtonText: 'Cancel',
+            customClass: {
+                popup: 'glass-panel rounded-[2rem] border border-white/20 shadow-xl',
+                title: 'text-xl font-bold text-gray-900 dark:text-white',
+                htmlContainer: 'text-sm text-gray-500 dark:text-gray-400',
+                confirmButton: `${isDanger ? 'bg-red-500 hover:bg-red-600 shadow-red-500/30' : 'bg-indigo-600 hover:bg-indigo-700 shadow-indigo-500/30'} text-white font-bold py-2 px-4 rounded-xl shadow-lg transition-all transform hover:scale-105`,
+                cancelButton: 'bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold py-2 px-4 rounded-xl transition-all ml-2'
+            },
+            buttonsStyling: false
+        });
+    };
 
     // Initial skeletons
     const skeletons = {
@@ -80,27 +102,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (el) el.innerHTML = html;
     });
 
-    // --- CHARTING ---
-    const chartCanvas = document.getElementById('adminChart');
-    if (chartCanvas && window.Chart) {
-        const ctx = chartCanvas.getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
-                datasets: [
-                    { label: 'Reqs', data: [2, 5, 3, 8, 4, 1, 2], borderColor: '#ef4444', tension: 0.4 },
-                    { label: 'Users', data: [5, 8, 12, 7, 15, 10, 6], borderColor: '#6366f1', tension: 0.4 }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: { y: { display: false }, x: { grid: { display: false } } }
-            }
-        });
-    }
+
 
     // --- USER MANAGEMENT ---
     const SUPER_ADMIN = 'kamilikhith@gmail.com';
@@ -130,6 +132,272 @@ document.addEventListener('DOMContentLoaded', async () => {
     let allUsersData = [];
     let selectedUsers = new Set();
 
+    // --- ANALYTICS STATE ---
+    let allBookingsData = [];
+    let allComplaintsData = [];
+    let allRoomsData = [];
+    let totalBeds = 0;
+
+    // Chart Instances (Analytics tab)
+    let occupancyChartInstance = null;
+    let complaintsChartInstance = null;
+    let weeklyChartInstance = null;
+    // Chart Instances (Overview tab)
+    let occupancyChartOverviewInstance = null;
+    let complaintsChartOverviewInstance = null;
+
+    const initAnalytics = () => {
+        // === OVERVIEW TAB CHARTS ===
+
+        // 1a. Room Occupancy Doughnut (Overview)
+        const ctxOccupancyOverview = document.getElementById('occupancyChartOverview')?.getContext('2d');
+        if (ctxOccupancyOverview) {
+            occupancyChartOverviewInstance = new Chart(ctxOccupancyOverview, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Booked', 'Available'],
+                    datasets: [{
+                        data: [0, 100],
+                        backgroundColor: ['#6366f1', '#e2e8f0'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    cutout: '75%',
+                    plugins: {
+                        legend: { position: 'bottom', labels: { usePointStyle: true, padding: 15, font: { size: 11 } } }
+                    }
+                }
+            });
+        }
+
+        // 1b. Complaints Volume Bar (Overview)
+        const ctxComplaintsOverview = document.getElementById('complaintsChartOverview')?.getContext('2d');
+        if (ctxComplaintsOverview) {
+            complaintsChartOverviewInstance = new Chart(ctxComplaintsOverview, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Complaints',
+                        data: [0, 0, 0, 0, 0, 0],
+                        backgroundColor: '#6366f1',
+                        borderRadius: 6,
+                        barThickness: 20
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, grid: { borderDash: [2, 4], color: '#e2e8f0' } },
+                        x: { grid: { display: false } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        // === ANALYTICS TAB CHARTS ===
+
+        // 2a. Room Occupancy Doughnut (Analytics)
+        const ctxOccupancy = document.getElementById('occupancyChart')?.getContext('2d');
+        if (ctxOccupancy) {
+            occupancyChartInstance = new Chart(ctxOccupancy, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Booked', 'Available', 'Maintenance'],
+                    datasets: [{
+                        data: [0, 100, 0],
+                        backgroundColor: ['#6366f1', '#e2e8f0', '#ef4444'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    cutout: '75%',
+                    plugins: {
+                        legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }
+                    }
+                }
+            });
+        }
+
+        // 2b. Complaints Volume Bar (Analytics)
+        const ctxComplaints = document.getElementById('complaintsChart')?.getContext('2d');
+        if (ctxComplaints) {
+            complaintsChartInstance = new Chart(ctxComplaints, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Complaints',
+                        data: [0, 0, 0, 0, 0, 0],
+                        backgroundColor: '#6366f1',
+                        borderRadius: 6,
+                        barThickness: 20
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, grid: { borderDash: [2, 4], color: '#e2e8f0' } },
+                        x: { grid: { display: false } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        // 3. Weekly Activity Line (Overview tab)
+        const ctxWeekly = document.getElementById('adminChart')?.getContext('2d');
+        if (ctxWeekly) {
+            weeklyChartInstance = new Chart(ctxWeekly, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [
+                        { label: 'Outpasses', data: [0, 0, 0, 0, 0, 0, 0], borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', fill: true, tension: 0.4 },
+                        { label: 'Complaints', data: [0, 0, 0, 0, 0, 0, 0], borderColor: '#6366f1', backgroundColor: 'rgba(99, 102, 241, 0.1)', fill: true, tension: 0.4 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top', align: 'end' } },
+                    scales: { y: { display: false }, x: { grid: { display: false } } }
+                }
+            });
+        }
+    };
+
+    const updateOccupancyChart = () => {
+        // Count total rooms
+        const totalRooms = allRoomsData.length;
+
+        // Get unique room IDs that have active bookings
+        const bookedRoomIds = new Set(
+            allBookingsData
+                .filter(b => b.status === CONSTANTS.STATUS.APPROVED || b.status === CONSTANTS.STATUS.CONFIRMED)
+                .map(b => b.roomId)
+        );
+        const bookedCount = bookedRoomIds.size;
+        const availableCount = Math.max(0, totalRooms - bookedCount);
+
+        // Update Analytics tab chart
+        if (occupancyChartInstance) {
+            occupancyChartInstance.data.datasets[0].data = [bookedCount, availableCount, 0];
+            occupancyChartInstance.update();
+        }
+
+        // Update Overview tab chart
+        if (occupancyChartOverviewInstance) {
+            occupancyChartOverviewInstance.data.datasets[0].data = [bookedCount, availableCount];
+            occupancyChartOverviewInstance.update();
+        }
+
+        // Update stat elements (shared between tabs)
+        const statTotal = document.getElementById('stat-total-rooms');
+        const statBooked = document.getElementById('stat-booked-rooms');
+        const statAvailable = document.getElementById('stat-available-rooms');
+        const statActiveBookings = document.getElementById('stat-active-bookings');
+        if (statTotal) statTotal.textContent = totalRooms;
+        if (statBooked) statBooked.textContent = bookedCount;
+        if (statAvailable) statAvailable.textContent = availableCount;
+        if (statActiveBookings) statActiveBookings.textContent = bookedCount;
+    };
+
+    const updateComplaintsChart = () => {
+        // Group by month for last 6 months
+        const months = [];
+        const counts = [];
+        const today = new Date();
+
+        for (let i = 5; i >= 0; i--) {
+            const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+            months.push(d.toLocaleString('default', { month: 'short' }));
+
+            // Count complaints in this month
+            const count = allComplaintsData.filter(c => {
+                if (!c.timestamp) return false;
+                const cDate = c.timestamp.toDate();
+                return cDate.getMonth() === d.getMonth() && cDate.getFullYear() === d.getFullYear();
+            }).length;
+            counts.push(count);
+        }
+
+        // Update Analytics tab chart
+        if (complaintsChartInstance) {
+            complaintsChartInstance.data.labels = months;
+            complaintsChartInstance.data.datasets[0].data = counts;
+            complaintsChartInstance.update();
+        }
+
+        // Update Overview tab chart
+        if (complaintsChartOverviewInstance) {
+            complaintsChartOverviewInstance.data.labels = months;
+            complaintsChartOverviewInstance.data.datasets[0].data = counts;
+            complaintsChartOverviewInstance.update();
+        }
+    };
+
+    const updateWeeklyChart = () => {
+        if (!weeklyChartInstance) return;
+
+        // Get last 7 days labels
+        const labels = [];
+        const outpassData = [];
+        const complaintData = [];
+        const today = new Date();
+
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date(today);
+            d.setDate(today.getDate() - i);
+            labels.push(d.toLocaleDateString('default', { weekday: 'short' }));
+
+            // Count for this day
+            const startOfDay = new Date(d.setHours(0, 0, 0, 0));
+            const endOfDay = new Date(d.setHours(23, 59, 59, 999));
+
+            // Outpasses count (using global allOutpasses if available or we need to capture it)
+            // We need access to allOutpasses. It's currently in a different scope? 
+            // Logic: We will check window.allOutpasses if we expose it, or move variable scope.
+            // For now, assuming we move `allOutpasses` to upper scope.
+
+            const outpasses = (window.allOutpasses || []).filter(o => {
+                if (!o.timestamp) return false; // timestamp is creation time
+                const t = o.timestamp.toDate();
+                return t >= startOfDay && t <= endOfDay;
+            }).length;
+            outpassData.push(outpasses);
+
+            const complaints = allComplaintsData.filter(c => {
+                if (!c.timestamp) return false;
+                const t = c.timestamp.toDate();
+                return t >= startOfDay && t <= endOfDay;
+            }).length;
+            complaintData.push(complaints);
+        }
+
+        weeklyChartInstance.data.labels = labels;
+        weeklyChartInstance.data.datasets[0].data = outpassData;
+        weeklyChartInstance.data.datasets[1].data = complaintData;
+        weeklyChartInstance.update();
+    };
+
+    // --- Refresh Analytics (for button in Analytics tab) ---
+    window.refreshAnalytics = () => {
+        updateOccupancyChart();
+        updateComplaintsChart();
+        updateWeeklyChart();
+    };
+
+    // --- END ANALYTICS SETUP ---
+
     const loadUsers = async () => {
         // CRITICAL FIX: Ensure we attempt to load users if isSuperAdmin is true.
         // If the user isn't super admin, we just return to avoid permission errors.
@@ -145,6 +413,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const totalUsersStat = document.getElementById('stat-total-users');
             if (totalUsersStat) totalUsersStat.innerText = snapshot.size;
+
+            // Also update Analytics tab "Total Students"
+            const statTotalStudents = document.getElementById('stat-total-students');
+            if (statTotalStudents) statTotalStudents.innerText = snapshot.size;
 
             // Store all users
             allUsersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -353,37 +625,41 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Restore
         const restoreBtn = e.target.closest('.restore-user-btn');
         if (restoreBtn) {
-            if (window.confirm('Restore User?')) {
-                window.safeAsync(async () => {
-                    const id = restoreBtn.dataset.id;
-                    const docSnap = await getDoc(doc(db, 'deletedUsers', id));
-                    if (docSnap.exists()) {
-                        const data = docSnap.data();
-                        delete data.deletedAt;
-                        delete data.deletedBy;
-                        await setDoc(doc(db, CONSTANTS.COLLECTIONS.USERS, id), data);
-                        await deleteDoc(doc(db, 'deletedUsers', id));
-                        showToast('User Restored');
-                        loadDeletedUsers();
-                        loadUsers();
-                        auditService.logAction('RESTORE_USER', id, 'user', { restoredBy: auth.currentUser.email });
-                    }
-                }, 'Restoring User...');
-            }
+            showConfirm('Restore User?', 'This user will be restored to active status.', 'Yes, Restore', false).then((result) => {
+                if (result.isConfirmed) {
+                    window.safeAsync(async () => {
+                        const id = restoreBtn.dataset.id;
+                        const docSnap = await getDoc(doc(db, 'deletedUsers', id));
+                        if (docSnap.exists()) {
+                            const data = docSnap.data();
+                            delete data.deletedAt;
+                            delete data.deletedBy;
+                            await setDoc(doc(db, CONSTANTS.COLLECTIONS.USERS, id), data);
+                            await deleteDoc(doc(db, 'deletedUsers', id));
+                            showToast('User Restored');
+                            loadDeletedUsers();
+                            loadUsers();
+                            auditService.logAction('RESTORE_USER', id, 'user', { restoredBy: auth.currentUser.email });
+                        }
+                    }, 'Restoring User...');
+                }
+            });
         }
 
         // Permanent Delete
         const deleteBtn = e.target.closest('.permanent-delete-btn');
         if (deleteBtn) {
-            if (window.confirm('PERMANENTLY DELETE? This action cannot be undone. All user details will be wiped.')) {
-                window.safeAsync(async () => {
-                    const id = deleteBtn.dataset.id;
-                    await deleteDoc(doc(db, 'deletedUsers', id));
-                    showToast('User Permanently Deleted');
-                    loadDeletedUsers();
-                    auditService.logAction('PERMANENT_DELETE_USER', id, 'user', { deletedBy: auth.currentUser.email });
-                }, 'Wiping Data...');
-            }
+            showConfirm('Permanent Delete?', 'This action cannot be undone. All user details will be wiped.', 'Yes, Delete Permanently', true).then((result) => {
+                if (result.isConfirmed) {
+                    window.safeAsync(async () => {
+                        const id = deleteBtn.dataset.id;
+                        await deleteDoc(doc(db, 'deletedUsers', id));
+                        showToast('User Permanently Deleted');
+                        loadDeletedUsers();
+                        auditService.logAction('PERMANENT_DELETE_USER', id, 'user', { deletedBy: auth.currentUser.email });
+                    }, 'Wiping Data...');
+                }
+            });
         }
     });
 
@@ -394,71 +670,80 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Make Admin
         if (btn.classList.contains('make-admin-btn')) {
-            if (window.confirm('Grant Admin?')) {
-                window.safeAsync(async () => {
-                    await updateDoc(doc(db, CONSTANTS.COLLECTIONS.USERS, btn.dataset.id), { role: CONSTANTS.ROLES.ADMIN });
-                    showToast('Role Updated');
-                    loadUsers();
-                    auditService.logAction('GRANT_ADMIN', btn.dataset.id, 'user', { by: auth.currentUser.email });
-                }, 'Updating Role...');
-            }
+            showConfirm('Grant Admin Access?', 'This user will have full access to the admin panel.', 'Grant Access', false).then((result) => {
+                if (result.isConfirmed) {
+                    window.safeAsync(async () => {
+                        await updateDoc(doc(db, CONSTANTS.COLLECTIONS.USERS, btn.dataset.id), { role: CONSTANTS.ROLES.ADMIN });
+                        showToast('Role Updated');
+                        if (typeof loadUsers === 'function') loadUsers();
+                        auditService.logAction('GRANT_ADMIN', btn.dataset.id, 'user', { by: auth.currentUser.email });
+                    }, 'Updating Role...');
+                }
+            });
         }
 
         // Remove Admin
         if (btn.classList.contains('remove-admin-btn')) {
-            if (window.confirm('Revoke Admin?')) {
-                window.safeAsync(async () => {
-                    await updateDoc(doc(db, CONSTANTS.COLLECTIONS.USERS, btn.dataset.id), { role: CONSTANTS.ROLES.STUDENT });
-                    showToast('Role Updated');
-                    loadUsers();
-                    auditService.logAction('REVOKE_ADMIN', btn.dataset.id, 'user', { by: auth.currentUser.email });
-                }, 'Updating Role...');
-            }
+            showConfirm('Revoke Admin Access?', 'This user will lose access to the admin panel.', 'Revoke Access', true).then((result) => {
+                if (result.isConfirmed) {
+                    window.safeAsync(async () => {
+                        await updateDoc(doc(db, CONSTANTS.COLLECTIONS.USERS, btn.dataset.id), { role: CONSTANTS.ROLES.STUDENT });
+                        showToast('Role Updated');
+                        if (typeof loadUsers === 'function') loadUsers();
+                        auditService.logAction('REVOKE_ADMIN', btn.dataset.id, 'user', { by: auth.currentUser.email });
+                    }, 'Updating Role...');
+                }
+            });
         }
 
         // Reset Profile (Delete Details)
         if (btn.classList.contains('reset-user-btn')) {
-            if (window.confirm('Reset Profile? This will delete phone, gender, ID, and photo. The user will need to complete their profile again.')) {
-                window.safeAsync(async () => {
-                    const id = btn.dataset.id;
-                    await updateDoc(doc(db, CONSTANTS.COLLECTIONS.USERS, id), {
-                        phone: null,
-                        gender: null,
-                        studentId: null,
-                        photoURL: null,
-                        dob: null,
-                        parentName: null,
-                        parentPhone: null,
-                        address: null
-                    });
-                    showToast('Profile Details Cleared');
-                    loadUsers();
-                    auditService.logAction('RESET_USER_PROFILE', id, 'user', { by: auth.currentUser.email });
-                }, 'Resetting Profile...');
-            }
+            showConfirm('Reset Profile?', 'This will clear all profile details (ID, phone, gender, etc). The user must complete setup again.', 'Reset Profile', true).then((result) => {
+                if (result.isConfirmed) {
+                    window.safeAsync(async () => {
+                        const id = btn.dataset.id;
+                        await updateDoc(doc(db, CONSTANTS.COLLECTIONS.USERS, id), {
+                            phone: null,
+                            gender: null,
+                            studentId: null,
+                            photoURL: null,
+                            dob: null,
+                            parentName: null,
+                            parentPhone: null,
+                            address: null
+                        });
+                        showToast('Profile Details Cleared');
+                        if (typeof loadUsers === 'function') loadUsers();
+                        auditService.logAction('RESET_USER_PROFILE', id, 'user', { by: auth.currentUser.email });
+                    }, 'Resetting Profile...');
+                }
+            });
         }
 
         // Delete/Archive User
         if (btn.classList.contains('delete-user-btn')) {
-            if (window.confirm('Archive User?')) {
-                window.safeAsync(async () => {
-                    const id = btn.dataset.id;
-                    const userSnap = await getDoc(doc(db, CONSTANTS.COLLECTIONS.USERS, id));
-                    if (userSnap.exists()) {
-                        await setDoc(doc(db, 'deletedUsers', id), {
-                            ...userSnap.data(),
-                            deletedAt: serverTimestamp(),
-                            deletedBy: auth.currentUser.email
-                        });
-                        await deleteDoc(doc(db, CONSTANTS.COLLECTIONS.USERS, id));
-                        showToast('User Archived');
-                        loadUsers();
-                        loadDeletedUsers();
-                        auditService.logAction('ARCHIVE_USER', id, 'user', { by: auth.currentUser.email });
-                    }
-                }, 'Archiving User...');
-            }
+            showConfirm('Archive User?', 'This user will be moved to the archive and can be restored later.', 'Yes, Archive', true).then((result) => {
+                if (result.isConfirmed) {
+                    window.safeAsync(async () => {
+                        const id = btn.dataset.id;
+                        const userSnap = await getDoc(doc(db, CONSTANTS.COLLECTIONS.USERS, id));
+                        if (userSnap.exists()) {
+                            await setDoc(doc(db, 'deletedUsers', id), {
+                                ...userSnap.data(),
+                                deletedAt: serverTimestamp(),
+                                deletedBy: auth.currentUser.email
+                            });
+                            await deleteDoc(doc(db, CONSTANTS.COLLECTIONS.USERS, id));
+                            showToast('User Archived');
+                            if (typeof loadUsers === 'function') loadUsers();
+                            if (typeof loadDeletedUsers === 'function') loadDeletedUsers();
+                            auditService.logAction('ARCHIVE_USER', id, 'user', { by: auth.currentUser.email });
+                        }
+                    }, 'Archiving User...');
+                }
+            });
         }
+
 
         // View Student ID
         if (btn.classList.contains('view-student-id')) {
@@ -741,7 +1026,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const statMainPending = document.getElementById('stat-pending-bookings'); // Main Dashboard Card
     const statVacateReqs = document.getElementById('stat-vacate-reqs');
 
-    let allBookingsData = [];
     let roomMetadata = {};
 
     // Load room metadata for displaying hostel names
@@ -830,13 +1114,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     onSnapshot(collection(db, CONSTANTS.COLLECTIONS.BOOKINGS), snap => {
         console.log('🔔 onSnapshot fired! Bookings updated, doc count:', snap.docs.length);
         allBookingsData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        // Trigger Analytics Update
+        updateOccupancyChart();
+
         const pendingCount = allBookingsData.filter(b => b.status === CONSTANTS.STATUS.PENDING).length;
 
         // Update Bookings Tab Stats
         if (statTotalBooked) statTotalBooked.innerText = allBookingsData.filter(b => b.status === CONSTANTS.STATUS.APPROVED).length;
         if (statPendingApproval) statPendingApproval.innerText = pendingCount;
 
-        // Update Main Dashboard Stats
         // Update Main Dashboard Stats
         if (statMainPending) statMainPending.innerText = pendingCount;
 
@@ -853,43 +1140,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log('🔧 handleBookingAction:', { action, bookingId, roomId, bedId });
         if (!auth.currentUser) return showToast('Session expired. Please login.', true);
 
-        // Handle vacate with confirmation OUTSIDE async context
         if (action === 'force-vacate') {
-            if (window.confirm('Vacate This Booking? This will mark the booking as vacated and free up the bed.')) {
-                console.log('🚀 User confirmed! Executing vacate...');
-                // ... logic continues below
-                // User confirmed, now execute the vacate
-                window.safeAsync(async () => {
-                    console.log('📝 Inside safeAsync, starting transaction...');
-                    const bRef = doc(db, CONSTANTS.COLLECTIONS.BOOKINGS, bookingId);
-                    const roomRef = doc(db, CONSTANTS.COLLECTIONS.ROOMS, roomId);
-                    await runTransaction(db, async (t) => {
-                        const rDoc = await t.get(roomRef);
-                        const bDoc = await t.get(bRef);
-                        const beds = rDoc.data().beds;
-                        console.log('🛏️ Current beds:', beds);
-                        console.log('🎯 Updating bed:', bedId);
-
-                        beds[bedId].status = 'available';
-                        beds[bedId].userId = null;
-                        t.update(roomRef, { beds });
-
-                        // Update booking status and clear any pending leave request
-                        const updateData = {
-                            status: CONSTANTS.STATUS.VACATED,
-                            leaveRequest: null  // Clear any pending vacate request
-                        };
-                        t.update(bRef, updateData);
-                        console.log('✅ Transaction completed - booking vacated and leaveRequest cleared');
-                    });
-                    console.log('✅ Transaction completed successfully');
-                    showToast('Vacated');
-                }, 'Processing Vacate...');
-            } else {
-                console.log('❌ User cancelled');
-            }
+            showConfirm('Vacate Booking?', 'This will mark the booking as vacated and free up the bed immediately.', 'Confirm Vacate', true).then((result) => {
+                if (result.isConfirmed) {
+                    window.safeAsync(async () => {
+                        const bRef = doc(db, CONSTANTS.COLLECTIONS.BOOKINGS, bookingId);
+                        const roomRef = doc(db, CONSTANTS.COLLECTIONS.ROOMS, roomId);
+                        await runTransaction(db, async (t) => {
+                            const rDoc = await t.get(roomRef);
+                            const beds = rDoc.data().beds;
+                            beds[bedId].status = 'available';
+                            beds[bedId].userId = null;
+                            t.update(roomRef, { beds });
+                            t.update(bRef, {
+                                status: CONSTANTS.STATUS.VACATED,
+                                leaveRequest: null
+                            });
+                        });
+                        showToast('Vacated');
+                    }, 'Processing Vacate...');
+                }
+            });
         } else if (action === 'approve') {
-            // Approve without confirmation
             window.safeAsync(async () => {
                 const bRef = doc(db, CONSTANTS.COLLECTIONS.BOOKINGS, bookingId);
                 await updateDoc(bRef, { status: CONSTANTS.STATUS.APPROVED });
@@ -898,29 +1170,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    // Initial load of bookings data
+    // Initial load
     loadBookings();
 
     // --- OUTPASSES ---
     const outpassList = document.getElementById('admin-outpass-list');
     const outpassHistory = document.getElementById('admin-outpass-history');
     const outpassSearch = document.getElementById('outpass-search');
-    let allOutpasses = [];
+    // window.allOutpasses is already declared
 
     const renderOutpasses = () => {
         const q = (outpassSearch?.value || '').toLowerCase();
-
-        // Filter by search
-        const matches = allOutpasses.filter(o =>
+        const matches = window.allOutpasses.filter(o =>
             (o.userName || '').toLowerCase().includes(q) ||
             (o.userEmail || '').toLowerCase().includes(q)
         );
 
-        // Split Data
         const pending = matches.filter(o => o.status === CONSTANTS.STATUS.PENDING);
         const history = matches.filter(o => o.status !== CONSTANTS.STATUS.PENDING);
 
-        // Render Pending List
         if (outpassList) {
             outpassList.innerHTML = pending.length ? pending.map(o => `
                 <div class="p-4 bg-white/60 dark:bg-white/5 rounded-2xl border border-white/20 mb-3 hover:shadow-lg transition-all duration-300">
@@ -947,7 +1215,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             `).join('') : '<div class="text-center py-10 opacity-50"><i class="fas fa-check-circle text-4xl mb-2 text-gray-300"></i><p class="text-xs font-bold uppercase tracking-widest text-gray-400">All Caught Up</p></div>';
         }
 
-        // Render History List
         if (outpassHistory) {
             outpassHistory.innerHTML = history.length ? history.map(o => `
                 <div class="p-3 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-white/5 mb-2 opacity-75 hover:opacity-100 transition-opacity">
@@ -962,7 +1229,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                     </div>
                     <div class="mt-1 flex justify-between items-center text-[9px] text-gray-400">
                          <span>${escapeHTML(o.destination || '')}</span>
-                         <span class="font-mono">${o.passId || ''}</span>
+                         <div class="flex items-center gap-2">
+                            <span class="font-mono">${o.passId || ''}</span>
+                            <button onclick="window.deleteOutpass('${o.id}')" class="text-red-400 hover:text-red-600 px-1" title="Delete Record">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                         </div>
                     </div>
                 </div>
             `).join('') : '<p class="text-center text-gray-400 text-[10px] py-6 uppercase tracking-widest font-bold">No recent history</p>';
@@ -970,32 +1242,60 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     onSnapshot(query(collection(db, CONSTANTS.COLLECTIONS.OUTPASSES), orderBy('timestamp', 'desc')), snap => {
-        allOutpasses = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        window.allOutpasses = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderOutpasses();
+        updateWeeklyChart();
+
+        // Update Analytics tab "Active Outpasses" stat
+        const activeCount = window.allOutpasses.filter(o => o.status === CONSTANTS.STATUS.APPROVED || o.status === CONSTANTS.STATUS.PENDING).length;
+        const statActiveOutpasses = document.getElementById('stat-active-outpasses');
+        if (statActiveOutpasses) statActiveOutpasses.innerText = activeCount;
     });
 
     window.updateOutpass = (id, status, studentId) => {
         window.safeAsync(async () => {
             const passRef = doc(db, CONSTANTS.COLLECTIONS.OUTPASSES, id);
-
-            // 1. Update Status
             const updateData = { status };
-            // Add approval timestamp if approved
             if (status === CONSTANTS.STATUS.APPROVED) {
                 updateData.approvedAt = serverTimestamp();
             }
             await updateDoc(passRef, updateData);
-
-            // 2. Send Notification
             await addDoc(collection(db, CONSTANTS.COLLECTIONS.NOTIFICATIONS), {
                 recipientId: studentId,
                 message: `Outpass ${status}`,
                 timestamp: serverTimestamp(),
                 read: false
             });
-
             showToast('Updated');
         }, 'Updating Outpass...');
+    };
+
+    window.deleteOutpass = (id) => {
+        showConfirm('Delete Outpass?', 'Are you sure you want to delete this outpass record?', 'Delete', true).then((result) => {
+            if (result.isConfirmed) {
+                window.safeAsync(async () => {
+                    await deleteDoc(doc(db, CONSTANTS.COLLECTIONS.OUTPASSES, id));
+                    showToast('Record Deleted');
+                }, 'Deleting...');
+            }
+        });
+    };
+
+    window.clearOutpassHistory = () => {
+        showConfirm('Clear History?', 'This will permanently delete ALL completed outpass records. This cannot be undone.', 'Clear All History', true).then((result) => {
+            if (result.isConfirmed) {
+                window.safeAsync(async () => {
+                    const history = window.allOutpasses.filter(o => o.status !== CONSTANTS.STATUS.PENDING);
+                    if (history.length === 0) return showToast('History is already empty');
+                    const batchSize = 10;
+                    for (let i = 0; i < history.length; i += batchSize) {
+                        const batch = history.slice(i, i + batchSize);
+                        await Promise.all(batch.map(o => deleteDoc(doc(db, CONSTANTS.COLLECTIONS.OUTPASSES, o.id))));
+                    }
+                    showToast(`Cleared ${history.length} records`);
+                }, 'Clearing History...');
+            }
+        });
     };
 
     // --- COMPLAINTS ---
@@ -1003,37 +1303,93 @@ document.addEventListener('DOMContentLoaded', async () => {
     const openComplaintsStat = document.getElementById('stat-open-complaints');
 
     onSnapshot(query(collection(db, CONSTANTS.COLLECTIONS.COMPLAINTS), orderBy('timestamp', 'desc')), snap => {
+        allComplaintsData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        updateComplaintsChart();
+        updateWeeklyChart();
+
         if (openComplaintsStat) openComplaintsStat.innerText = snap.size;
+
+        // Update Analytics tab "Pending Issues" stat
+        const pendingIssuesCount = allComplaintsData.filter(c => c.status !== CONSTANTS.STATUS.RESOLVED).length;
+        const statPendingIssues = document.getElementById('stat-pending-issues');
+        if (statPendingIssues) statPendingIssues.innerText = pendingIssuesCount;
         if (!complaintsList) return;
         complaintsList.innerHTML = snap.docs.map(doc => {
             const c = doc.data();
             return `
-                <div class="p-4 bg-white/60 dark:bg-white/5 rounded-2xl border border-white/20 mb-3">
+                <div class="p-4 bg-white/60 dark:bg-white/5 rounded-2xl border border-white/20 mb-3 hover:shadow-lg transition-all duration-300">
                     <div class="flex justify-between mb-1">
                         <span class="text-[8px] font-bold uppercase text-indigo-500">${escapeHTML(c.category)}</span>
                         <span class="text-[8px] font-bold uppercase ${c.status === CONSTANTS.STATUS.RESOLVED ? 'text-green-500' : 'text-amber-500'}">${c.status}</span>
                     </div>
                     <p class="font-bold text-xs">${escapeHTML(c.title)}</p>
                     <p class="text-[10px] text-gray-400 mt-1">${escapeHTML(c.description)}</p>
-                    <div class="mt-3 flex gap-2">
-                        <button class="resolve-btn text-[10px] font-bold text-green-600" data-id="${doc.id}">Resolve</button>
-                        <button class="del-btn text-[10px] font-bold text-red-500" data-id="${doc.id}">Delete</button>
+                    <div class="mt-3 pt-3 border-t border-gray-100 dark:border-white/5 flex gap-2">
+                        ${c.status !== CONSTANTS.STATUS.RESOLVED ? `<button onclick="window.resolveComplaint('${doc.id}')"
+                            class="flex-1 py-2 bg-green-50 dark:bg-green-500/10 text-green-600 text-[10px] font-bold rounded-xl hover:bg-green-100 dark:hover:bg-green-500/20 transition-colors">
+                            <i class="fas fa-check mr-1"></i>Resolve
+                        </button>` : `<span class="flex-1 py-2 text-center text-green-500 text-[10px] font-bold rounded-xl bg-green-50 dark:bg-green-500/10"><i class="fas fa-check-circle mr-1"></i>Resolved</span>`}
+                        <button onclick="window.deleteComplaint('${doc.id}')"
+                            class="flex-1 py-2 bg-red-50 dark:bg-red-500/10 text-red-500 text-[10px] font-bold rounded-xl hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors">
+                            <i class="fas fa-trash mr-1"></i>Delete
+                        </button>
                     </div>
                 </div>
             `;
         }).join('');
     });
 
-    complaintsList?.addEventListener('click', e => {
-        const btn = e.target.closest('button');
-        if (!btn) return;
-        const id = btn.dataset.id;
+    // --- Complaint Action Handlers ---
+    window.resolveComplaint = (id) => {
         window.safeAsync(async () => {
-            if (btn.classList.contains('resolve-btn')) await updateDoc(doc(db, CONSTANTS.COLLECTIONS.COMPLAINTS, id), { status: CONSTANTS.STATUS.RESOLVED });
-            if (btn.classList.contains('del-btn')) await deleteDoc(doc(db, CONSTANTS.COLLECTIONS.COMPLAINTS, id));
-            showToast('Done');
-        }, 'Updating...');
+            await updateDoc(doc(db, CONSTANTS.COLLECTIONS.COMPLAINTS, id), {
+                status: CONSTANTS.STATUS.RESOLVED,
+                resolvedAt: serverTimestamp()
+            });
+            showToast('Complaint resolved');
+        }, 'Resolving...');
+    };
+
+    window.deleteComplaint = (id) => {
+        Swal.fire({
+            title: 'Delete Complaint?',
+            text: 'This action cannot be undone.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel',
+            customClass: {
+                popup: 'glass-panel rounded-[2rem] border border-white/20 shadow-xl',
+                title: 'text-xl font-bold text-gray-900 dark:text-white',
+                htmlContainer: 'text-sm text-gray-500 dark:text-gray-400',
+                confirmButton: 'bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-xl shadow-lg shadow-red-500/30 transition-all transform hover:scale-105',
+                cancelButton: 'bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold py-2 px-4 rounded-xl transition-all ml-2'
+            },
+            buttonsStyling: false
+        }).then(result => {
+            if (result.isConfirmed) {
+                window.safeAsync(async () => {
+                    await deleteDoc(doc(db, CONSTANTS.COLLECTIONS.COMPLAINTS, id));
+                    showToast('Complaint deleted');
+                }, 'Deleting...');
+            }
+        });
+    };
+
+
+
+
+
+    // --- ROOMS LISTENER for CAPACITY ---
+    onSnapshot(collection(db, CONSTANTS.COLLECTIONS.ROOMS), snap => {
+        allRoomsData = snap.docs.map(d => d.data());
+        totalBeds = allRoomsData.reduce((acc, room) => acc + (room.beds ? room.beds.length : 0), 0);
+        updateOccupancyChart();
     });
+
+
+
+
 
     // --- MESS MENU ---
     const menuForm = document.getElementById('menu-form');
@@ -1171,15 +1527,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Clear All Broadcasts
         document.getElementById('clear-broadcasts-btn')?.addEventListener('click', () => {
-            if (window.confirm('Clear History? This will delete all broadcast records.')) {
-                window.safeAsync(async () => {
-                    const snap = await getDocs(query(collection(db, CONSTANTS.COLLECTIONS.NOTIFICATIONS), where('recipientId', '==', null)));
-                    const batch = writeBatch(db);
-                    snap.docs.forEach(d => batch.delete(d.ref));
-                    await batch.commit();
-                    showToast('History Cleared');
-                }, 'Clearing...');
-            }
+            showConfirm('Clear Broadcast History?', 'This will delete all broadcast records permanently.', 'Clear All', true).then((result) => {
+                if (result.isConfirmed) {
+                    window.safeAsync(async () => {
+                        const snap = await getDocs(query(collection(db, CONSTANTS.COLLECTIONS.NOTIFICATIONS), where('recipientId', '==', null)));
+                        const batch = writeBatch(db);
+                        snap.docs.forEach(d => batch.delete(d.ref));
+                        await batch.commit();
+                        showToast('History Cleared');
+                    }, 'Clearing...');
+                }
+            });
         });
     }
 
@@ -1234,15 +1592,66 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Clear Board
     document.getElementById('delete-all-notices-btn')?.addEventListener('click', () => {
-        if (window.confirm('Clear Board? This will delete all notices.')) {
-            window.safeAsync(async () => {
-                const snap = await getDocs(collection(db, CONSTANTS.COLLECTIONS.NOTICES));
-                const batch = writeBatch(db);
-                snap.docs.forEach(d => batch.delete(d.ref));
-                await batch.commit();
-                showToast('Board Cleared');
-            }, 'Clearing...');
-        }
+        showConfirm('Clear Notice Board?', 'This will remove all notices from the board.', 'Clear Board', true).then((result) => {
+            if (result.isConfirmed) {
+                window.safeAsync(async () => {
+                    const snap = await getDocs(collection(db, CONSTANTS.COLLECTIONS.NOTICES));
+                    const batch = writeBatch(db);
+                    snap.docs.forEach(d => batch.delete(d.ref));
+                    await batch.commit();
+                    showToast('Board Cleared');
+                }, 'Clearing...');
+            }
+        });
     });
+
+    // --- Analytics Functions ---
+    window.refreshAnalytics = async function () {
+        const btn = document.querySelector('button[onclick="window.refreshAnalytics()"]');
+        if (btn) btn.classList.add('animate-spin');
+
+        try {
+            console.log("Refreshing Analytics...");
+            // 1. Total Students
+            const studentsQuery = query(collection(db, CONSTANTS.COLLECTIONS.USERS), where('role', '==', 'student'));
+            const studentsSnap = await getCountFromServer(studentsQuery);
+            const studentCount = studentsSnap.data().count;
+            const studentEl = document.getElementById('stat-total-students');
+            if (studentEl) studentEl.textContent = studentCount;
+
+            // 2. Pending Issues (Complaints)
+            const issuesQuery = query(collection(db, CONSTANTS.COLLECTIONS.COMPLAINTS), where('status', 'in', ['open', 'pending']));
+            const issuesSnap = await getCountFromServer(issuesQuery);
+            const issuesCount = issuesSnap.data().count;
+            const issuesEl = document.getElementById('stat-pending-issues');
+            if (issuesEl) issuesEl.textContent = issuesCount;
+
+            // 3. Active Outpasses (Approved)
+            const outpassQuery = query(collection(db, CONSTANTS.COLLECTIONS.OUTPASSES), where('status', '==', 'approved'));
+            const outpassSnap = await getCountFromServer(outpassQuery);
+            const outpassCount = outpassSnap.data().count;
+            const outpassEl = document.getElementById('stat-active-outpasses');
+            if (outpassEl) outpassEl.textContent = outpassCount;
+
+            // Update Charts
+            updateComplaintsChart?.();
+            updateOccupancyChart?.();
+            updateWeeklyChart?.();
+
+            showToast('Analytics Refreshed');
+        } catch (error) {
+            console.error("Analytics Error:", error);
+            showToast('Failed to load analytics', true);
+        } finally {
+            if (btn) btn.classList.remove('animate-spin');
+        }
+    };
+
+    // Initial Call if tab is active (Check periodically or on load)
+    setTimeout(() => {
+        if (document.querySelector('[x-show="currentTab === \'analytics\'"]')?.style.display !== 'none') {
+            window.refreshAnalytics();
+        }
+    }, 1000);
 
 });
