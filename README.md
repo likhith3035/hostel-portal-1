@@ -292,6 +292,25 @@ Navigate to `http://localhost:8000` — You're all set! 🎉
 
 ---
 
+## 🔮 Roadmap
+
+- [ ] **Push Notifications**: Real-time alerts for outpass approvals.
+- [ ] **Parent Portal**: Dedicated login for parents to view attendance and expenses.
+- [ ] **Payment Gateway**: Integration for hostel fee payments.
+- [ ] **AI Chatbot**: For answering common student queries regarding rules and mess.
+
+---
+
+## ❓ Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| **White Screen / No Data** | Check your internet connection and ensure Firestore rules allow read access. |
+| **Login Fails** | Verify that you have created an account in the Authentication tab of Firebase Console. |
+| **Map Not Loading** | Ensure `booking.js` is correctly linked and your browser supports SVG rendering. |
+
+---
+
 ## 🤝 Contributing
 
 Contributions are welcome! Here's how:
