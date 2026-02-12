@@ -221,6 +221,7 @@ hostel-portal-2/
 │   ├── 📁 firebase/                 # Firebase SDK wrappers
 │   ├── 📁 core/                     # DB services & constants
 │   ├── 📁 security/                 # Encryption & audit utils
+│   ├── 📁 components/               # Reusable UI components
 │   ├── admin.js                     # Admin logic (80KB+)
 │   ├── booking.js                   # Room booking logic
 │   ├── outpass.js                   # Outpass logic
@@ -278,6 +279,22 @@ const firebaseConfig = {
 };
 ```
 
+
+### Step 3.1 — EmailJS Setup (Optional)
+
+This project uses **EmailJS** for sending emails without a backend server.
+
+1.  Create an account at [EmailJS](https://www.emailjs.com/).
+2.  Create a **Service** (e.g., Gmail).
+3.  Create an **Email Template**.
+4.  Update the Public Key in `js/admin.js` and `js/outpass.js` where `emailjs.init()` is called.
+
+```javascript
+emailjs.init("YOUR_PUBLIC_KEY");
+```
+
+---
+
 ### Step 4 — Launch
 
 | Method | Command |
@@ -289,6 +306,31 @@ const firebaseConfig = {
 ### Step 5 — Open
 
 Navigate to `http://localhost:8000` — You're all set! 🎉
+
+---
+
+## 🚀 Deployment
+
+The easiest way to deploy this project is with **Netlify**.
+
+### Option 1: Drag & Drop (Recommended)
+1.  Go to [Netlify Drop](https://app.netlify.com/drop).
+2.  Drag the `hostel-portal-2` folder onto the page.
+3.  **Done!** Your site is live. 
+
+> [!IMPORTANT]  
+> Remember to add your Netlify domain (e.g., `https://your-site.netlify.app`) to **Firebase Console → Authentication → Settings → Authorized Domains** to allow sign-ins.
+
+### Option 2: Netlify CLI
+```bash
+npm install netlify-cli -g
+netlify login
+netlify deploy --prod
+```
+
+### Option 3: Vercel / GitHub Pages
+- **Vercel**: Install Vercel CLI or import from GitHub.
+- **GitHub Pages**: Not recommended for this specific setup due to SPA routing with history API, but possible with configuration.
 
 ---
 
@@ -362,3 +404,33 @@ git push origin feature/AmazingFeature
 <p align="center">
   <sub>⭐ Star this repo if you found it useful!</sub>
 </p>
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License**.
+
+```text
+MIT License
+
+Copyright (c) 2024 Likhith Kami
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
