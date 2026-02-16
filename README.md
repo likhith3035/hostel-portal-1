@@ -132,7 +132,7 @@ This project was built to simulate a **real-world hostel management ecosystem**,
 
 | **Student Dashboard** | **Room Booking** |
 |:---:|:---:|
-| <img src="assets/images/dashboard.png" alt="Student Dashboard" width="400"/> | <img src="assets/images/booking.png" alt="Room Booking" width="400"/> |
+| <img src="C:\Users\kamil\OneDrive\Pictures\Saved Pictures\Screenshots\Screenshot 2026-02-16 181512.png" alt="Student Dashboard" width="400"/> | <img src="assets/images/booking.png" alt="Room Booking" width="400"/> |
 | *Real-time notices & menu* | *Interactive campus map* |
 
 | **Admin Panel** | **Mobile View** |
